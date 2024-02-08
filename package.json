@@ -1,6 +1,6 @@
 {
   "name": "react-native-zoomable",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Performant zoom for images, videos and other components",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -35,9 +35,32 @@
     "release": "release-it"
   },
   "keywords": [
+    "rn",
     "react-native",
-    "ios",
-    "android"
+    "react-native-zoomable",
+    "react-native-image-zoom",
+    "react-native-video-zoom",
+    "react-native-zoom",
+    "zoom",
+    "zoomable",
+    "resumable-zoom",
+    "resetable-zoom",
+    "image-zoom",
+    "zoomable-image",
+    "zoom-image",
+    "video-zoom",
+    "zoomable-video",
+    "zoom-video",
+    "reanimated",
+    "picture",
+    "gesture",
+    "photo",
+    "pan",
+    "pinch",
+    "double-tap",
+    "ui-lib",
+    "typescript",
+    "instagram"
   ],
   "repository": {
     "type": "git",
