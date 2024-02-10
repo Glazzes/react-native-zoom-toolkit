@@ -26,21 +26,21 @@ type ResizeConfig = {
 
 type ResetableZoomProps = {
   resizeConfig?: ResizeConfig;
-  gesturesEnabled?: boolean;
+  onGestureEnd?: (finished: boolean) => void;
 } & CommonZoomProps &
   CommonZoomCallbacks;
 
 const ResetableZoom: React.FC<ResetableZoomProps> = ({
   children,
-  resizeConfig,
   zIndex: zIndexByUser = 0,
   hitSlop = DEFAULT_HITSLOP,
+  resizeConfig,
   timingConfig,
-  gesturesEnabled = true,
   onTap,
   onDoubleTap,
   onPinchStart,
   onPinchEnd,
+  onGestureEnd,
 }) => {
   const width = useSharedValue<number | undefined>(resizeConfig?.size.width);
   const height = useSharedValue<number | undefined>(resizeConfig?.size.height);
@@ -53,7 +53,6 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
-    .enabled(gesturesEnabled)
     .onStart((e) => {
       if (onPinchStart) {
         runOnJS(onPinchStart)(e);
@@ -85,12 +84,15 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
         if (finished) {
           zIndex.value = 0;
         }
+
+        if (onGestureEnd) {
+          runOnJS(onGestureEnd)(finished as boolean);
+        }
       });
     });
 
   const tap = Gesture.Tap()
     .maxDuration(250)
-    .enabled(gesturesEnabled)
     .onStart((e) => {
       if (onTap) {
         runOnJS(onTap)(e);
@@ -100,7 +102,6 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .maxDuration(250)
-    .enabled(gesturesEnabled)
     .onStart((e) => {
       if (onDoubleTap) {
         runOnJS(onDoubleTap)(e);
@@ -176,10 +177,7 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
         </View>
       </Animated.View>
       <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
-        <Animated.View
-          pointerEvents={gesturesEnabled ? undefined : 'none'}
-          style={dummyStyles}
-        />
+        <Animated.View style={dummyStyles} />
       </GestureDetector>
     </View>
   );
