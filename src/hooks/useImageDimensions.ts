@@ -3,8 +3,11 @@ import { Image } from 'react-native';
 import { type CanvasSize, type Source } from '../types';
 
 export const useImageDimensions = (source: Source) => {
-  const deps = JSON.stringify(source);
-  const [dimensions, setDimensions] = useState<CanvasSize>();
+  const [dimensions, setDimensions] = useState<CanvasSize>({
+    width: 1,
+    height: 1,
+  });
+
   const [error, setError] = useState<Error>();
 
   const handleSizeChange = (width: number, height: number): void => {
@@ -15,6 +18,7 @@ export const useImageDimensions = (source: Source) => {
     setError(e);
   };
 
+  const deps = JSON.stringify(source);
   useEffect(() => {
     if (source.headers === undefined) {
       Image.getSize(source.uri, handleSizeChange, handleError);

@@ -6,14 +6,12 @@ type Options = {
   maxHeight?: number;
 };
 
-export const calculateAspectRatioDimensions = (
-  options: Options
-): CanvasSize => {
+export const calculateAspectRatioSize = (options: Options): CanvasSize => {
   'worklet';
   const { aspecRatio, maxWidth, maxHeight } = options;
   if (maxWidth) {
     return {
-      width: maxWidth,
+      width: Math.round(maxWidth),
       height: Math.round(maxWidth / aspecRatio),
     };
   }
@@ -21,7 +19,7 @@ export const calculateAspectRatioDimensions = (
   if (maxHeight) {
     return {
       width: Math.round(maxHeight * aspecRatio),
-      height: maxHeight,
+      height: Math.round(maxHeight),
     };
   }
 
