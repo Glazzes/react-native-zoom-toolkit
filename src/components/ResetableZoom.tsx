@@ -13,16 +13,11 @@ import Animated, {
 import type {
   CommonZoomCallbacks,
   CommonZoomProps,
-  CanvasSize,
+  ResizeConfig,
 } from '../types';
 import { useVector } from '../hooks/useVector';
 import { DEFAULT_HITSLOP } from '../constants';
-
-type ResizeConfig = {
-  size: CanvasSize;
-  aspectRatio: number;
-  scale: number;
-};
+import { StyleSheet } from 'react-native';
 
 type ResetableZoomProps = {
   resizeConfig?: ResizeConfig;
@@ -31,7 +26,7 @@ type ResetableZoomProps = {
 } & CommonZoomProps &
   CommonZoomCallbacks;
 
-const ResetableZoom: React.FC<ResetableZoomProps> = ({
+const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
   children,
   zIndex: zIndexByUser = 0,
   hitSlop = DEFAULT_HITSLOP,
@@ -67,7 +62,7 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
     })
     .onChange((e) => {
       const deltaX = e.focalX - (width.value ?? 0) / 2 - origin.x.value;
-      const deltaY = e.focalY - (width.value ?? 0) / 2 - origin.y.value;
+      const deltaY = e.focalY - (height.value ?? 0) / 2 - origin.y.value;
 
       const toX = -1 * (origin.x.value * e.scale - origin.x.value) + deltaX;
       const toY = -1 * (origin.y.value * e.scale - origin.y.value) + deltaY;
@@ -115,7 +110,7 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
 
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
-  const dummyStyles = useAnimatedStyle(() => ({
+  const fixedSizeStyle = useAnimatedStyle(() => ({
     width: width.value,
     height: height.value,
     position: 'absolute',
@@ -161,6 +156,8 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
       width: endWidth,
       height: endHeight,
       zIndex: zIndex.value,
+      justifyContent: 'center',
+      alignItems: 'center',
       transform: [
         { translateX: translate.x.value - diffX },
         { translateY: translate.y.value - diffY },
@@ -170,27 +167,38 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
   });
 
   const onLayout = (e: LayoutChangeEvent) => {
-    width.value = e.nativeEvent.layout.width;
-    height.value = e.nativeEvent.layout.height;
+    if (resizeConfig === undefined) {
+      width.value = e.nativeEvent.layout.width;
+      height.value = e.nativeEvent.layout.height;
+    }
   };
 
   return (
-    <View>
-      <Animated.View style={animatedStyle}>
-        <View onLayout={onLayout} collapsable={false}>
+    <View style={styles.center}>
+      {resizeConfig ? (
+        <Animated.View style={[fixedSizeStyle, { position: undefined }]}>
+          <Animated.View style={[animatedStyle]}>{children}</Animated.View>
+        </Animated.View>
+      ) : (
+        <Animated.View style={animatedStyle} onLayout={onLayout}>
           {children}
-        </View>
-      </Animated.View>
-      <GestureDetector
-        gesture={Gesture.Simultaneous(pinch, composedTapGesture)}
-      >
+        </Animated.View>
+      )}
+      <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
         <Animated.View
           pointerEvents={gesturesEnabled ? undefined : 'none'}
-          style={dummyStyles}
+          style={fixedSizeStyle}
         />
       </GestureDetector>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default ResetableZoom;
