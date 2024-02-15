@@ -38,7 +38,7 @@ No additional setup is required.
 As its name suggests, it returns to its original position after the pinch gesture ends, this is very useful when dealing with previews of some sort, for instance how Telegram does it for chat messages containing images or Instagram for post previews. 
 
 >[!NOTE]
->This component works by overlaying an animated view on top of your component when gestures are enabled, therefore it will block all touches to your component, consider using `onTap` and `onDoubleTap` properties for touch handling.
+>This component works by overlaying an animated view on top of your component when gestures are enabled, therefore it will block all pointer events to your component, consider using `onTap` and `onDoubleTap` properties for touch handling instead.
 
 Its usage is pretty straight forward, import `ResetableZoom` component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it, for instance:
 
@@ -46,14 +46,14 @@ Its usage is pretty straight forward, import `ResetableZoom` component from `@gl
 import { ResetableZoom } from "@glazzes/react-native-zoomable"
 
 <ResetableZoom
-  zIndex={100}
   hitSlop={{ vertical: 50, horizontal: 50 }}
   timingConfig={{ duration: 150, easing: Easing.linear }}
   onTap={(e) => console.log(e)}
   onDoubleTap={(e) => console.log(e)}
   onPinchStart={(e) => console.log(e)}
   onPinchEnd={(e) => console.log(e)}
-  onGestureEnd={(finished) => console.log(finished)}>
+  onGestureActive={e => console.log(e)}
+  onGestureEnd={() => console.log('animation finished!')}>
     <Image {/* <= This could be an Expo image or a Video */}
       source={{ uri: IMAGE }}
       style={{ width: 200, height: 200 }}
@@ -65,18 +65,17 @@ import { ResetableZoom } from "@glazzes/react-native-zoomable"
 #### Properties
 | Property        | Type     | Default                        | Description                                                                                                                                                                                                                                                          |
 | --------------- | -------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| zIndex          | number   | 0                              | if your component uses the zIndex style property, consider using this property instead, also see [notes](#resetablezoom-notes)                                                                                                                                                                                               |
 | hitslop         | object   | undefined | increases the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components, see [hitslop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
-| timingConfig    | object   | undefined                      | custom timing configirutation used to snap back to the original position, see [timing config](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)                                                                                |
-| resizeConfig    | object   | undefined                      | dynamically recalculate the `ResetableZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#resetablezoom-notes).                                                            |
-| gesturesEnabled | boolean  | true                           | enables and disables gestures, when disabled your component can detect touches again  |
+| timingConfig    | object   | undefined                      | custom Reanimated's timing configirutation used to snap back to the original position, see [timing config](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)                                                                                |
+| resizeConfig    | object   | undefined                      | dynamically recalculate the `ResetableZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#resetablezoom's-notes).                                                            |
+| gesturesEnabled | boolean  | true                           | enables and disables gestures, when gestures are disabled your component can detect pointer events again  |
 | onTap           | function | undefined                      | callback fired when a single tap is made                                                                                                                                                                                                                             |
 | onDoubleTap     | function | undefined                      | callback fired when a double tap is made                                                                                                                                                                                                                             |
 | onPinchStart    | function | undefined                      | callback fired when the pinch gesture starts                                                                                                                                                                                                                         |
-| onPinchEnd      | function | undefined                      | callback fired as soon as the user lift their fingers off the screen                                                                                                                                                                                                 |
-| onGestureEnd    | function | undefined                      | callback fired once the snap back animated has finished successfuly or not, it takes a boolean parameter indicating its success or failure                                                                                                                                                                                             |
-#### ResetableZoom Notes
-**zIndex:** due to the historical lack of support for this property for Android, I adsive a quick read to [Expo's documentation](https://docs.expo.dev/ui-programming/z-index/) about this property if you aim to build complex interactions.
+| onPinchEnd      | function | undefined                      | callback fired as soon as the user lift their fingers off the screen after pinching |
+| onGestureActive | function | undefined                      | [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) fired from the moment pinch gesture starts until the snap back animation finishes, as its only argument receives the state of the gesture that includes position in `x` and `y`, `width`, `height`, `translateX`, `translateY` and `scale` values, useful when you want to mirror the current pinch gesture to some other component |
+| onGestureEnd    | function | undefined                      | callback fired once the snap back animation has finished                                                                                                                                                                                             |
+#### ResetableZoom's Notes
 
 **resizeConfig:** everything is better with an example, imagine you have a lot of images you want to render as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1980x1080 pixel size and you would like this image to resize in a way the aspect ratio is no longer compromised when the image as scaled two times by the pinch gesture, your object would look like this
 ```javascript
