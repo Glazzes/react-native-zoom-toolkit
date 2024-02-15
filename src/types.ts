@@ -1,4 +1,3 @@
-import type React from 'react';
 import type {
   GestureStateChangeEvent,
   PinchGestureHandlerEventPayload,
@@ -17,19 +16,36 @@ export type CanvasSize = {
   height: number;
 };
 
+export type ResizeConfig = {
+  size: CanvasSize;
+  aspectRatio: number;
+  scale: number;
+};
+
+// Commom component stuff
 export type CommonZoomProps = {
-  children?: React.ReactNode;
-  zIndex?: number;
   hitSlop?: HitSlop;
   timingConfig?: WithTimingConfig;
 };
 
-type OnTapEvent = GestureStateChangeEvent<TapGestureHandlerEventPayload>;
-type OnPinchEvent = GestureStateChangeEvent<PinchGestureHandlerEventPayload>;
+export type OnTapEvent = GestureStateChangeEvent<TapGestureHandlerEventPayload>;
+export type OnPinchEvent =
+  GestureStateChangeEvent<PinchGestureHandlerEventPayload>;
 
-export type CommonZoomCallbacks = {
+export type PinchContext = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  translateX: number;
+  translateY: number;
+  scale: number;
+};
+
+export type CommonZoomCallbackProps = {
   onTap?: (e: OnTapEvent) => void;
   onDoubleTap?: (e: OnTapEvent) => void;
   onPinchStart?: (e: OnPinchEvent) => void;
   onPinchEnd?: (e: OnPinchEvent, success: boolean) => void;
+  onGestureActive?: (context: PinchContext) => void;
 };

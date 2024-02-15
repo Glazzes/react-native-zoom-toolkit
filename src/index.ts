@@ -1,3 +1,5 @@
 export { default as ResetableZoom } from './components/ResetableZoom';
-export { useImageDimensions } from './hooks/useImageDimensions';
+export { useImageSize } from './hooks/useImageSize';
 export { calculateAspectRatioSize } from './utils';
+
+export type * from './types';

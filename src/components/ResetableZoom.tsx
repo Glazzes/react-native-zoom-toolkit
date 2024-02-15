@@ -1,34 +1,37 @@
 import React from 'react';
-import { View, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  Extrapolation,
-  interpolate,
+  measure,
   runOnJS,
+  useAnimatedRef,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
 import type {
-  CommonZoomCallbacks,
+  CommonZoomCallbackProps,
   CommonZoomProps,
   ResizeConfig,
 } from '../types';
 import { useVector } from '../hooks/useVector';
 import { DEFAULT_HITSLOP } from '../constants';
-import { StyleSheet } from 'react-native';
+import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
 
-type ResetableZoomProps = {
+type Props = {
   resizeConfig?: ResizeConfig;
   gesturesEnabled?: boolean;
-  onGestureEnd?: (finished: boolean) => void;
-} & CommonZoomProps &
-  CommonZoomCallbacks;
+  onGestureEnd?: () => void;
+};
 
-const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
+type ResetableZoomProps = React.PropsWithChildren<Props> &
+  CommonZoomProps &
+  CommonZoomCallbackProps;
+
+const ResetableZoom: React.FC<ResetableZoomProps> = ({
   children,
-  zIndex: zIndexByUser = 0,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
   timingConfig,
@@ -37,32 +40,62 @@ const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
   onDoubleTap,
   onPinchStart,
   onPinchEnd,
+  onGestureActive,
   onGestureEnd,
 }) => {
-  const width = useSharedValue<number | undefined>(resizeConfig?.size.width);
-  const height = useSharedValue<number | undefined>(resizeConfig?.size.height);
+  const position = useVector(0, 0);
+  const width = useSharedValue<number>(resizeConfig?.size.width ?? 0);
+  const height = useSharedValue<number>(resizeConfig?.size.height ?? 0);
 
   const translate = useVector(0, 0);
   const origin = useVector(0, 0);
-
   const scale = useSharedValue<number>(1);
-  const zIndex = useSharedValue<number>(0);
+
+  const isPinchActive = useSharedValue<boolean>(false);
+
+  const containerRef = useAnimatedRef();
+  const measurePinchContainer = () => {
+    'worklet';
+    if (onGestureActive !== undefined) {
+      const measuremet = measure(containerRef);
+      if (measuremet) {
+        position.x.value = measuremet.pageX;
+        position.y.value = measuremet.pageY;
+      }
+    }
+  };
+
+  useDerivedValue(() => {
+    if (onGestureActive !== undefined && isPinchActive.value) {
+      onGestureActive({
+        x: position.x.value,
+        y: position.y.value,
+        width: width.value,
+        height: height.value,
+        translateX: translate.x.value,
+        translateY: translate.y.value,
+        scale: scale.value,
+      });
+    }
+  }, [position, translate, scale, width, height, isPinchActive]);
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled)
     .onStart((e) => {
+      origin.x.value = e.focalX - width.value / 2;
+      origin.y.value = e.focalY - height.value / 2;
+
+      measurePinchContainer();
       if (onPinchStart) {
         runOnJS(onPinchStart)(e);
       }
 
-      zIndex.value = zIndexByUser;
-      origin.x.value = e.focalX - (width.value ?? 0) / 2;
-      origin.y.value = e.focalY - (height.value ?? 0) / 2;
+      isPinchActive.value = true;
     })
-    .onChange((e) => {
-      const deltaX = e.focalX - (width.value ?? 0) / 2 - origin.x.value;
-      const deltaY = e.focalY - (height.value ?? 0) / 2 - origin.y.value;
+    .onUpdate((e) => {
+      const deltaX = e.focalX - width.value / 2 - origin.x.value;
+      const deltaY = e.focalY - height.value / 2 - origin.y.value;
 
       const toX = -1 * (origin.x.value * e.scale - origin.x.value) + deltaX;
       const toY = -1 * (origin.y.value * e.scale - origin.y.value) + deltaY;
@@ -72,19 +105,17 @@ const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
       scale.value = e.scale;
     })
     .onEnd((e, success) => {
-      if (onPinchEnd) {
+      if (onPinchEnd !== undefined) {
         runOnJS(onPinchEnd)(e, success);
       }
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
-      scale.value = withTiming(1, timingConfig, (finished) => {
-        if (finished) {
-          zIndex.value = 0;
-        }
+      scale.value = withTiming(1, timingConfig, (_) => {
+        isPinchActive.value = false;
 
-        if (onGestureEnd) {
-          runOnJS(onGestureEnd)(finished as boolean);
+        if (onGestureEnd !== undefined) {
+          runOnJS(onGestureEnd)();
         }
       });
     });
@@ -92,8 +123,8 @@ const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
   const tap = Gesture.Tap()
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onStart((e) => {
-      if (onTap) {
+    .onEnd((e) => {
+      if (onTap !== undefined) {
         runOnJS(onTap)(e);
       }
     });
@@ -102,65 +133,36 @@ const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
     .numberOfTaps(2)
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onStart((e) => {
-      if (onDoubleTap) {
+    .onEnd((e) => {
+      if (onDoubleTap !== undefined) {
         runOnJS(onDoubleTap)(e);
       }
     });
 
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
-  const fixedSizeStyle = useAnimatedStyle(() => ({
-    width: width.value,
-    height: height.value,
-    position: 'absolute',
-  }));
-
-  const animatedStyle = useAnimatedStyle(() => {
-    let endWidth = width.value ?? 0;
-    let endHeight = height.value ?? 0;
-    if (resizeConfig !== undefined) {
-      const { size, aspectRatio, scale: maxScale } = resizeConfig;
-      const isWide = aspectRatio > 1;
-
-      endWidth = isWide
-        ? interpolate(
-            scale.value,
-            [1, maxScale],
-            [size.width, size.height * aspectRatio],
-            Extrapolation.CLAMP
-          )
-        : size.width;
-
-      endHeight = isWide
-        ? size.height
-        : interpolate(
-            scale.value,
-            [1, maxScale],
-            [size.height, size.width / aspectRatio],
-            Extrapolation.CLAMP
-          );
-    }
-
-    if (endWidth === 0 && endHeight === 0) {
-      return {
-        width: undefined,
-        height: undefined,
-      };
-    }
-
-    const diffX = (endWidth - (width.value ?? 0)) / 2;
-    const diffY = (endHeight - (height.value ?? 0)) / 2;
-
+  const containerStyle = useAnimatedStyle(() => {
     return {
-      width: endWidth,
-      height: endHeight,
-      zIndex: zIndex.value,
-      justifyContent: 'center',
-      alignItems: 'center',
+      width: width.value === 0 ? undefined : width.value,
+      height: height.value === 0 ? undefined : height.value,
+    };
+  });
+
+  const childrenStyle = useAnimatedStyle(() => {
+    const resized = resizeToAspectRatio({
+      resizeConfig,
+      width: width.value,
+      height: height.value,
+      scale: scale.value,
+    });
+
+    const { width: finalWidth, height: finalHeight, deltaX, deltaY } = resized;
+    return {
+      width: finalWidth === 0 ? undefined : finalWidth,
+      height: finalHeight === 0 ? undefined : finalHeight,
       transform: [
-        { translateX: translate.x.value - diffX },
-        { translateY: translate.y.value - diffY },
+        { translateX: translate.x.value - deltaX },
+        { translateY: translate.y.value - deltaY },
         { scale: scale.value },
       ],
     };
@@ -175,21 +177,22 @@ const ResetableZoom: React.FC<React.PropsWithChildren<ResetableZoomProps>> = ({
 
   return (
     <View style={styles.center}>
-      {resizeConfig ? (
-        <Animated.View style={[fixedSizeStyle, { position: undefined }]}>
-          <Animated.View style={[animatedStyle]}>{children}</Animated.View>
-        </Animated.View>
-      ) : (
-        <Animated.View style={animatedStyle} onLayout={onLayout}>
-          {children}
-        </Animated.View>
-      )}
       <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
         <Animated.View
           pointerEvents={gesturesEnabled ? undefined : 'none'}
-          style={fixedSizeStyle}
+          style={[containerStyle, styles.absolute]}
         />
       </GestureDetector>
+
+      <Animated.View style={[containerStyle, styles.center]}>
+        <Animated.View
+          ref={containerRef}
+          style={childrenStyle}
+          onLayout={resizeConfig ? undefined : onLayout}
+        >
+          {children}
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 };
@@ -198,6 +201,10 @@ const styles = StyleSheet.create({
   center: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  absolute: {
+    position: 'absolute',
+    zIndex: 1,
   },
 });
 

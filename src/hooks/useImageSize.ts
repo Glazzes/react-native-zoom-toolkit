@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { type CanvasSize, type Source } from '../types';
 
-export const useImageDimensions = (source: Source) => {
+export const useImageSize = (source: Source) => {
   const [dimensions, setDimensions] = useState<CanvasSize>({
     width: 1,
     height: 1,
