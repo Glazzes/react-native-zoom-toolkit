@@ -3,15 +3,11 @@ import { Image } from 'react-native';
 import { type CanvasSize, type Source } from '../types';
 
 export const useImageSize = (source: Source) => {
-  const [dimensions, setDimensions] = useState<CanvasSize>({
-    width: 1,
-    height: 1,
-  });
-
+  const [size, setSize] = useState<CanvasSize | undefined>(undefined);
   const [error, setError] = useState<Error>();
 
   const handleSizeChange = (width: number, height: number): void => {
-    setDimensions({ width, height });
+    setSize({ width, height });
   };
 
   const handleError = (e: Error): void => {
@@ -34,5 +30,5 @@ export const useImageSize = (source: Source) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deps]);
 
-  return { dimensions, error };
+  return { size, error };
 };

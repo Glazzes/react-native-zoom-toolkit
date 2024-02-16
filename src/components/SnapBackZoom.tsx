@@ -10,15 +10,15 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { useVector } from '../hooks/useVector';
+import { DEFAULT_HITSLOP } from '../constants';
+import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
 
 import type {
   CommonZoomCallbackProps,
   CommonZoomProps,
   ResizeConfig,
 } from '../types';
-import { useVector } from '../hooks/useVector';
-import { DEFAULT_HITSLOP } from '../constants';
-import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
 
 type Props = {
   resizeConfig?: ResizeConfig;
@@ -26,11 +26,11 @@ type Props = {
   onGestureEnd?: () => void;
 };
 
-type ResetableZoomProps = React.PropsWithChildren<Props> &
+type SnapBackZoomProps = React.PropsWithChildren<Props> &
   CommonZoomProps &
   CommonZoomCallbackProps;
 
-const ResetableZoom: React.FC<ResetableZoomProps> = ({
+const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   children,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
@@ -56,12 +56,14 @@ const ResetableZoom: React.FC<ResetableZoomProps> = ({
   const containerRef = useAnimatedRef();
   const measurePinchContainer = () => {
     'worklet';
-    if (onGestureActive !== undefined) {
-      const measuremet = measure(containerRef);
-      if (measuremet) {
-        position.x.value = measuremet.pageX;
-        position.y.value = measuremet.pageY;
-      }
+    if (onGestureActive === undefined) {
+      return;
+    }
+
+    const measuremet = measure(containerRef);
+    if (measuremet !== null) {
+      position.x.value = measuremet.pageX;
+      position.y.value = measuremet.pageY;
     }
   };
 
@@ -208,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ResetableZoom;
+export default SnapBackZoom;

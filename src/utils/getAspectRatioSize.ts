@@ -1,24 +1,24 @@
-import type { CanvasSize } from './types';
+import type { CanvasSize } from '../types';
 
 type Options = {
-  aspecRatio: number;
+  aspectRatio: number;
   maxWidth?: number;
   maxHeight?: number;
 };
 
-export const calculateAspectRatioSize = (options: Options): CanvasSize => {
+export const getAspectRatioSize = (options: Options): CanvasSize => {
   'worklet';
-  const { aspecRatio, maxWidth, maxHeight } = options;
+  const { aspectRatio, maxWidth, maxHeight } = options;
   if (maxWidth) {
     return {
       width: Math.round(maxWidth),
-      height: Math.round(maxWidth / aspecRatio),
+      height: Math.round(maxWidth / aspectRatio),
     };
   }
 
   if (maxHeight) {
     return {
-      width: Math.round(maxHeight * aspecRatio),
+      width: Math.round(maxHeight * aspectRatio),
       height: Math.round(maxHeight),
     };
   }
