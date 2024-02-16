@@ -4,18 +4,37 @@
 </div>
 
 > [!WARNING]
-> This library is in active development in order to bring a bettter development experience to the React Native community.
+> This library is a work in progress in order to deliver a better pinching experience to the React Native community.
 
-**<p style="text-align: center;">¡Snap back or resume the choice is yours!</p>**
+<div>
+  <h4 align="center">A tool-kit for common "pinch to zoom" requirements</h4>
+</div>
+
+## Table of contents
+- [Movitation](#motivation)
+- [Features](#features)
+- [Installation](#installation)
+- API
+  - [SnapBackZoom](#snapbackzoom)
+  - ResumableZoom
+  - Utilities
+- [License](#license) 
+ 
+## Motivation
+Pinch to zoom is such an intuitive interaction for mobile device users, this interaction can be found in a wide variety of situations including the following:
+- Zooming in an image/video contained a chat message, mostly previews
+- Detail screens
+- Cropping an image or video
+- Image galeries
+
+The idea behind this library is to provide a set of components and utilities for the most common use chases of the "Pinch to Zoom" interaction.
 
 ## Features
 - **Limitless**: Smoothly zoom in and out any component you want, you're not limited to images only.
 - **Performance:** This libray has been written with `Reanimated v3 (v2 compatible)` and `Geture Handler v2`
-- **Resetable Zoom:** Zoom in and snap back, this component automatically snap backs to its original position once the gesture ends, making it ideal for zoomable previews.
+- **SnapBack Zoom:** Zoom in and snap back, this component automatically snap backs to its original position once the gesture ends, making it ideal for zoomable previews.
 - **Resumable Zoom**: Pick up where you left last time! This component remembers your previous interactions with it, just the same way it works in your Android/IOS OS integrated gallery application, making it ideal for detail screens.
-- **Customizable Settings:**  Customizable zoom and gesture configuration settings.
-- **Expo Go Compatible**: This library has been written with typescript only and supported modules by the expo go app, don't worry about recompiling your app. 
-
+- **Expo Go Compatible**: This library has been written in typescript and supported modules by the expo go app. 
 
 ## Installation
 > [!IMPORTANT]
@@ -32,20 +51,30 @@ yarn add @glazzes/react-native-zoomable
 ```
 No additional setup is required.
 
-## Components: TODO
+## API
 
-#### ResetableZoom
+#### SnapBackZoom
 As its name suggests, it returns to its original position after the pinch gesture ends, this is very useful when dealing with previews of some sort, for instance how Telegram does it for chat messages containing images or Instagram for post previews. 
 
 >[!NOTE]
 >This component works by overlaying an animated view on top of your component when gestures are enabled, therefore it will block all pointer events to your component, consider using `onTap` and `onDoubleTap` properties for touch handling instead.
 
-Its usage is pretty straight forward, import `ResetableZoom` component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it, for instance:
+Its usage is pretty straight forward, import `SnapBackZoom` component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it, for instance:
 
 ```jsx
-import { ResetableZoom } from "@glazzes/react-native-zoomable"
+import { SnapBackZoom } from "@glazzes/react-native-zoomable"
 
-<ResetableZoom
+{/* Simplest use case */}
+<SnapBackZoom>
+  <Image {/* <= This could be an Expo image or a Video */}
+    source={{ uri: IMAGE }}
+    style={{ width: 200, height: 200 }}
+    resizeMethod={"scale"} {/* Very important for images in Android do not forget it */}
+    resizeMode={"cover"}/>
+</SnapBackZoom>
+
+{/* Complex use case */}
+<SnapBackZoom
   hitSlop={{ vertical: 50, horizontal: 50 }}
   timingConfig={{ duration: 150, easing: Easing.linear }}
   onTap={(e) => console.log(e)}
@@ -59,7 +88,7 @@ import { ResetableZoom } from "@glazzes/react-native-zoomable"
       style={{ width: 200, height: 200 }}
       resizeMethod={"scale"} {/* Very important for images in Android do not forget it */}
       resizeMode={"cover"}/>
-</ResetableZoom>
+</SnapBackZoom>
 ```
 
 #### Properties
@@ -67,7 +96,7 @@ import { ResetableZoom } from "@glazzes/react-native-zoomable"
 | --------------- | -------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | hitslop         | object   | undefined | increases the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components, see [hitslop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
 | timingConfig    | object   | undefined                      | custom Reanimated's timing configirutation used to snap back to the original position, see [timing config](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)                                                                                |
-| resizeConfig    | object   | undefined                      | dynamically recalculate the `ResetableZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#resetablezoom's-notes).                                                            |
+| resizeConfig    | object   | undefined                      | dynamically recalculate the `ResetableZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#snapbackzooms-notes).                                                            |
 | gesturesEnabled | boolean  | true                           | enables and disables gestures, when gestures are disabled your component can detect pointer events again  |
 | onTap           | function | undefined                      | callback fired when a single tap is made                                                                                                                                                                                                                             |
 | onDoubleTap     | function | undefined                      | callback fired when a double tap is made                                                                                                                                                                                                                             |
@@ -75,9 +104,9 @@ import { ResetableZoom } from "@glazzes/react-native-zoomable"
 | onPinchEnd      | function | undefined                      | callback fired as soon as the user lift their fingers off the screen after pinching |
 | onGestureActive | function | undefined                      | [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) fired from the moment pinch gesture starts until the snap back animation finishes, as its only argument receives the state of the gesture that includes position in `x` and `y`, `width`, `height`, `translateX`, `translateY` and `scale` values, useful when you want to mirror the current pinch gesture to some other component |
 | onGestureEnd    | function | undefined                      | callback fired once the snap back animation has finished                                                                                                                                                                                             |
-#### ResetableZoom's Notes
+#### SnapBackZoom's Notes
 
-**resizeConfig:** everything is better with an example, imagine you have a lot of images you want to render as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1980x1080 pixel size and you would like this image to resize in a way the aspect ratio is no longer compromised when the image as scaled two times by the pinch gesture, your object would look like this
+**resizeConfig:** everything is better with an example, imagine you have a lot of images you want to render as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1920x1080 pixel size and you would like this image to resize in a way the aspect ratio is no longer compromised when the image has been scaled two times by the pinch gesture, your object would look like this
 ```javascript
 {
   size: { width: 200, height: 200 }, // size of your tile
@@ -86,7 +115,7 @@ import { ResetableZoom } from "@glazzes/react-native-zoomable"
 }
 ```
 >[!IMPORTANT]
->ResetableZoom resizes its own diemsnions not your component's ones, remember to use `flex: 1` for images and videos so they cover the entire area of ResetableZoom
+>SnapBackZoom resizes its own diemsnions not your component's ones, remember to use `{width: '100%', height: '100%'}` for images and videos so they cover the entire area of SnapBackZoom as it resizes.
 
 At a scale of one your image is a tile of 200x200 pixel, in other words a square, but at a scale two it resizes to 200x340 pixel size becoming a rectangle matching with the image's aspect ratio.
 
