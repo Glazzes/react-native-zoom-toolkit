@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   measure,
@@ -56,12 +56,11 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   const containerRef = useAnimatedRef();
   const measurePinchContainer = () => {
     'worklet';
-    if (onGestureActive === undefined) {
-      return;
-    }
 
     const measuremet = measure(containerRef);
     if (measuremet !== null) {
+      width.value = measuremet.width;
+      height.value = measuremet.height;
       position.x.value = measuremet.pageX;
       position.y.value = measuremet.pageY;
     }
@@ -85,14 +84,13 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled)
     .onStart((e) => {
-      origin.x.value = e.focalX - width.value / 2;
-      origin.y.value = e.focalY - height.value / 2;
-
-      measurePinchContainer();
       if (onPinchStart) {
         runOnJS(onPinchStart)(e);
       }
 
+      measurePinchContainer();
+      origin.x.value = e.focalX - width.value / 2;
+      origin.y.value = e.focalY - height.value / 2;
       isPinchActive.value = true;
     })
     .onUpdate((e) => {
@@ -170,32 +168,19 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
     };
   });
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    if (resizeConfig === undefined) {
-      width.value = e.nativeEvent.layout.width;
-      height.value = e.nativeEvent.layout.height;
-    }
-  };
-
   return (
-    <View style={styles.center}>
+    <Animated.View style={[containerStyle, styles.center]}>
       <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
         <Animated.View
           pointerEvents={gesturesEnabled ? undefined : 'none'}
-          style={[containerStyle, styles.absolute]}
+          style={styles.absolute}
         />
       </GestureDetector>
 
-      <Animated.View style={[containerStyle, styles.center]}>
-        <Animated.View
-          ref={containerRef}
-          style={childrenStyle}
-          onLayout={resizeConfig ? undefined : onLayout}
-        >
-          {children}
-        </Animated.View>
+      <Animated.View ref={containerRef} style={childrenStyle}>
+        {children}
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -205,6 +190,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   absolute: {
+    height: '100%',
+    width: '100%',
     position: 'absolute',
     zIndex: 1,
   },
