@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useVector } from '../hooks/useVector';
+import { useSize } from '../hooks/useSize';
 import { DEFAULT_HITSLOP } from '../constants';
 import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
 
@@ -44,8 +45,12 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureEnd,
 }) => {
   const position = useVector(0, 0);
-  const width = useSharedValue<number>(resizeConfig?.size.width ?? 0);
-  const height = useSharedValue<number>(resizeConfig?.size.height ?? 0);
+
+  const childrenSize = useSize(0, 0);
+  const containerSize = useSize(
+    resizeConfig?.size.width ?? 0,
+    resizeConfig?.size.height ?? 0
+  );
 
   const translate = useVector(0, 0);
   const origin = useVector(0, 0);
@@ -59,8 +64,8 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
 
     const measuremet = measure(containerRef);
     if (measuremet !== null) {
-      width.value = measuremet.width;
-      height.value = measuremet.height;
+      containerSize.width.value = measuremet.width;
+      containerSize.height.value = measuremet.height;
       position.x.value = measuremet.pageX;
       position.y.value = measuremet.pageY;
     }
@@ -71,31 +76,33 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
       onGestureActive({
         x: position.x.value,
         y: position.y.value,
-        width: width.value,
-        height: height.value,
+        width: containerSize.width.value,
+        height: containerSize.height.value,
+        resizedWidth: childrenSize.width.value,
+        resizedHeight: childrenSize.height.value,
         translateX: translate.x.value,
         translateY: translate.y.value,
         scale: scale.value,
       });
     }
-  }, [position, translate, scale, width, height, isPinchActive]);
+  }, [position, translate, scale, containerSize, childrenSize, isPinchActive]);
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled)
     .onStart((e) => {
-      if (onPinchStart) {
+      if (onPinchStart !== undefined) {
         runOnJS(onPinchStart)(e);
       }
 
       measurePinchContainer();
-      origin.x.value = e.focalX - width.value / 2;
-      origin.y.value = e.focalY - height.value / 2;
+      origin.x.value = e.focalX - containerSize.width.value / 2;
+      origin.y.value = e.focalY - containerSize.height.value / 2;
       isPinchActive.value = true;
     })
     .onUpdate((e) => {
-      const deltaX = e.focalX - width.value / 2 - origin.x.value;
-      const deltaY = e.focalY - height.value / 2 - origin.y.value;
+      const deltaX = e.focalX - containerSize.width.value / 2 - origin.x.value;
+      const deltaY = e.focalY - containerSize.height.value / 2 - origin.y.value;
 
       const toX = -1 * (origin.x.value * e.scale - origin.x.value) + deltaX;
       const toY = -1 * (origin.y.value * e.scale - origin.y.value) + deltaY;
@@ -142,21 +149,27 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
   const containerStyle = useAnimatedStyle(() => {
+    const width = containerSize.width.value;
+    const height = containerSize.height.value;
+
     return {
-      width: width.value === 0 ? undefined : width.value,
-      height: height.value === 0 ? undefined : height.value,
+      width: width === 0 ? undefined : containerSize.width.value,
+      height: height === 0 ? undefined : containerSize.height.value,
     };
   });
 
   const childrenStyle = useAnimatedStyle(() => {
     const resized = resizeToAspectRatio({
       resizeConfig,
-      width: width.value,
-      height: height.value,
+      width: containerSize.width.value,
+      height: containerSize.height.value,
       scale: scale.value,
     });
 
     const { width: finalWidth, height: finalHeight, deltaX, deltaY } = resized;
+    childrenSize.width.value = finalWidth;
+    childrenSize.height.value = finalHeight;
+
     return {
       width: finalWidth === 0 ? undefined : finalWidth,
       height: finalHeight === 0 ? undefined : finalHeight,

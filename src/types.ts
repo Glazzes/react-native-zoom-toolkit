@@ -37,6 +37,8 @@ export type PinchContext = {
   y: number;
   width: number;
   height: number;
+  resizedWidth: number;
+  resizedHeight: number;
   translateX: number;
   translateY: number;
   scale: number;
