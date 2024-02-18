@@ -4,10 +4,10 @@
 </div>
 
 > [!WARNING]
-> This library is a work in progress in order to deliver a better pinching experience to the React Native community.
+> This library is a work in progress in order to deliver a better pinch to zoom experience to the React Native community.
 
 <div>
-  <h4 align="center">A tool-kit for common "pinch to zoom" requirements</h4>
+  <h4 align="center">A tool-kit for common pinch to zoom feature requirements</h4>
 </div>
 
 ## Table of contents
@@ -21,13 +21,13 @@
 - [License](#license) 
  
 ## Motivation
-Pinch to zoom is such an intuitive interaction for mobile device users, this interaction can be found in a wide variety of situations including the following:
-- Zooming in an image/video contained a chat message, mostly previews
+Pinch to zoom is a must have feature for any application that displays images to the user, this one can be found in a wide variety of use cases:
+- Zooming in media contained a chat message
 - Detail screens
 - Cropping an image or video
 - Image galeries
 
-The idea behind this library is to provide a set of components and utilities for the most common use chases of the "Pinch to Zoom" interaction.
+The idea behind this library is to provide a set of components and utilities for the most common use cases of the Pinch to Zoom interaction.
 
 ## Features
 - **Limitless**: Smoothly zoom in and out any component you want, you're not limited to images only.
@@ -56,9 +56,6 @@ No additional setup is required.
 #### SnapBackZoom
 As its name suggests, it returns to its original position after the pinch gesture ends, this is very useful when dealing with previews of some sort, for instance how Telegram does it for chat messages containing images or Instagram for post previews. 
 
->[!NOTE]
->This component works by overlaying an animated view on top of your component when gestures are enabled, therefore it will block all pointer events to your component, consider using `onTap` and `onDoubleTap` properties for touch handling instead.
-
 Its usage is pretty straight forward, import `SnapBackZoom` component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it, for instance:
 
 ```jsx
@@ -81,7 +78,10 @@ import { SnapBackZoom } from "@glazzes/react-native-zoomable"
   onDoubleTap={(e) => console.log(e)}
   onPinchStart={(e) => console.log(e)}
   onPinchEnd={(e) => console.log(e)}
-  onGestureActive={e => console.log(e)}
+  onGestureActive={(e) => {
+    'worklet';
+     console.log(e);
+  }}
   onGestureEnd={() => console.log('animation finished!')}>
     <Image {/* <= This could be an Expo image or a Video */}
       source={{ uri: IMAGE }}
@@ -97,12 +97,12 @@ import { SnapBackZoom } from "@glazzes/react-native-zoomable"
 | hitslop         | object   | undefined | increases the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components, see [hitslop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
 | timingConfig    | object   | undefined                      | custom Reanimated's timing configirutation used to snap back to the original position, see [timing config](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)                                                                                |
 | resizeConfig    | object   | undefined                      | dynamically recalculate the `ResetableZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#snapbackzooms-notes).                                                            |
-| gesturesEnabled | boolean  | true                           | enables and disables gestures, when gestures are disabled your component can detect pointer events again  |
+| gesturesEnabled | boolean  | true                           | enables or disables gestures, when gestures are disabled your component can detect pointer events again  |
 | onTap           | function | undefined                      | callback fired when a single tap is made                                                                                                                                                                                                                             |
 | onDoubleTap     | function | undefined                      | callback fired when a double tap is made                                                                                                                                                                                                                             |
 | onPinchStart    | function | undefined                      | callback fired when the pinch gesture starts                                                                                                                                                                                                                         |
 | onPinchEnd      | function | undefined                      | callback fired as soon as the user lift their fingers off the screen after pinching |
-| onGestureActive | function | undefined                      | [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) fired from the moment pinch gesture starts until the snap back animation finishes, as its only argument receives the state of the gesture that includes position in `x` and `y`, `width`, `height`, `translateX`, `translateY` and `scale` values, useful when you want to mirror the current pinch gesture to some other component |
+| onGestureActive | function | undefined                      | [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) fired from the moment pinch gesture starts until the snap back animation finishes, as argument it receives the state of the gesture which includes position in `x` and `y`, initial `width` and `height`, resized `width` and `height` if `resizedConfig` is used, `translateX`, `translateY` and `scale` values, useful when you want to mirror the current pinch gesture to some other component |
 | onGestureEnd    | function | undefined                      | callback fired once the snap back animation has finished                                                                                                                                                                                             |
 #### SnapBackZoom's Notes
 
