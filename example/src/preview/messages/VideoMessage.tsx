@@ -105,9 +105,7 @@ const VideoMessage: React.FC<VideoMessageProps> = ({ index, activeIndex }) => {
               style={styles.video}
             />
 
-            <Animated.View
-              style={[StyleSheet.absoluteFill, styles.overlay, { opacity }]}
-            >
+            <Animated.View style={[styles.overlay, { opacity }]}>
               <View style={styles.playButton}>
                 <Icon
                   name={'play'}
@@ -132,9 +130,12 @@ const styles = StyleSheet.create({
   video: {
     width: 200,
     height: 200,
-    borderRadius: theme.spacing.s,
+    // borderRadius: theme.spacing.s,
   },
   overlay: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
   },
