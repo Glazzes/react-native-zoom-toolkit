@@ -3,14 +3,14 @@
   <h1 align="center">React Native Zoom Toolkit</h1>
 </div>
 
-| SnapBackZoom |
-|--------------|
-|<video src="./docs/assets/snapbackzoom.m4v" width="100%" controls>|
-
-
 <div>
   <h4 align="center">A tool-kit for common pinch to zoom feature requirements</h4>
 </div>
+
+| SnapBackZoom |
+|--------------|
+|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/74251348-9cad-470b-a22e-0db64ed73253" width="100%" controls>|
+
 
 > [!WARNING]
 > This library is a work in progress in order to deliver a better pinch to zoom experience to the React Native community.
