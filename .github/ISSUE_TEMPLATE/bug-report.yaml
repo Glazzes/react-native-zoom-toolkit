@@ -1,0 +1,55 @@
+name: Bug Report
+description: Thanks for taking the time to fill out this form
+title: "[BUG]: "
+labels:
+  - "bug"
+body:
+  - type: textarea
+    id: summary
+    validations:
+      required: true
+    attributes:
+      label: Summary
+      description: Please describe what happened
+      placeholder: My component goes out of screen bounds when I pinch.
+
+  - type: textarea
+    id: actual-behaviour
+    validations:
+      required: true
+    attributes:
+      label: Actual behavior
+      placeholder: My component goes out of screen bounds.
+
+  - type: textarea
+    id: expected-behavior
+    validations:
+      required: true
+    attributes:
+      label: Expected behavior
+      placeholder: My component should not go out of the screen bounds.
+
+  - type: textarea
+    id: steps-to-reproduce
+    validations:
+      required: false
+    attributes:
+      label: Steps to reproduce
+      description: >-
+        If you can reproduce this bug consistenly, please describe the steps.
+        A reproduceable repository or an Expo Snack are welcome addtions!
+      placeholder: |
+        1. Go to file X
+        2. Add X property to component Y
+
+  - type: textarea
+    id: library-versions
+    validations:
+      required: true
+    attributes:
+      label: Library versions
+      placeholder: |
+        1. React Native version
+        2. Reanimated version
+        3. Gesture Handler version
+        4. react-native-zoom-toolkit version
