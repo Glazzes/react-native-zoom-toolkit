@@ -1,0 +1,12 @@
+name: Ask a question
+description: I'll reply to you as soon as I possibly can!
+labels:
+  - "question"
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: What would you like to know?
+      description: There are no silly questions.
+      placeholder: Does this library works with x library?

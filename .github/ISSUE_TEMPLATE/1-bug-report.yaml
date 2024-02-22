@@ -10,7 +10,7 @@ body:
       required: true
     attributes:
       label: Summary
-      description: Please describe what happened
+      description: Please describe what happened.
       placeholder: My component goes out of screen bounds when I pinch.
 
   - type: textarea
@@ -36,8 +36,8 @@ body:
     attributes:
       label: Steps to reproduce
       description: >-
-        If you can reproduce this bug consistenly, please describe the steps.
-        A reproduceable repository or an Expo Snack are welcome addtions!
+        If you can reproduce this bug consistenly, please describe the steps,
+        a reproduceable demo or an Expo Snack are welcome addtions.
       placeholder: |
         1. Go to file X
         2. Add X property to component Y
