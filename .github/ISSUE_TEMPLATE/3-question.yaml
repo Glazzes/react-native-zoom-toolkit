@@ -1,5 +1,7 @@
 name: Ask a question
-description: I'll reply to you as soon as I possibly can!
+description: >-
+  Before you ask a question make sure you've read the documentation carefuly, additionaly you can 
+  take a look to the example application for common use cases for this library.
 labels:
   - "question"
 body:
