@@ -1,0 +1,24 @@
+# https://github.com/marketplace/actions/close-stale-issues
+name: close stale issues and pull requests
+on:
+  schedule:
+    - cron: "30 21 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 60
+          days-before-close: 7
+          stale-issue-message: "This issue is stale because it has been open 60 days with no activity. Remove stale label or comment or this will be closed in 7 days."
+
+          days-before-pr-stale: 90
+          days-before-pr-close: 7
+          stale-pr-message: "This pull request is stale because it has been open 60 days with no activity. Remove stale label or comment or this will be closed in 7 days."
