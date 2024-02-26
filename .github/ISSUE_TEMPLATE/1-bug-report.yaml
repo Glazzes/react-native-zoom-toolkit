@@ -18,7 +18,7 @@ body:
     validations:
       required: true
     attributes:
-      label: Actual behavior
+      label: Actual Behavior
       placeholder: My component goes out of screen bounds.
 
   - type: textarea
@@ -26,15 +26,28 @@ body:
     validations:
       required: true
     attributes:
-      label: Expected behavior
+      label: Expected Behavior
       placeholder: My component should not go out of the screen bounds.
+
+  - type: textarea
+    id: versions
+    validations:
+      required: true
+    attributes:
+      label: Versions
+      description: What versions of Reanimated, Gesture Handler and this library are you using?
+      placeholder: |
+        1. React Native version
+        2. Reanimated version
+        3. Gesture Handler version
+        4. react-native-zoom-toolkit version
 
   - type: textarea
     id: steps-to-reproduce
     validations:
       required: false
     attributes:
-      label: Steps to reproduce
+      label: Steps to Reproduce
       description: >-
         If you can reproduce this bug consistenly, please describe the steps,
         a reproduceable demo or an Expo Snack are welcome addtions.
@@ -43,13 +56,10 @@ body:
         2. Add X property to component Y
 
   - type: textarea
-    id: library-versions
+    id: additional-context
     validations:
-      required: true
+      required: false
     attributes:
-      label: Library versions
-      placeholder: |
-        1. React Native version
-        2. Reanimated version
-        3. Gesture Handler version
-        4. react-native-zoom-toolkit version
+      label: Additional Context
+      description: Anything else you consider relevant to this issue.
+      placeholder: Platform, Development enviroment, Package.json, etc.

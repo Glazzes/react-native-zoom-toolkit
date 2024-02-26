@@ -9,6 +9,6 @@ body:
     validations:
       required: true
     attributes:
-      label: What would you like to know?
-      description: There are no silly questions.
-      placeholder: Does this library works with x library?
+      label: What Would You Like to Know?
+      description: All questions are valid questions!
+      placeholder: Does this library works with this other library?
