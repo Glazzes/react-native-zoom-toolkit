@@ -1,0 +1,19 @@
+name: Feature Request
+description: Thanks for taking the time to fill out this form
+title: "[FEATURE]: "
+labels:
+  - "enhancement"
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Summary
+      description: Please describe the need and/or use cases for this feature.
+
+  - type: textarea
+    validations:
+      required: false
+    attributes:
+      label: Expected API
+      description: Please describe how the API for this feture should look like.

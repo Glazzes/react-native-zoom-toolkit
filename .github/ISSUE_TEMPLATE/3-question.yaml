@@ -1,0 +1,14 @@
+name: Ask a question
+description: >-
+  Before you ask a question make sure you've read the documentation carefuly, additionaly you can 
+  take a look to the example application for common use cases for this library.
+labels:
+  - "question"
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: What Would You Like to Know?
+      description: All questions are valid questions!
+      placeholder: Does this library works with this other library?
