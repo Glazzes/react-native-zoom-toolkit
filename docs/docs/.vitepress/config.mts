@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "React Native Zoom Toolkit",
   description: "A set of components and utilities for common pinch to zoom requirements",
+  base: '/react-native-zoomable/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
