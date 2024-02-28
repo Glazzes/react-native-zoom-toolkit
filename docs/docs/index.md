@@ -11,10 +11,6 @@ hero:
       text: Get Started
       link: ./get-started
 
-    - theme: alt
-      text: API Examples
-      link: /api-examples
-
 features:
   - title: Feature A
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit

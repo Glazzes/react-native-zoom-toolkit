@@ -70,7 +70,7 @@ Increase the gesture detection area around your component in all directions by a
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position 
 
 ### resizeConfig
-- Type: [ResizeConfig]()
+- Type: [ResizeConfig](#resizeconfig-type)
 - Default: `undefined`
 
 Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#notes)
@@ -145,3 +145,16 @@ Imagine you've got a lot of images you want to display as tiles of 200x200 pixel
 :::
 
 At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.
+
+## Type Definitions
+### ResizeConfig Type
+```jsx
+type ResizeConfig = {
+  size: {
+    width: number;
+    height: number;
+  },
+  aspectRatio: number;
+  scale: number;
+}
+```
