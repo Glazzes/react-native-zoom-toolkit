@@ -33,12 +33,12 @@ jobs:
           cd docs
           yarn install
           yarn run docs:build
-          ls -la
+          ls -la docs/
           touch ./docs/.vitepress/dist/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/.vitepress/dist
+          path: docs/docs/.vitepress/dist
 
   deploy:
     environment:
