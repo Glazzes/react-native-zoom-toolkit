@@ -22,7 +22,8 @@ export default defineConfig({
       {
         text: 'Components',
         items: [
-          {text: 'SnapbackZoom', link: '/components/snapbackzoom'}
+          {text: 'SnapbackZoom', link: '/components/snapbackzoom'},
+          {text: 'Crop Zoom', link: '/components/cropzoom'}
         ]
       }
     ],

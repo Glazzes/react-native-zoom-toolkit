@@ -8,11 +8,14 @@ outline: deep
 
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
 
+The next video is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
+
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/snapbackzoom.mp4" controls />
 </div>
 
-Its usage is pretty straight forward, import SnapBackZoom component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it, for instance:
+## How to use
+Its usage is pretty straight forward, import SnapBackZoom component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it.
 
 ::: danger Caution
 Do not use `position: "absolute"` directly in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so
@@ -55,13 +58,13 @@ import { SnapBackZoom } from "@glazzes/react-native-zoomable"
 All properties for this component are optional
 
 ### hitslop
-- Type: [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
+- Type:  `object`, see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
 - Default: `undefined`
 
 Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components
 
 ### timingConfig 
-- Type: [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
+- Type: `object`, see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
 - Default: `undefined`
 
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position 
@@ -141,4 +144,4 @@ Imagine you've got a lot of images you want to display as tiles of 200x200 pixel
 `SnapbackZoom` resizes its own dimensions not your component's ones, remember to use `{width: '100%', height: '100%'}` for images and videos so they cover the entire area of `SnapBackZoom` as it resizes.
 :::
 
-At a scale of one your image is a tile of 200x200 pixel, in other words a square, but at a scale two it resizes to 200x340 pixel size becoming a rectangle matching with the image's aspect ratio.
+At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.
