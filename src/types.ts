@@ -5,19 +5,15 @@ import type {
 } from 'react-native-gesture-handler';
 import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 import type { WithTimingConfig } from 'react-native-reanimated';
+import type { SizeVector } from './commons/types';
 
 export type Source = {
   uri: string;
   headers?: Record<string, string>;
 };
 
-export type CanvasSize = {
-  width: number;
-  height: number;
-};
-
 export type ResizeConfig = {
-  size: CanvasSize;
+  size: SizeVector<number>;
   aspectRatio: number;
   scale: number;
 };

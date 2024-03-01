@@ -28,13 +28,13 @@ export const getRotatedSize = (options: Options): SizeVector<number> => {
 
   if (aspectRatio <= 1 && size.height > height) {
     throw new Error(
-      "Impossible crop: cropSize's height is bigger than the height of your component"
+      "Impossible crop: cropSize's height property is bigger than the computed height by resolution property's aspect ratio"
     );
   }
 
   if (aspectRatio > 1 && size.width > width) {
     throw new Error(
-      "Impossible crop: cropSize's width is bigger than the width of your component"
+      "Impossible crop: cropSize's width property is bigger than the computed width by resolution property's aspect ratio"
     );
   }
 
