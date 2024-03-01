@@ -27,6 +27,7 @@
   ],
   "scripts": {
     "example": "yarn workspace react-native-zoomable-example",
+    "docs": "yarn workspace react-native-zoom-toolkit-docs",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -71,7 +72,7 @@
   "bugs": {
     "url": "https://github.com/Glazzes/react-native-zoomable/issues"
   },
-  "homepage": "https://github.com/Glazzes/react-native-zoomable#readme",
+  "homepage": "https://glazzes.github.io/react-native-zoomable/",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
