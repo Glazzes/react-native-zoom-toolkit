@@ -30,9 +30,10 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   activeIndex,
   useResizeConfig,
 }) => {
-  const { size, error } = useImageSize({ uri });
+  const { size } = useImageSize({ uri });
 
-  const aspectRatio = error ? 0 : (size?.width ?? 1) / (size?.height ?? 1);
+  const aspectRatio =
+    size === undefined ? 1 : (size?.width ?? 1) / (size?.height ?? 1);
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio,
     maxWidth: 250,

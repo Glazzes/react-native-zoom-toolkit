@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   video: {
     width: 200,
     height: 200,
-    // borderRadius: theme.spacing.s,
+    borderRadius: theme.spacing.s,
   },
   overlay: {
     width: '100%',
