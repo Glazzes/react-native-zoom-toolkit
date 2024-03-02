@@ -5,10 +5,9 @@ outline: deep
 ---
 
 # Snapback Zoom
-
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
 
-The next video is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/snapbackzoom.mp4" controls />
@@ -18,7 +17,7 @@ The next video is taken from the [Example app](https://github.com/Glazzes/react-
 Its usage is pretty straight forward, import SnapBackZoom component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it.
 
 ::: danger Caution
-Do not use `position: "absolute"` directly in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so
+Do not use `position: "absolute"` directly in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
 :::
 
 ```jsx
@@ -55,55 +54,58 @@ import { SnapBackZoom } from "@glazzes/react-native-zoomable"
 ```
 
 ## Properties
-All properties for this component are optional
+All properties for this component are optional.
 
 ### hitslop
-- Type:  `object`, see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
+- Type:  `object`
 - Default: `undefined`
+- see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
 
-Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components
+Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
 ### timingConfig 
-- Type: `object`, see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
+- Type: `object`
 - Default: `undefined`
+- see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
 
-Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position 
+Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position.
 
 ### resizeConfig
 - Type: [ResizeConfig](#resizeconfig-type)
 - Default: `undefined`
+- see [notes](#notes)
 
-Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases, see [notes](#notes)
+Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases.
 
 ### gesturesEnabled
 - Type: `boolean`
 - Default: `true`
 
-Enables or disable gestures, when gestures are disabled your component can detect pointer events again
+Enables or disable gestures, when gestures are disabled your component can detect pointer events again.
 
 ### onTap
 - Type: `function`
 - Default: `undefiend`
 
-Callback triggered when a single tap is made
+Callback triggered when a single tap is made.
 
 ### onDoubleTap
 - Type: `function`
 - Default: `undefiend`
 
-Callback triggered when a double tap is made
+Callback triggered when a double tap is made.
 
 ### onPinchStart
 - Type: `function`
 - Default: `undefiend`
 
-callback triggered when the pinch gesture starts
+callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
 - Type: `function`
 - Default: `undefiend`
 
-Callback triggered as soon as the user lift their fingers off the screen after pinching
+Callback triggered as soon as the user lift their fingers off the screen after pinching.
 
 ### onGestureActive
 - Type: [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
@@ -126,11 +128,11 @@ This property is very useful when you need to mirror the current pinch gesture t
 - Type: `function`
 - Default: `undefiend`
 
-Callback triggered once the snap back animation has finished 
+Callback triggered once the snap back animation has finished.
 
 ## Notes
 ### On resizeConfig Property
-Imagine you've got a lot of images you want to display as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1920x1080 pixel size and you would like this image to resize in such a way the aspect ratio is no longer compromised when the image has been scaled two times by the pinch gesture, your object would look like this
+Imagine you've got a lot of images you want to display as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1920x1080 pixel size and you would like this image to resize in such a way the aspect ratio is no longer compromised when the image has been scaled two times by the pinch gesture, your object would look like this one.
 
 ```javascript
 {
@@ -148,13 +150,9 @@ At a scale of one your image is a tile of 200x200 pixel size, in other words a s
 
 ## Type Definitions
 ### ResizeConfig Type
-```jsx
-type ResizeConfig = {
-  size: {
-    width: number;
-    height: number;
-  },
-  aspectRatio: number;
-  scale: number;
-}
-```
+
+| Property | type | description |
+|----------|------|-------------|
+| size     | `{width: number; height: number;}` | Fields specify the width and height of your component. |
+| aspectRatio | `number` | Aspect ratio of your image/video/component. |
+| scale       | `number` | At which scale your component will be fully resized to meet the aspect ratio. |

@@ -3,25 +3,44 @@ outline: deep
 ---
 
 # Crop Zoom
+An ideal, practical and unopinionated component for image and video cropping needs, among its features we can find the following:
+
+- Build your own custom UI on top of it.
+- Resumable and accurate zoom features, pan, pinch and even pan with the pinch gesture! It will resume where you left.
+- For complex uses cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
+- Enforce all resulting crops to be a fixed size, ideal for profile pictures.
+<br/><br/>
+
+This component has been designed to work seamessly with [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/) library for image cropping.
+
+- see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo)
+<br/><br/>
+
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
+<div style="width: 100%; display: flex; justify-content: center; align-items: center">
+  <video src="../assets/cropzoom.mp4" controls />
+</div>
 
 ## How to use
-Sadly in order to provide the most unopinionated API possible, it requires a good chunk of boilerplate to be used, so here's a starting template you can use
+TODO
 
 ## Properties
+All properties for this component are optional unless they are specificed as `Required`
+
 ### cropSize
-- Type: `{width: number, height: number}`
-- Required
+- Type: `{ width: number; height: number; }`
+- `Required`
 
 
 ### resolution
-- Type: `{width: number, height: number}`
-- Required
+- Type: `{ width: number; height: number; }`
+- `Required`
 
 Resolution of your image/video or how big whatever you are tying to crop is
 
 ### OverlayComponent
 - Type: `JSX.Element`
-- Required
+- Default: `undefined`
 
 ### onGestureActive
 - Type: [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
@@ -32,88 +51,112 @@ Resolution of your image/video or how big whatever you are tying to crop is
 All methods are accesible through a ref object
 ```jsx
 import { useRef } from 'react';
-import { CropZoom, type CropZoomType } from '@glazzes/react-native-zoomable'
+import { CropZoom, Type CropZoomType } from '@glazzes/react-native-zoomable'
 
 const ref = useRef<CropZoomType>(null);
-ref.current?.canvasToSize(200);
+ref.current?.crop(200);
 
 <CropZoom ref={ref} />
 ```
 
-### rotate
-Rotates the component 90 degrees clockwise in a range from 0 to 360 degrees
+### crop
+Maps all the trasnformations applied to your component by the pinch gesture into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
 - Arguments
 
-| name | type | default |description |
-|------|------|-----|--------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not |
-
-### flipHorizontal
-Flips the component horizontally
-- Arguments
-
-| name | type | default |description |
-|------|------|-----|--------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not |
-
-### flipVertical
-Flips the component vertically
-- Arguments
-
-| name | type | default |description |
-|------|------|-----|--------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not |
-
-### canvasToSize
-Maps all the trasnformations applied to your component into a simple and ready to use object specifying the context necessary for a crop action, such object takes into account the following transformations `translateX`, `translateY`, `scale`, `rotate`, `rotateX` and `rotateY`.
-- Arguments
-
-| name | type | default | description |
+| Name | Type | Default | Description |
 |------|------|-------------|---------|
-| fixedCropWidth | `number \| undefined` | `undefined` |Enforce all resulting crops to be of a fixed width, height is infered by the computed CropZoom's [cropSize](#cropsize) property aspect ratio |
+| fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is infered by the computed aspect ratio of CropZoom's [cropSize](#cropsize) property. |
 
 - Returns
 [CropContextResult](#cropcontextresult)
 
-:::danger Caution
-The order in which you apply the values given by [CropContextResult](#cropcontextresult) matters, they should be applied in the following order
-
-- rotate
-- resize (if aplicable)
-- flip verticaly and horizontaly
-- crop
-:::
-
-### reset
-Resets all transformations to their initial state
+### rotate
+Rotates the component 90 degrees clockwise in a range from 0 to 360 degrees.
 - Arguments
 
-| name | type | default |description |
+| Name | Type | Default |Description |
+|------|------|-----|--------------|
+| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+### flipHorizontal
+Flips the component horizontally.
+- Arguments
+
+| Name | Type | Default |Description |
+|------|------|-----|--------------|
+| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+### flipVertical
+Flips the component vertically.
+- Arguments
+
+| Name | Type | Default |Description |
+|------|------|-----|--------------|
+| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+### reset
+Resets all transformations to their initial state.
+- Arguments
+
+| Name | Type | Default |Description |
 |------|------|---------|------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not |
+| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
 ## Type Definitions
 ### CropContextResult
+
+<table>
+<tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Description</th>
+</tr>
+
+<tr>
+<td>crop</td>
+<td>
+
 ```typescript
-type CropContextResult = {
-    crop: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    },
-    context: {
-        rotationAngle: number;
-        flipHorizontal: boolean;
-        flipVertical: boolean;
-    },
-    resize?: {
-        width: number;
-        height: number;
-    }
+{
+  originX: number; 
+  originY: number; 
+  width: number; 
+  height: number;
 }
 ```
+</td>
+<td>Fields specify the top left corner and size of the crop.</td>
+</tr>
 
-- `crop` Fields specify top-left corner and size of a crop rectangle.
-- `context` Fields specify wheter to flip the image or not, as well as to what angle the image/video must be rotated
-- `resize` Fields specify the size your image/video must be resized to before cropping, if its `undefined` it means resizing is not necessary
+<tr>
+<td>context</td>
+<td>
+
+```typescript
+{
+  rotationAngle: number; 
+  flipHorizontal: boolean; 
+  flipVertical: boolean;
+}
+```
+</td>
+<td>Fields specify if the image/video needs to flipped and to what angle must be rotated.</td>
+</tr>
+
+<tr>
+<td>resize</td>
+<td>
+
+```typescript
+{
+  width: number; 
+  height: number; 
+} | undefined
+```
+</td>
+<td>
+Fields specify the size your image/video must be resized to before cropping, if this property is undefined it means no resizing is necessary. <br/><br/> This property is always undefined if you call <a href="#crop">crop method</a> without fixedWidth argument.
+</td>
+</tr>
+
+</table>

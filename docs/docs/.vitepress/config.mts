@@ -26,6 +26,12 @@ export default defineConfig({
           {text: 'SnapbackZoom', link: '/components/snapbackzoom'},
           {text: 'Crop Zoom', link: '/components/cropzoom'}
         ]
+      },
+      {
+        text: 'Guides',
+        items: [
+          {text: 'Use Crop Zoom with Expo Image Manipulator', link: '/guides/cropzoomexpo'},
+        ]
       }
     ],
 
