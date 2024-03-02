@@ -1,3 +1,4 @@
+[![documentation](https://github.com/Glazzes/react-native-zoomable/actions/workflows/docs.yaml/badge.svg)](https://github.com/Glazzes/react-native-zoomable/actions/workflows/docs.yaml)
 
 <div>
   <h1 align="center">React Native Zoom Toolkit</h1>
@@ -37,7 +38,7 @@ Planned features for next releases:
 - [ ] **Image Gallery:** A simple and ready to use image gallery which uses ResumableZoom
 
 ## Documentation
-To check out the docs, visit [React Native Zoom Toolkit's documentation]()
+To check out the docs, visit https://glazzes.github.io/react-native-zoomable/
 
 ## License
 [MIT](./LICENSE) License.

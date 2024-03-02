@@ -1,4 +1,4 @@
-# Contributing
+# React Native Zoom Toolkit Contribution Guide
 
 Contributions are always welcome, no matter how large or small!
 
@@ -10,6 +10,7 @@ This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/f
 
 - The library package in the root directory.
 - An example app in the `example/` directory.
+- A documentation website in the `docs` directory.
 
 To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
 
@@ -17,6 +18,7 @@ To get started with the project, run `yarn` in the root directory to install the
 yarn
 ```
 
+> [!NOTE]
 > Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
 
 The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
