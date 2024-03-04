@@ -1,16 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Dimensions, Image } from 'react-native';
-import CropZoom from '../../../src/components/crop/CropZoom';
-import { useImageSize } from '../../../src/hooks/useImageSize';
-import type { CropZoomType } from '../../../src/components/crop/types';
+import CropZoom from '../../../../src/components/crop/CropZoom';
+import { useImageSize } from '../../../../src/hooks/useImageSize';
+import type { CropZoomType } from '../../../../src/components/crop/types';
 import { StatusBar } from 'expo-status-bar';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import EffectIndicator from './EffectIndicator';
-import CropModal from './CropModal';
+import CropModal from '../commons/CropModal';
 
 const IMAGE =
-  'https://cff2.earth.com/uploads/2022/09/01124810/Emperor-penguins.jpg';
-
+  //'https://cff2.earth.com/uploads/2022/09/01124810/Emperor-penguins.jpg';
+  'https://static1.e621.net/data/fa/bf/fabfd7827c7d96558e9658979aceab8a.png';
 const { width, height } = Dimensions.get('screen');
 const center = { x: width / 2, y: height * 0.5 };
 
@@ -37,19 +37,20 @@ const CropManagedExample = ({}) => {
     <View style={styles.root}>
       <StatusBar style="light" backgroundColor="transparent" />
       <CropZoom
+        debug={false}
         ref={ref}
         cropSize={{ width: cropSize, height: cropSize }}
         resolution={size}
         maxScale={6}
+        panMode="clamp"
         scaleMode="bounce"
-        panMode="free"
         panWithPinch={true}
       >
         <Image source={{ uri: IMAGE }} style={styles.image} />
       </CropZoom>
 
       <Canvas style={styles.flex}>
-        <Path path={path} color={'rgba(0, 0, 0, 0.3)'} />
+        <Path path={path} color={'rgba(0, 0, 0, 0.5)'} />
       </Canvas>
 
       <EffectIndicator uri={IMAGE} cropRef={ref} setCrop={setResult} />

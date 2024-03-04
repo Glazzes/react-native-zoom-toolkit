@@ -8,7 +8,6 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@likashefqet/react-native-image-zoom": "2.0.0-alpha.0",
     "@shopify/react-native-skia": "0.1.221",
     "expo": "50.0.5",
     "expo-av": "13.10.4",

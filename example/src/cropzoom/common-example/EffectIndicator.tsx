@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import type { CropZoomType } from '../../../src/components/crop/types';
-import { theme } from '../constants';
+import type { CropZoomType } from '../../../../src/components/crop/types';
+import { theme } from '../../constants';
 import { FlipType, type Action, manipulateAsync } from 'expo-image-manipulator';
 
 type EffectIndicatorProps = {

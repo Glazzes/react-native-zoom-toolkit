@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-import { theme } from '../constants';
+import { theme } from '../../constants';
 import Animated, { Easing, ZoomIn, ZoomOut } from 'react-native-reanimated';
 
 type CropModalProps = {
