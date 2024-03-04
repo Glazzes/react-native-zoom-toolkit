@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 import { useVector } from '../../commons/hooks/useVector';
 import Animated, {
   useAnimatedStyle,
@@ -7,17 +7,19 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import type { CropZoomType, CropZoomProps, CropContextResult } from './types';
-import { StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { pinchTransform } from '../../commons/utils/pinchTransform';
-import { clamp } from '../../commons/utils/clamp';
 import canvasToSize from './utils';
-import type { SizeVector } from '../../commons/types';
 import { useSize } from '../../commons/hooks/useSize';
 import { getRotatedSize } from '../../commons/utils/getRotatedSize';
+import { usePanCommons } from '../../commons/hooks/usePanCommons';
+
+import type { BoundFuction, SizeVector } from '../../commons/types';
+import type { CropZoomType, CropZoomProps, CropContextResult } from './types';
+import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 
 const RAD2DEG = 180 / Math.PI;
+const detectorColor = 'rgba(50, 168, 82, 0.5)';
+const containerColor = 'rgba(255, 242, 105, 0.5)';
 
 const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   const {
@@ -39,6 +41,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   const rotation = useSharedValue<number>(0);
   const rotate = useVector(0, 0);
 
+  const delta = useVector(0, 0);
   const scale = useSharedValue<number>(1);
   const scaleOffset = useSharedValue<number>(1);
 
@@ -46,8 +49,8 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   const detector = useSize(cropSize.width, cropSize.height);
   const sizeAngle = useSharedValue<number>(0);
 
-  const gestureTranslate = useVector(0, 0);
-  const gestureScale = useSharedValue<number>(1);
+  const detectorTranslate = useVector(0, 0);
+  const detectorScale = useSharedValue<number>(1);
 
   useDerivedValue(() => {
     const size = getRotatedSize({
@@ -56,12 +59,12 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       angle: sizeAngle.value,
     });
 
+    container.width.value = withTiming(size.width);
+    container.height.value = withTiming(size.height);
+
     const isFlipped = rotation.value % Math.PI === Math.PI / 2;
     detector.width.value = isFlipped ? size.height : size.width;
     detector.height.value = isFlipped ? size.width : size.height;
-
-    container.width.value = withTiming(size.width);
-    container.height.value = withTiming(size.height);
   }, [cropSize, resolution, sizeAngle]);
 
   useDerivedValue(() => {
@@ -75,16 +78,16 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       rotateX: rotate.x.value,
       rotateY: rotate.y.value,
     });
-  }, [translate, scale, rotate, rotation]);
+  }, [container, translate, scale, rotate, rotation]);
 
   const setDetectionTransformation = (tx: number, ty: number, sc: number) => {
     'worklet';
-    gestureTranslate.x.value = tx;
-    gestureTranslate.y.value = ty;
-    gestureScale.value = sc;
+    detectorTranslate.x.value = tx;
+    detectorTranslate.y.value = ty;
+    detectorScale.value = sc;
   };
 
-  const getBounds = (sc: number) => {
+  const getBounds: BoundFuction = (sc: number) => {
     'worklet';
     let size = { width: container.width.value, height: container.height.value };
 
@@ -93,121 +96,59 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       size = { width: size.height, height: size.width };
     }
 
-    const boundX = Math.max(0, size.width * sc - cropSize.width) / 2;
-    const boundY = Math.max(0, size.height * sc - cropSize.height) / 2;
-    return { boundX, boundY };
+    const x = Math.max(0, size.width * sc - cropSize.width) / 2;
+    const y = Math.max(0, size.height * sc - cropSize.height) / 2;
+    return { x, y };
   };
 
-  const delta = useVector(0, 0);
+  const { onPinchStart, onPinchUpdate, onPinchEnd } = usePinchCommons({
+    detector,
+    detectorTranslate,
+    detectorScale,
+    translate,
+    offset,
+    origin,
+    scale,
+    scaleOffset,
+    maxScale,
+    delta,
+    panWithPinch,
+    scaleMode,
+    boundFn: getBounds,
+  });
+
+  const { onPanStart, onChange, onPanEnd } = usePanCommons({
+    translate,
+    detectorTranslate,
+    offset,
+    scale,
+    detectorScale,
+    panMode,
+    boundFn: getBounds,
+  });
 
   const pinch = Gesture.Pinch()
-    .onStart((e) => {
-      origin.x.value = e.focalX - detector.width.value / 2;
-      origin.y.value = e.focalY - detector.height.value / 2;
-
-      offset.x.value = translate.x.value;
-      offset.y.value = translate.y.value;
-      scaleOffset.value = scale.value;
-    })
-    .onUpdate((e) => {
-      const toScale = e.scale * scaleOffset.value;
-      delta.x.value = e.focalX - detector.width.value / 2 - origin.x.value;
-      delta.y.value = e.focalY - detector.height.value / 2 - origin.y.value;
-
-      const { x: toX, y: toY } = pinchTransform({
-        toScale: toScale,
-        fromScale: scaleOffset.value,
-        origin: { x: origin.x.value, y: origin.y.value },
-        offset: { x: offset.x.value, y: offset.y.value },
-        delta: {
-          x: panWithPinch ? delta.x.value * scaleOffset.value : 0,
-          y: panWithPinch ? delta.y.value * scaleOffset.value : 0,
-        },
-      });
-
-      translate.x.value = toX;
-      translate.y.value = toY;
-      scale.value = toScale;
-    })
-    .onEnd(() => {
-      if (scale.value < 1) {
-        translate.x.value = withTiming(0);
-        translate.y.value = withTiming(0);
-        scale.value = withTiming(1);
-
-        setDetectionTransformation(0, 0, 1);
-        return;
-      }
-
-      if (scale.value > maxScale && scaleMode === 'bounce') {
-        const { x, y } = pinchTransform({
-          toScale: maxScale,
-          fromScale: scale.value,
-          origin: { x: origin.x.value, y: origin.y.value },
-          offset: { x: translate.x.value, y: translate.y.value },
-          delta: {
-            x: -1 * delta.x.value * scaleOffset.value,
-            y: -1 * delta.y.value * scaleOffset.value,
-          },
-        });
-
-        translate.x.value = withTiming(x);
-        translate.y.value = withTiming(y);
-        scale.value = withTiming(maxScale);
-        setDetectionTransformation(x, y, maxScale);
-        return;
-      }
-
-      const { boundX, boundY } = getBounds(scale.value);
-      const toX = clamp(translate.x.value, -1 * boundX, boundX);
-      const toY = clamp(translate.y.value, -1 * boundY, boundY);
-
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      setDetectionTransformation(toX, toY, scale.value);
-    });
+    .onStart(onPinchStart)
+    .onUpdate(onPinchUpdate)
+    .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
     .maxPointers(1)
-    .onStart((_) => {
-      offset.x.value = translate.x.value;
-      offset.y.value = translate.y.value;
-    })
-    .onUpdate(({ translationX, translationY }) => {
-      const toX = translationX + offset.x.value;
-      const toY = translationY + offset.y.value;
-
-      if (panMode === 'free') {
-        translate.x.value = toX;
-        translate.y.value = toY;
-        return;
-      }
-
-      const { boundX, boundY } = getBounds(scale.value);
-      translate.x.value = clamp(toX, -1 * boundX, boundX);
-      translate.y.value = clamp(toY, -1 * boundY, boundY);
-    })
-    .onEnd((_) => {
-      const { boundX, boundY } = getBounds(scale.value);
-      const toX = clamp(translate.x.value, -1 * boundX, boundX);
-      const toY = clamp(translate.y.value, -1 * boundY, boundY);
-
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      setDetectionTransformation(toX, toY, scale.value);
-    });
+    .onStart(onPanStart)
+    .onChange(onChange)
+    .onEnd(onPanEnd);
 
   const detectorStyle = useAnimatedStyle(() => {
     return {
       width: detector.width.value,
       height: detector.height.value,
       position: 'absolute',
-      backgroundColor: debug ? 'rgba(0, 0, 255, 0.5)' : undefined,
-      zIndex: 100,
+      zIndex: 1,
+      backgroundColor: debug ? detectorColor : undefined,
       transform: [
-        { translateX: gestureTranslate.x.value },
-        { translateY: gestureTranslate.y.value },
-        { scale: gestureScale.value },
+        { translateX: detectorTranslate.x.value },
+        { translateY: detectorTranslate.y.value },
+        { scale: detectorScale.value },
       ],
     };
   });
@@ -345,25 +286,28 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     crop: handleCrop,
   }));
 
+  const root: ViewStyle = {
+    minWidth: cropSize.width,
+    minHeight: cropSize.height,
+  };
+
+  const cropStyle: ViewStyle = {
+    width: cropSize.width,
+    height: cropSize.height,
+  };
+
+  const reflectionSyle: ViewStyle = {
+    backgroundColor: debug ? containerColor : undefined,
+  };
+
   return (
-    <View style={styles.root}>
-      <View
-        style={[
-          styles.crop,
-          { width: cropSize.width, height: cropSize.height },
-        ]}
-      >
+    <View style={[root, styles.root]}>
+      <View style={[cropStyle, styles.center]}>
         <Animated.View style={containerStyle}>{children}</Animated.View>
+        <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
         <GestureDetector gesture={Gesture.Race(pinch, pan)}>
           <Animated.View style={detectorStyle} />
         </GestureDetector>
-        <View
-          style={[
-            styles.reflection,
-            { backgroundColor: debug ? 'rgba(255, 0, 0, 0.5)' : undefined },
-          ]}
-          pointerEvents="none"
-        />
       </View>
     </View>
   );
@@ -375,14 +319,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  crop: {
+  center: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  reflection: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
   },
 });
 

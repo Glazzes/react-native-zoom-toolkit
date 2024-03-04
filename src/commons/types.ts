@@ -7,3 +7,5 @@ export type SizeVector<T> = {
   width: T;
   height: T;
 };
+
+export type BoundFuction = (scale: number) => Vector<number>;
