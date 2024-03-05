@@ -8,4 +8,15 @@ export type SizeVector<T> = {
   height: T;
 };
 
-export type BoundFuction = (scale: number) => Vector<number>;
+export type BoundsFuction = (scale: number) => Vector<number>;
+
+export enum PanMode {
+  CLAMP = 'clamp',
+  FREE = 'free',
+  FRICTION = 'friction',
+}
+
+export enum ScaleMode {
+  CLAMP = 'clamp',
+  BOUNCE = 'bounce',
+}

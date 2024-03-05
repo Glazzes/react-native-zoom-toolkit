@@ -1,20 +1,22 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
-import type {
-  CropGestureCallBack,
-  CropZoomType,
-} from '../../../../src/components/crop/types';
-import CropZoom from '../../../../src/components/crop/CropZoom';
+import {
+  CropZoom,
+  PanMode,
+  ScaleMode,
+  type CropZoomType,
+  type CropGestureCallBack,
+} from '../../../../src';
 import {
   Canvas,
   Image,
   useImage,
   vec,
-  type Transforms2d,
   ColorMatrix,
   Lerp,
   useCanvasRef,
+  type Transforms2d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
 import { useImageSize } from '../../../../src/hooks/useImageSize';
@@ -35,7 +37,7 @@ const blackAndWhite = [
 ];
 
 const IMAGE =
-  'https://cdn.shopify.com/s/files/1/1600/7061/files/3_57d3ac14-ff6f-4daa-b771-66a069fe7498.jpg?v=1693304833';
+  'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const SkiaCropZoom: React.FC = ({}) => {
   const { size: resolution } = useImageSize({ uri: IMAGE });
@@ -114,24 +116,23 @@ const SkiaCropZoom: React.FC = ({}) => {
 
       <CropZoom
         ref={ref}
+        debug={false}
         cropSize={{ width: cropSize, height: cropSize }}
         resolution={resolution}
         onGestureActive={onGestureActive}
-        scaleMode="bounce"
-        panMode="free"
-        maxScale={6}
+        scaleMode={ScaleMode.BOUNCE}
+        panMode={PanMode.FREE}
+        maxScale={-1}
         panWithPinch={true}
       />
 
-      {image !== null ? (
-        <EffectIndicator
-          progress={progress}
-          image={image}
-          canvasRef={canvasRef}
-          cropRef={ref}
-          setCrop={setCropImage}
-        />
-      ) : null}
+      <EffectIndicator
+        progress={progress}
+        image={image}
+        canvasRef={canvasRef}
+        cropRef={ref}
+        setCrop={setCropImage}
+      />
 
       {cropImage !== undefined ? (
         <CropModal uri={cropImage} setCrop={setCropImage} />

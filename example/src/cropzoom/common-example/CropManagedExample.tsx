@@ -1,16 +1,20 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Dimensions, Image } from 'react-native';
-import CropZoom from '../../../../src/components/crop/CropZoom';
-import { useImageSize } from '../../../../src/hooks/useImageSize';
-import type { CropZoomType } from '../../../../src/components/crop/types';
+import {
+  CropZoom,
+  useImageSize,
+  PanMode,
+  ScaleMode,
+  type CropZoomType,
+} from '../../../../src';
 import { StatusBar } from 'expo-status-bar';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import EffectIndicator from './EffectIndicator';
 import CropModal from '../commons/CropModal';
 
 const IMAGE =
-  //'https://cff2.earth.com/uploads/2022/09/01124810/Emperor-penguins.jpg';
-  'https://static1.e621.net/data/fa/bf/fabfd7827c7d96558e9658979aceab8a.png';
+  'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
+
 const { width, height } = Dimensions.get('screen');
 const center = { x: width / 2, y: height * 0.5 };
 
@@ -41,9 +45,8 @@ const CropManagedExample = ({}) => {
         ref={ref}
         cropSize={{ width: cropSize, height: cropSize }}
         resolution={size}
-        maxScale={6}
-        panMode="clamp"
-        scaleMode="bounce"
+        panMode={PanMode.FREE}
+        scaleMode={ScaleMode.BOUNCE}
         panWithPinch={true}
       >
         <Image source={{ uri: IMAGE }} style={styles.image} />

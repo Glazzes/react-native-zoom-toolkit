@@ -8,16 +8,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import canvasToSize from './utils';
-import { useSize } from '../../commons/hooks/useSize';
+import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { getRotatedSize } from '../../commons/utils/getRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
-
-import type { BoundFuction, SizeVector } from '../../commons/types';
-import type { CropZoomType, CropZoomProps, CropContextResult } from './types';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
+import { canvasToSize } from './utils';
+import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
+import type { CropZoomType, CropZoomProps, CropContextResult } from './types';
 
-const RAD2DEG = 180 / Math.PI;
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(255, 242, 105, 0.5)';
 
@@ -27,9 +26,9 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     cropSize,
     resolution,
     children,
-    maxScale = Number.MAX_SAFE_INTEGER,
-    scaleMode = 'bounce',
-    panMode = 'free',
+    maxScale: userMaxScale = -1,
+    scaleMode = ScaleMode.BOUNCE,
+    panMode = PanMode.FREE,
     panWithPinch = true,
     onGestureActive,
   } = props;
@@ -45,12 +44,22 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   const scale = useSharedValue<number>(1);
   const scaleOffset = useSharedValue<number>(1);
 
-  const container = useSize(cropSize.width, cropSize.height);
-  const detector = useSize(cropSize.width, cropSize.height);
+  const container = useSizeVector(1, 1);
+  const detector = useSizeVector(1, 1);
   const sizeAngle = useSharedValue<number>(0);
 
   const detectorTranslate = useVector(0, 0);
   const detectorScale = useSharedValue<number>(1);
+
+  const maxScale = useDerivedValue(() => {
+    const { width, height } = container;
+    const scaleValue = getMaxScale(
+      { width: width.value, height: height.value },
+      resolution
+    );
+
+    return userMaxScale < 0 ? scaleValue : userMaxScale;
+  }, [container, userMaxScale]);
 
   useDerivedValue(() => {
     const size = getRotatedSize({
@@ -59,13 +68,15 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       angle: sizeAngle.value,
     });
 
-    container.width.value = withTiming(size.width);
-    container.height.value = withTiming(size.height);
+    const isFlipped = rotation.value % Math.PI !== 0;
+    const render1 = container.width.value === 1 && container.height.value === 1;
 
-    const isFlipped = rotation.value % Math.PI === Math.PI / 2;
+    container.width.value = render1 ? size.width : withTiming(size.width);
+    container.height.value = render1 ? size.height : withTiming(size.height);
+
     detector.width.value = isFlipped ? size.height : size.width;
     detector.height.value = isFlipped ? size.width : size.height;
-  }, [cropSize, resolution, sizeAngle]);
+  }, [cropSize, resolution, sizeAngle, rotation]);
 
   useDerivedValue(() => {
     onGestureActive?.({
@@ -80,25 +91,18 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     });
   }, [container, translate, scale, rotate, rotation]);
 
-  const setDetectionTransformation = (tx: number, ty: number, sc: number) => {
-    'worklet';
-    detectorTranslate.x.value = tx;
-    detectorTranslate.y.value = ty;
-    detectorScale.value = sc;
-  };
-
-  const getBounds: BoundFuction = (sc: number) => {
+  const boundsFn: BoundsFuction = (scaleValue: number) => {
     'worklet';
     let size = { width: container.width.value, height: container.height.value };
 
-    const isFlipped = rotation.value % Math.PI === Math.PI / 2;
-    if (isFlipped) {
+    const isInInverseAspectRatio = rotation.value % Math.PI !== 0;
+    if (isInInverseAspectRatio) {
       size = { width: size.height, height: size.width };
     }
 
-    const x = Math.max(0, size.width * sc - cropSize.width) / 2;
-    const y = Math.max(0, size.height * sc - cropSize.height) / 2;
-    return { x, y };
+    const boundX = Math.max(0, size.width * scaleValue - cropSize.width) / 2;
+    const boundY = Math.max(0, size.height * scaleValue - cropSize.height) / 2;
+    return { x: boundX, y: boundY };
   };
 
   const { onPinchStart, onPinchUpdate, onPinchEnd } = usePinchCommons({
@@ -114,17 +118,17 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     delta,
     panWithPinch,
     scaleMode,
-    boundFn: getBounds,
+    boundFn: boundsFn,
   });
 
   const { onPanStart, onChange, onPanEnd } = usePanCommons({
     translate,
-    detectorTranslate,
     offset,
     scale,
+    detectorTranslate,
     detectorScale,
     panMode,
-    boundFn: getBounds,
+    boundFn: boundsFn,
   });
 
   const pinch = Gesture.Pinch()
@@ -169,10 +173,16 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     };
   });
 
-  /*
-   * Reference handling
-   */
+  // Reference handling section
   const canAnimate = useSharedValue<boolean>(true);
+
+  const resetDetectorTransformations = () => {
+    'worklet';
+    detectorTranslate.x.value = 0;
+    detectorTranslate.y.value = 0;
+    detectorScale.value = 1;
+  };
+
   const handleRotate = (animate: boolean = true) => {
     if (!canAnimate.value) {
       return;
@@ -186,10 +196,10 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
       scale.value = withTiming(1);
+      resetDetectorTransformations();
 
       rotation.value = withTiming(toAngle, undefined, (_) => {
         canAnimate.value = true;
-        setDetectionTransformation(0, 0, 1);
         if (rotation.value === Math.PI * 2) {
           rotation.value = 0;
         }
@@ -201,7 +211,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     translate.x.value = 0;
     translate.y.value = 0;
     scale.value = 1;
-    setDetectionTransformation(0, 0, 1);
+    resetDetectorTransformations();
   };
 
   const handleFlipHorizontal = (animate: boolean = true) => {
@@ -244,38 +254,19 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
-    const context = canvasToSize({
+    const angle = rotation.value;
+    const flipHorizontal = rotate.y.value === Math.PI;
+    const flipVertical = rotate.x.value === Math.PI;
+
+    return canvasToSize({
       cropSize: cropSize,
       resolution: resolution,
+      canvas: { width: container.width.value, height: container.height.value },
       position: { x: translate.x.value, y: translate.y.value },
-      canvasSize: {
-        width: container.width.value,
-        height: container.height.value,
-      },
       scale: scale.value,
-      rotationAngle: rotation.value,
+      context: { rotationAngle: angle, flipHorizontal, flipVertical },
       fixedWidth,
     });
-
-    let resize: SizeVector<number> | undefined;
-    if (fixedWidth !== undefined) {
-      resize = { width: context.resizeWidth, height: context.resizeHeight };
-    }
-
-    return {
-      crop: {
-        originX: context.x,
-        originY: context.y,
-        width: context.width,
-        height: context.height,
-      },
-      context: {
-        rotationAngle: rotation.value * RAD2DEG,
-        flipHorizontal: rotate.y.value === Math.PI,
-        flipVertical: rotate.x.value === Math.PI,
-      },
-      resize: resize,
-    };
   };
 
   useImperativeHandle(ref, () => ({

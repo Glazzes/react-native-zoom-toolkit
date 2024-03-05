@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { SizeVector } from '../../commons/types';
+import type { PanMode, ScaleMode } from '../../commons/types';
 
 export type CropContextResult = {
   crop: {
@@ -87,8 +88,8 @@ export type CropZoomProps = React.PropsWithChildren<{
   debug?: boolean;
   minScale?: number;
   maxScale?: number;
-  scaleMode?: 'clamp' | 'free' | 'bounce';
-  panMode?: 'clamp' | 'free' | 'friction';
+  scaleMode?: ScaleMode;
+  panMode?: PanMode;
   panWithPinch?: boolean;
   onGestureActive?: CropGestureCallBack;
 }>;

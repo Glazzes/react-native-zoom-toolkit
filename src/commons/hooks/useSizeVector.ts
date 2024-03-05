@@ -1,7 +1,7 @@
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import type { SizeVector } from '../types';
 
-export const useSize = (
+export const useSizeVector = (
   x: number,
   y?: number
 ): SizeVector<SharedValue<number>> => {

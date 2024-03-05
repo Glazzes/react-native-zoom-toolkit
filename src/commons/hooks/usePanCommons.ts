@@ -4,7 +4,7 @@ import {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
-import type { BoundFuction, Vector } from '../types';
+import type { BoundsFuction, PanMode, Vector } from '../types';
 import type {
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
@@ -21,10 +21,10 @@ type PanCommmonOptions = {
   translate: Vector<SharedValue<number>>;
   detectorTranslate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
-  panMode: 'free' | 'clamp' | 'friction';
+  panMode: PanMode;
   scale: SharedValue<number>;
   detectorScale: SharedValue<number>;
-  boundFn: BoundFuction;
+  boundFn: BoundsFuction;
 };
 
 export const usePanCommons = (options: PanCommmonOptions) => {

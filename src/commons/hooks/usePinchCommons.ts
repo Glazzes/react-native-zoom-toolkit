@@ -4,7 +4,7 @@ import {
   type SharedValue,
   cancelAnimation,
 } from 'react-native-reanimated';
-import type { BoundFuction, SizeVector, Vector } from '../types';
+import type { BoundsFuction, ScaleMode, SizeVector, Vector } from '../types';
 import type {
   GestureStateChangeEvent,
   GestureUpdateEvent,
@@ -22,10 +22,10 @@ type PinchOptions = {
   delta: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
   scaleOffset: SharedValue<number>;
-  panWithPinch: boolean;
-  scaleMode: 'free' | 'clamp' | 'bounce';
-  maxScale: number;
-  boundFn: BoundFuction;
+  scaleMode: ScaleMode;
+  maxScale: SharedValue<number>;
+  boundFn: BoundsFuction;
+  panWithPinch?: boolean;
 };
 
 type PinchGestureEvent =
@@ -69,7 +69,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     'worklet';
     let toScale = e.scale * scaleOffset.value;
     if (scaleMode === 'clamp') {
-      toScale = clamp(toScale, 0, maxScale);
+      toScale = clamp(toScale, 0, maxScale.value);
     }
 
     delta.x.value = e.focalX - detector.width.value / 2 - origin.x.value;
@@ -104,10 +104,11 @@ export const usePinchCommons = (options: PinchOptions) => {
       return;
     }
 
-    if (scale.value > maxScale && scaleMode === 'bounce') {
+    if (scale.value > maxScale.value && scaleMode === 'bounce') {
       const scaleDiff = scale.value / scaleOffset.value;
+
       const { x, y } = pinchTransform({
-        toScale: maxScale,
+        toScale: maxScale.value,
         fromScale: scale.value,
         origin: { x: origin.x.value, y: origin.y.value },
         offset: { x: translate.x.value, y: translate.y.value },
@@ -117,17 +118,17 @@ export const usePinchCommons = (options: PinchOptions) => {
         },
       });
 
-      const { x: boundX, y: boundY } = boundFn(maxScale);
+      const { x: boundX, y: boundY } = boundFn(maxScale.value);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
 
       translate.x.value = withTiming(toX);
       translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale);
+      scale.value = withTiming(maxScale.value);
 
       detectorTranslate.x.value = toX;
       detectorTranslate.y.value = toY;
-      detectorScale.value = maxScale;
+      detectorScale.value = maxScale.value;
       return;
     }
 

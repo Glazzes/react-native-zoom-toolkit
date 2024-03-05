@@ -1,6 +1,6 @@
 import React from 'react';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
-import { SkiaCropZoom } from './cropzoom';
+import { SkiaCropZoom } from './src/cropzoom';
 
 type AppProps = {};
 

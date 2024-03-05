@@ -2957,18 +2957,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@likashefqet/react-native-image-zoom@npm:2.0.0-alpha.0":
-  version: 2.0.0-alpha.0
-  resolution: "@likashefqet/react-native-image-zoom@npm:2.0.0-alpha.0"
-  peerDependencies:
-    react: ">=16.x.x"
-    react-native: ">=0.62.x"
-    react-native-gesture-handler: ">=2.x.x"
-    react-native-reanimated: ">=2.x.x"
-  checksum: 7305bb49a5242196b051c62a99c34b11259ac695127c89bb11fd242258b13e513b0fa4d8fc26db0c43685076e76e5b7b53041380288a6972d6364fb202465669
-  languageName: node
-  linkType: hard
-
 "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1":
   version: 5.1.1-v1
   resolution: "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1"
@@ -14901,7 +14889,6 @@ __metadata:
   dependencies:
     "@babel/core": ^7.20.0
     "@expo/webpack-config": ^18.0.1
-    "@likashefqet/react-native-image-zoom": 2.0.0-alpha.0
     "@shopify/react-native-skia": 0.1.221
     babel-loader: ^8.1.0
     babel-plugin-module-resolver: ^5.0.0

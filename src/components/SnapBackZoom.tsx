@@ -10,10 +10,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useVector } from '../hooks/useVector';
-import { useSize } from '../hooks/useSize';
+import { useVector } from '../commons/hooks/useVector';
+import { useSizeVector } from '../commons/hooks/useSizeVector';
 import { DEFAULT_HITSLOP } from '../constants';
-import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
+import { resizeToAspectRatio } from '../commons/utils/resizeToAspectRatio';
 
 import type {
   CommonZoomCallbackProps,
@@ -46,8 +46,8 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
 }) => {
   const position = useVector(0, 0);
 
-  const childrenSize = useSize(0, 0);
-  const containerSize = useSize(
+  const childrenSize = useSizeVector(0, 0);
+  const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
@@ -72,19 +72,17 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   };
 
   useDerivedValue(() => {
-    if (onGestureActive !== undefined && isPinchActive.value) {
-      onGestureActive({
-        x: position.x.value,
-        y: position.y.value,
-        width: containerSize.width.value,
-        height: containerSize.height.value,
-        resizedWidth: childrenSize.width.value,
-        resizedHeight: childrenSize.height.value,
-        translateX: translate.x.value,
-        translateY: translate.y.value,
-        scale: scale.value,
-      });
-    }
+    onGestureActive?.({
+      x: position.x.value,
+      y: position.y.value,
+      width: containerSize.width.value,
+      height: containerSize.height.value,
+      resizedWidth: childrenSize.width.value,
+      resizedHeight: childrenSize.height.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    });
   }, [position, translate, scale, containerSize, childrenSize, isPinchActive]);
 
   const pinch = Gesture.Pinch()
