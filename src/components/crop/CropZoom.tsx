@@ -15,13 +15,19 @@ import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { canvasToSize } from './utils';
 import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
-import type { CropZoomType, CropZoomProps, CropContextResult } from './types';
+import {
+  type CropZoomType,
+  type CropZoomProps,
+  type CropContextResult,
+  CropMode,
+} from './types';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(255, 242, 105, 0.5)';
 
 const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
   const {
+    mode,
     debug,
     cropSize,
     resolution,
@@ -31,6 +37,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     panMode = PanMode.FREE,
     panWithPinch = true,
     onGestureActive,
+    OverlayComponent,
   } = props;
 
   const translate = useVector(0, 0);
@@ -147,7 +154,6 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       width: detector.width.value,
       height: detector.height.value,
       position: 'absolute',
-      zIndex: 1,
       backgroundColor: debug ? detectorColor : undefined,
       transform: [
         { translateX: detectorTranslate.x.value },
@@ -161,7 +167,6 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     return {
       width: container.width.value,
       height: container.height.value,
-      position: 'absolute',
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
@@ -291,15 +296,30 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     backgroundColor: debug ? containerColor : undefined,
   };
 
-  return (
-    <View style={[root, styles.root]}>
-      <View style={[cropStyle, styles.center]}>
-        <Animated.View style={containerStyle}>{children}</Animated.View>
-        <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
+  if (mode === CropMode.MANAGED) {
+    return (
+      <View style={[root, styles.root]}>
+        <View style={[cropStyle, styles.center]}>
+          <Animated.View style={containerStyle}>{children}</Animated.View>
+          <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
+        </View>
+
+        <View style={[styles.absolute, styles.center]}>{OverlayComponent}</View>
+
         <GestureDetector gesture={Gesture.Race(pinch, pan)}>
           <Animated.View style={detectorStyle} />
         </GestureDetector>
       </View>
+    );
+  }
+
+  return (
+    <View style={[cropStyle, styles.center]}>
+      <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
+
+      <GestureDetector gesture={Gesture.Race(pinch, pan)}>
+        <Animated.View style={detectorStyle} />
+      </GestureDetector>
     </View>
   );
 });
@@ -309,6 +329,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  absolute: {
+    position: 'absolute',
   },
   center: {
     justifyContent: 'center',

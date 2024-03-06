@@ -2,6 +2,11 @@ import type React from 'react';
 import type { SizeVector } from '../../commons/types';
 import type { PanMode, ScaleMode } from '../../commons/types';
 
+export enum CropMode {
+  MANAGED = 'managed',
+  OVERLAY = 'overlay',
+}
+
 export type CropContextResult = {
   crop: {
     originX: number;
@@ -69,6 +74,25 @@ export type CropZoomType = {
   crop: (fixedWidth?: number) => CropContextResult;
 };
 
+export type CropZoomProps = React.PropsWithChildren<{
+  mode: CropMode;
+  cropSize: SizeVector<number>;
+  resolution: SizeVector<number>;
+  debug?: boolean;
+  minScale?: number;
+  maxScale?: number;
+  scaleMode?: ScaleMode;
+  panMode?: PanMode;
+  panWithPinch?: boolean;
+  onGestureActive?: CropGestureEventCallBack;
+  OverlayComponent?: React.ReactElement;
+}>;
+
+export type RotateTransitionCallback = (
+  animate?: boolean,
+  callback?: (angle: number) => void
+) => void;
+
 export type CropGestureEvent = {
   width: number;
   height: number;
@@ -80,16 +104,4 @@ export type CropGestureEvent = {
   rotateY: number;
 };
 
-export type CropGestureCallBack = (event: CropGestureEvent) => void;
-
-export type CropZoomProps = React.PropsWithChildren<{
-  cropSize: SizeVector<number>;
-  resolution: SizeVector<number>;
-  debug?: boolean;
-  minScale?: number;
-  maxScale?: number;
-  scaleMode?: ScaleMode;
-  panMode?: PanMode;
-  panWithPinch?: boolean;
-  onGestureActive?: CropGestureCallBack;
-}>;
+export type CropGestureEventCallBack = (event: CropGestureEvent) => void;
