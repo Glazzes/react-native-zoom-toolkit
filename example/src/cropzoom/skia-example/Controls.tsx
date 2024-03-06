@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,14 +13,20 @@ import {
   rect,
   ImageFormat,
   type SkiaDomView,
-  Canvas,
   type SkImage,
-  Image,
-  ColorMatrix,
 } from '@shopify/react-native-skia';
 import { cacheDirectory, writeAsStringAsync } from 'expo-file-system';
 import { cropSize } from '../commons/CropOverlay';
 import { withTiming, type SharedValue } from 'react-native-reanimated';
+import {
+  baseColor,
+  activeColor,
+  buttonSize,
+  indentity,
+  blackAndWhite,
+  controlSize,
+} from '../commons/contants';
+import EffectPreview from './EffectPreview';
 
 type EffectIndicatorProps = {
   progress: SharedValue<number>;
@@ -30,15 +36,9 @@ type EffectIndicatorProps = {
   canvasRef: React.RefObject<SkiaDomView>;
 };
 
-const baseColor = '#fff';
-const activeColor = '#75DAEA';
+const matrices: number[][] = [indentity, blackAndWhite];
 
-const BUTTON_SIZE = 50;
-const blackAndWhite = [
-  0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0,
-];
-
-const EffectIndicator: React.FC<EffectIndicatorProps> = ({
+const Controls: React.FC<EffectIndicatorProps> = ({
   image,
   progress,
   cropRef,
@@ -47,6 +47,7 @@ const EffectIndicator: React.FC<EffectIndicatorProps> = ({
 }) => {
   const { width, height } = useWindowDimensions();
 
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [rotated, setRotated] = useState<number>(0);
 
@@ -61,15 +62,12 @@ const EffectIndicator: React.FC<EffectIndicatorProps> = ({
     });
   };
 
-  const desaturate = () => (progress.value = withTiming(1));
-  const saturate = () => (progress.value = withTiming(0));
-
   const cropCanvas = async () => {
     setIsCropping(true);
 
     const canvasCrop = rect(
       (width - cropSize) / 2,
-      (height - cropSize) / 2,
+      (height - controlSize - cropSize) / 2,
       cropSize,
       cropSize
     );
@@ -87,36 +85,25 @@ const EffectIndicator: React.FC<EffectIndicatorProps> = ({
     }
   };
 
+  useEffect(() => {
+    progress.value = withTiming(activeIndex);
+  }, [activeIndex, progress]);
+
   return (
     <View style={styles.root}>
       <View style={styles.previewContainer}>
-        <Pressable onPress={saturate} style={styles.pressable}>
-          <Canvas style={styles.canvas}>
-            <Image
+        {matrices.map((matrix, index) => {
+          return (
+            <EffectPreview
+              key={`matrix-${index}`}
+              index={index}
+              activeIndex={activeIndex}
+              setActiveIndex={setActiveIndex}
               image={image}
-              x={0}
-              y={0}
-              width={BUTTON_SIZE}
-              height={BUTTON_SIZE}
-              fit={'cover'}
+              matrix={matrix}
             />
-          </Canvas>
-        </Pressable>
-
-        <Pressable onPress={desaturate} style={styles.pressable}>
-          <Canvas style={styles.canvas}>
-            <Image
-              image={image}
-              x={0}
-              y={0}
-              width={BUTTON_SIZE}
-              height={BUTTON_SIZE}
-              fit={'cover'}
-            >
-              <ColorMatrix matrix={blackAndWhite} />
-            </Image>
-          </Canvas>
-        </Pressable>
+          );
+        })}
       </View>
 
       <Pressable onPress={rotate}>
@@ -147,8 +134,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.m,
     paddingBottom: theme.spacing.s,
     gap: theme.spacing.l,
-    position: 'absolute',
-    bottom: 0,
     zIndex: 100,
   },
   previewContainer: {
@@ -156,24 +141,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.m,
   },
-  pressable: {
-    borderWidth: 1,
-    borderRadius: theme.spacing.s,
-    borderColor: baseColor,
-    overflow: 'hidden',
-  },
-  canvas: {
-    width: BUTTON_SIZE,
-    height: BUTTON_SIZE,
-  },
   button: {
-    width: BUTTON_SIZE,
-    height: BUTTON_SIZE,
-    borderRadius: BUTTON_SIZE / 2,
+    width: buttonSize,
+    height: buttonSize,
+    borderRadius: buttonSize / 2,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#75DAEA',
   },
 });
 
-export default EffectIndicator;
+export default Controls;

@@ -6,7 +6,8 @@ import {
   PanMode,
   ScaleMode,
   type CropZoomType,
-  type CropGestureCallBack,
+  type CropGestureEventCallBack,
+  CropMode,
 } from '../../../../src';
 import {
   Canvas,
@@ -22,19 +23,20 @@ import { StatusBar } from 'expo-status-bar';
 import { useImageSize } from '../../../../src/hooks/useImageSize';
 import CropModal from '../commons/CropModal';
 import CropOverlay, { cropSize } from '../commons/CropOverlay';
-import EffectIndicator from './EffectIndicator';
+import Controls from './Controls';
+import {
+  buttonSize,
+  blackAndWhite,
+  controlSize,
+  indentity,
+} from '../commons/contants';
+import { theme } from '../../constants';
 
 const useVector = (x: number, y?: number) => {
   const first = useSharedValue(x);
   const second = useSharedValue(y ?? x);
   return { x: first, y: second };
 };
-
-const indentity = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-
-const blackAndWhite = [
-  0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0,
-];
 
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -62,7 +64,7 @@ const SkiaCropZoom: React.FC = ({}) => {
     [width, screenWidth]
   );
   const posY = useDerivedValue(
-    () => (screenHeight - height.value) / 2,
+    () => (screenHeight - height.value - buttonSize - theme.spacing.s) / 2,
     [height, screenHeight]
   );
 
@@ -75,7 +77,7 @@ const SkiaCropZoom: React.FC = ({}) => {
     ];
   }, [translate, rotation, scale]);
 
-  const onGestureActive: CropGestureCallBack = (e) => {
+  const onGestureActive: CropGestureEventCallBack = (e) => {
     'worklet';
     width.value = e.width;
     height.value = e.height;
@@ -100,7 +102,7 @@ const SkiaCropZoom: React.FC = ({}) => {
           height={height}
           image={image}
           fit={'cover'}
-          origin={vec(screenWidth / 2, screenHeight / 2)}
+          origin={vec(screenWidth / 2, (screenHeight - controlSize) / 2)}
           transform={transform}
         >
           <Lerp t={progress}>
@@ -110,23 +112,24 @@ const SkiaCropZoom: React.FC = ({}) => {
         </Image>
       </Canvas>
 
+      <View style={styles.container}>
+        <CropZoom
+          ref={ref}
+          mode={CropMode.OVERLAY}
+          cropSize={{ width: cropSize, height: cropSize }}
+          resolution={resolution}
+          onGestureActive={onGestureActive}
+          scaleMode={ScaleMode.BOUNCE}
+          panMode={PanMode.FREE}
+          panWithPinch={true}
+        />
+      </View>
+
       <View style={StyleSheet.absoluteFill}>
         <CropOverlay />
       </View>
 
-      <CropZoom
-        ref={ref}
-        debug={false}
-        cropSize={{ width: cropSize, height: cropSize }}
-        resolution={resolution}
-        onGestureActive={onGestureActive}
-        scaleMode={ScaleMode.BOUNCE}
-        panMode={PanMode.FREE}
-        maxScale={-1}
-        panWithPinch={true}
-      />
-
-      <EffectIndicator
+      <Controls
         progress={progress}
         image={image}
         canvasRef={canvasRef}
@@ -144,9 +147,12 @@ const SkiaCropZoom: React.FC = ({}) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#121212',
+  },
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212',
   },
   flex: {
     width: '100%',

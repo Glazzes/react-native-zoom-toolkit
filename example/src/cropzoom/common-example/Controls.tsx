@@ -4,21 +4,15 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import type { CropZoomType } from '../../../../src/components/crop/types';
 import { theme } from '../../constants';
 import { FlipType, type Action, manipulateAsync } from 'expo-image-manipulator';
+import { activeColor, baseColor } from '../commons/contants';
 
-type EffectIndicatorProps = {
+type ControlProps = {
   uri: string;
   setCrop: (uri: string | undefined) => void;
   cropRef: React.RefObject<CropZoomType>;
 };
 
-const baseColor = '#fff';
-const activeColor = '#75DAEA';
-
-const EffectIndicator: React.FC<EffectIndicatorProps> = ({
-  uri,
-  cropRef,
-  setCrop,
-}) => {
+const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
   const [isCropping, setIsCropping] = useState<boolean>(false);
 
   const [isFlippedH, setIsFlippedH] = useState<boolean>(false);
@@ -125,9 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.m,
     paddingBottom: theme.spacing.s,
     gap: theme.spacing.l,
-    position: 'absolute',
-    bottom: 0,
-    zIndex: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   button: {
     width: 50,
@@ -139,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EffectIndicator;
+export default Controls;

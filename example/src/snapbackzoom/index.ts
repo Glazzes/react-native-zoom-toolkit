@@ -1,1 +1,1 @@
-export { default as PreviewExample } from './PreviewExample';
+export { default as SnapbackZoomExample } from './SnapbackZoomExample';

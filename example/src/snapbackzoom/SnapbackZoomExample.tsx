@@ -5,7 +5,7 @@ import { ReflectionProvider } from './reflection/ReflectionContext';
 import MessageList from './list/MessageList';
 import Reflection from './reflection/Reflection';
 
-const PreviewExample: React.FC = ({}) => {
+const SnapbackZoomExample: React.FC = ({}) => {
   return (
     <SafeAreaView style={styles.root}>
       <ReflectionProvider>
@@ -32,4 +32,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default gestureHandlerRootHOC(PreviewExample);
+export default gestureHandlerRootHOC(SnapbackZoomExample);

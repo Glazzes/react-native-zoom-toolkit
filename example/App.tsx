@@ -1,11 +1,11 @@
 import React from 'react';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
-import { SkiaCropZoom } from './src/cropzoom';
+import { CropManagedExample } from './src/cropzoom';
 
 type AppProps = {};
 
 const App: React.FC<AppProps> = ({}) => {
-  return <SkiaCropZoom />;
+  return <CropManagedExample />;
 };
 
 export default gestureHandlerRootHOC(App);

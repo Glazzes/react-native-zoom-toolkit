@@ -1,18 +1,20 @@
 import React from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
+import { buttonSize } from './contants';
+import { theme } from '../../constants';
 
 const { width, height } = Dimensions.get('screen');
-const center = { x: width / 2, y: height / 2 };
-
-const radius = (width * 0.9) / 2;
-const path = Skia.Path.MakeFromSVGString(
-  `M 0 0 h ${width} v ${height} h ${-width} v ${-height} M ${
-    center.x - radius
-  } ${center.y} a 1 1 0 0 0 ${radius * 2} 0 a 1 1 0 0 0 ${-1 * radius * 2} 0`
-)!;
 
 export const cropSize = width * 0.9;
+const controlSize = buttonSize + theme.spacing.s;
+const center = { x: width / 2, y: (height - controlSize) / 2 };
+
+const path = Skia.Path.MakeFromSVGString(
+  `M 0 0 h ${width} v ${height} h ${-width} v ${-height} M ${
+    center.x - cropSize / 2
+  } ${center.y} a 1 1 0 0 0 ${cropSize} 0 a 1 1 0 0 0 ${-1 * cropSize} 0`
+)!;
 
 const CropOverlay: React.FC = ({}) => {
   return (
@@ -25,6 +27,7 @@ const CropOverlay: React.FC = ({}) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: 'pink',
   },
 });
 
