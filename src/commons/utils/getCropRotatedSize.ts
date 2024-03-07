@@ -7,7 +7,7 @@ type Options = {
   aspectRatio?: number;
 };
 
-export const getRotatedSize = (options: Options): SizeVector<number> => {
+export const getCropRotatedSize = (options: Options): SizeVector<number> => {
   'worklet';
   const { size, angle, aspectRatio = 1 } = options;
 

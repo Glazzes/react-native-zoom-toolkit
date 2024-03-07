@@ -23,6 +23,7 @@ type PinchOptions = {
   scale: SharedValue<number>;
   scaleOffset: SharedValue<number>;
   scaleMode: ScaleMode;
+  minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
   panWithPinch?: boolean;
@@ -44,6 +45,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     delta,
     scale,
     scaleOffset,
+    minScale,
     maxScale,
     scaleMode,
     panWithPinch,
@@ -69,7 +71,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     'worklet';
     let toScale = e.scale * scaleOffset.value;
     if (scaleMode === 'clamp') {
-      toScale = clamp(toScale, 0, maxScale.value);
+      toScale = clamp(toScale, minScale, maxScale.value);
     }
 
     delta.x.value = e.focalX - detector.width.value / 2 - origin.x.value;
@@ -93,19 +95,22 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchEnd = () => {
     'worklet';
-    if (scale.value < 1) {
+    if (scale.value <= minScale) {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
-      scale.value = withTiming(1);
+      scale.value = withTiming(minScale);
 
       detectorTranslate.x.value = 0;
       detectorTranslate.y.value = 0;
-      detectorScale.value = 1;
+      detectorScale.value = minScale;
       return;
     }
 
     if (scale.value > maxScale.value && scaleMode === 'bounce') {
-      const scaleDiff = scale.value / scaleOffset.value;
+      const scaleDiff = Math.max(
+        0,
+        scaleOffset.value - (scale.value - scaleOffset.value) / 2
+      );
 
       const { x, y } = pinchTransform({
         toScale: maxScale.value,

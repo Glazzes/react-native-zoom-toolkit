@@ -1,6 +1,5 @@
 import type React from 'react';
-import type { SizeVector } from '../../commons/types';
-import type { PanMode, ScaleMode } from '../../commons/types';
+import type { CommonResumableProps, SizeVector } from '../../commons/types';
 
 export enum CropMode {
   MANAGED = 'managed',
@@ -75,18 +74,15 @@ export type CropZoomType = {
 };
 
 export type CropZoomProps = React.PropsWithChildren<{
+  reference?: React.ForwardedRef<CropZoomType>;
   mode: CropMode;
   cropSize: SizeVector<number>;
   resolution: SizeVector<number>;
   debug?: boolean;
-  minScale?: number;
-  maxScale?: number;
-  scaleMode?: ScaleMode;
-  panMode?: PanMode;
-  panWithPinch?: boolean;
   onGestureActive?: CropGestureEventCallBack;
-  OverlayComponent?: React.ReactElement;
-}>;
+  OverlayComponent?: () => React.ReactElement<any>;
+}> &
+  CommonResumableProps;
 
 export type RotateTransitionCallback = (
   animate?: boolean,

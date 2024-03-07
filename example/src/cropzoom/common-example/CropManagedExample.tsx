@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -33,22 +33,28 @@ const CropManagedExample = ({}) => {
   const cropSize = width * 0.9;
   const overlayHeight = height - controlSize;
 
-  const path = useMemo(() => {
+  const renderOverlay = useCallback(() => {
     const center = { x: width / 2, y: overlayHeight / 2 };
 
-    return Skia.Path.MakeFromSVGString(
+    const path = Skia.Path.MakeFromSVGString(
       `M 0 0 h ${width} v ${overlayHeight} h ${-width} v ${-overlayHeight} M ${
         center.x - cropSize / 2
       } ${center.y} a 1 1 0 0 0 ${cropSize} 0 a 1 1 0 0 0 ${-1 * cropSize} 0`
     )!;
 
+    const overlayStyle: ViewStyle = {
+      width: width,
+      height: overlayHeight,
+    };
+
+    return (
+      <Canvas style={overlayStyle}>
+        <Path path={path} color={'rgba(0, 0, 0, 0.4)'} />
+      </Canvas>
+    );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height]);
-
-  const overlayStyle: ViewStyle = {
-    width: width,
-    height: overlayHeight,
-  };
 
   if (size === undefined) {
     return null;
@@ -66,11 +72,7 @@ const CropManagedExample = ({}) => {
         panMode={PanMode.FREE}
         scaleMode={ScaleMode.BOUNCE}
         panWithPinch={true}
-        OverlayComponent={
-          <Canvas style={overlayStyle}>
-            <Path path={path} color={'rgba(0, 0, 0, 0.4)'} />
-          </Canvas>
-        }
+        OverlayComponent={renderOverlay}
       >
         <Image source={{ uri: IMAGE }} style={styles.image} />
       </CropZoom>

@@ -20,3 +20,11 @@ export enum ScaleMode {
   CLAMP = 'clamp',
   BOUNCE = 'bounce',
 }
+
+export type CommonResumableProps = {
+  minScale?: number;
+  maxScale?: number;
+  panMode?: PanMode;
+  scaleMode?: ScaleMode;
+  panWithPinch?: boolean;
+};

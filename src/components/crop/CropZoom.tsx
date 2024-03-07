@@ -1,6 +1,5 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { useImperativeHandle } from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
-import { useVector } from '../../commons/hooks/useVector';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -9,29 +8,33 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { getRotatedSize } from '../../commons/utils/getRotatedSize';
+import { getCropRotatedSize } from '../../commons/utils/getCropRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
-import { canvasToSize } from './utils';
+import { useVector } from '../../commons/hooks/useVector';
 import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
+import { canvasToSize } from './utils';
 import {
-  type CropZoomType,
+  CropMode,
   type CropZoomProps,
   type CropContextResult,
-  CropMode,
+  type CropZoomType,
 } from './types';
+import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(255, 242, 105, 0.5)';
 
-const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
+const CropZoom: React.FC<CropZoomProps> = (props) => {
   const {
+    reference,
     mode,
     debug,
     cropSize,
     resolution,
     children,
+    minScale = 1,
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
@@ -65,11 +68,11 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       resolution
     );
 
-    return userMaxScale < 0 ? scaleValue : userMaxScale;
+    return userMaxScale < 1 ? scaleValue : userMaxScale;
   }, [container, userMaxScale]);
 
   useDerivedValue(() => {
-    const size = getRotatedSize({
+    const size = getCropRotatedSize({
       size: cropSize,
       aspectRatio: resolution.width / resolution.height,
       angle: sizeAngle.value,
@@ -121,6 +124,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     origin,
     scale,
     scaleOffset,
+    minScale,
     maxScale,
     delta,
     panWithPinch,
@@ -274,7 +278,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
     });
   };
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle(reference, () => ({
     rotate: handleRotate,
     flipHorizontal: handleFlipHorizontal,
     flipVertical: handleFlipVertical,
@@ -304,7 +308,9 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
           <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
         </View>
 
-        <View style={[styles.absolute, styles.center]}>{OverlayComponent}</View>
+        <View style={[styles.absolute, styles.center]}>
+          {OverlayComponent?.()}
+        </View>
 
         <GestureDetector gesture={Gesture.Race(pinch, pan)}>
           <Animated.View style={detectorStyle} />
@@ -322,7 +328,7 @@ const CropZoom = forwardRef<CropZoomType, CropZoomProps>((props, ref) => {
       </GestureDetector>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   root: {
@@ -339,4 +345,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CropZoom;
+export default withResumableValidation<CropZoomType, CropZoomProps>(CropZoom);
