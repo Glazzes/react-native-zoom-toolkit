@@ -3,7 +3,7 @@ import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
 import { maxDimension, theme } from '../../constants';
 import {
   SnapBackZoom,
-  useImageSize,
+  useImageResolution,
   getAspectRatioSize,
   type ResizeConfig,
 } from '../../../../src';
@@ -30,10 +30,13 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   activeIndex,
   useResizeConfig,
 }) => {
-  const { size } = useImageSize({ uri });
+  const animatedRef = useAnimatedRef();
 
-  const aspectRatio =
-    size === undefined ? 1 : (size?.width ?? 1) / (size?.height ?? 1);
+  const { isFetching, resolution } = useImageResolution({ uri });
+  const aspectRatio = isFetching
+    ? 1
+    : (resolution?.width ?? 1) / (resolution?.height ?? 1);
+
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio,
     maxWidth: 250,
@@ -45,14 +48,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     scale: 1.75,
   };
 
-  const imageStyle: ImageStyle = {
-    width: imageWidth,
-    height: imageHeight,
-    borderRadius: 8,
-  };
-
-  const animatedRef = useAnimatedRef();
-  const backgroundColor = useSharedValue<string>(theme.colors.userMessage);
   const {
     width,
     height,
@@ -60,10 +55,11 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     x,
     y,
   } = useContext(ReflectionContext);
+  const backgroundColor = useSharedValue<string>(theme.colors.userMessage);
 
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: backgroundColor.value,
-    borderRadius: 8,
+    borderRadius: theme.spacing.s,
     padding: theme.spacing.xs / 2,
   }));
 
@@ -104,6 +100,12 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     activeIndex.value = -1;
     x.value = -1 * maxDimension;
     y.value = -1 * maxDimension;
+  };
+
+  const imageStyle: ImageStyle = {
+    width: imageWidth,
+    height: imageHeight,
+    borderRadius: theme.spacing.s,
   };
 
   return (

@@ -74,19 +74,19 @@ export type CropZoomType = {
 };
 
 export type CropZoomProps = React.PropsWithChildren<{
-  reference?: React.ForwardedRef<CropZoomType>;
-  mode: CropMode;
   cropSize: SizeVector<number>;
   resolution: SizeVector<number>;
   debug?: boolean;
+  mode?: CropMode;
   onGestureActive?: CropGestureEventCallBack;
   OverlayComponent?: () => React.ReactElement<any>;
+  reference?: React.ForwardedRef<CropZoomType>;
 }> &
   CommonResumableProps;
 
 export type RotateTransitionCallback = (
   animate?: boolean,
-  callback?: (angle: number) => void
+  callback?: (value: number) => void
 ) => void;
 
 export type CropGestureEvent = {

@@ -29,7 +29,7 @@ const containerColor = 'rgba(255, 242, 105, 0.5)';
 const CropZoom: React.FC<CropZoomProps> = (props) => {
   const {
     reference,
-    mode,
+    mode = CropMode.MANAGED,
     debug,
     cropSize,
     resolution,

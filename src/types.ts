@@ -7,11 +7,6 @@ import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handle
 import type { WithTimingConfig } from 'react-native-reanimated';
 import type { SizeVector } from './commons/types';
 
-export type Source = {
-  uri: string;
-  headers?: Record<string, string>;
-};
-
 export type ResizeConfig = {
   size: SizeVector<number>;
   aspectRatio: number;

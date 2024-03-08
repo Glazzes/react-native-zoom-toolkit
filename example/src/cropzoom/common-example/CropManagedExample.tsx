@@ -8,10 +8,7 @@ import {
 } from 'react-native';
 import {
   CropZoom,
-  useImageSize,
-  CropMode,
-  PanMode,
-  ScaleMode,
+  useImageResolution,
   type CropZoomType,
 } from '../../../../src';
 import { StatusBar } from 'expo-status-bar';
@@ -27,9 +24,8 @@ const CropManagedExample = ({}) => {
   const ref = useRef<CropZoomType>(null);
   const [result, setResult] = useState<string | undefined>(undefined);
 
-  const { size } = useImageSize({ uri: IMAGE });
   const { width, height } = useWindowDimensions();
-
+  const { resolution } = useImageResolution({ uri: IMAGE });
   const cropSize = width * 0.9;
   const overlayHeight = height - controlSize;
 
@@ -56,7 +52,7 @@ const CropManagedExample = ({}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height]);
 
-  if (size === undefined) {
+  if (resolution === undefined) {
     return null;
   }
 
@@ -65,13 +61,8 @@ const CropManagedExample = ({}) => {
       <StatusBar style="light" backgroundColor="transparent" />
       <CropZoom
         ref={ref}
-        debug={false}
-        mode={CropMode.MANAGED}
         cropSize={{ width: cropSize, height: cropSize }}
-        resolution={size}
-        panMode={PanMode.FREE}
-        scaleMode={ScaleMode.BOUNCE}
-        panWithPinch={true}
+        resolution={resolution}
         OverlayComponent={renderOverlay}
       >
         <Image source={{ uri: IMAGE }} style={styles.image} />

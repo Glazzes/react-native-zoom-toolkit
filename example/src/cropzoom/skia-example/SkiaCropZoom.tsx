@@ -5,6 +5,7 @@ import {
   CropZoom,
   PanMode,
   ScaleMode,
+  useImageResolution,
   type CropZoomType,
   type CropGestureEventCallBack,
   CropMode,
@@ -20,7 +21,6 @@ import {
   type Transforms2d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
-import { useImageSize } from '../../../../src/hooks/useImageSize';
 import CropModal from '../commons/CropModal';
 import CropOverlay, { cropSize } from '../commons/CropOverlay';
 import Controls from './Controls';
@@ -42,7 +42,7 @@ const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const SkiaCropZoom: React.FC = ({}) => {
-  const { size: resolution } = useImageSize({ uri: IMAGE });
+  const { resolution } = useImageResolution({ uri: IMAGE });
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const ref = useRef<CropZoomType>(null);
