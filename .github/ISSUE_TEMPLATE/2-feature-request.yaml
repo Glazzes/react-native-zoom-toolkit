@@ -1,5 +1,5 @@
 name: Feature Request
-description: Didn't you find what you need? Let us know.
+description: Suggest an idea for this project.
 title: "[FEATURE]: "
 labels:
   - "enhancement"
@@ -16,4 +16,4 @@ body:
       required: false
     attributes:
       label: Expected API
-      description: Please describe how the API for this feture should look like.
+      description: Please describe how the API for this feature should look like.

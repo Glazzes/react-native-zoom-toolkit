@@ -1,7 +1,5 @@
 name: Ask a question
-description: >-
-  Before you ask a question make sure you've read the documentation carefuly, additionaly you can 
-  take a look to the example application for common use cases for this library.
+description: Make sure you've read the documentation carefully before asking a question.
 labels:
   - "question"
 body:
