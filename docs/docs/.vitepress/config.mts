@@ -5,26 +5,37 @@ export default defineConfig({
   title: "React Native Zoom Toolkit",
   description: "A set of components and utilities for common pinch to zoom requirements",
   base: '/react-native-zoomable/',
+  markdown: {
+    lineNumbers: true
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
       {text: '1.0.0', items: [
         {text: 'Changelog', link: 'https://www.youtube.com/'},
-        {text: 'Contributing', link: 'https://www.youtube.com/'},
+        {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoomable/blob/main/CONTRIBUTING.md'},
       ]}
     ],
 
     sidebar: [
       {
         text: 'Get Started',
-        link: '/get-started'
+        items: [
+          {text: 'Installation', link: '/installation'}
+        ]
       },
       {
         text: 'Components',
         items: [
           {text: 'SnapbackZoom', link: '/components/snapbackzoom'},
-          {text: 'Crop Zoom', link: '/components/cropzoom'}
+          {text: 'CropZoom', link: '/components/cropzoom'}
+        ]
+      },
+      {
+        text: 'Utilities',
+        items: [
+          {text: 'useImageResolution', link: '/utilities/useimageresolution'}
         ]
       },
       {

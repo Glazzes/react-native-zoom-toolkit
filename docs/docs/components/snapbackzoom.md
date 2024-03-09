@@ -4,7 +4,7 @@ description: An ideal component for preview handling
 outline: deep
 ---
 
-# Snapback Zoom
+# SnapbackZoom
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
 
 The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
@@ -57,70 +57,90 @@ import { SnapBackZoom } from "@glazzes/react-native-zoomable"
 All properties for this component are optional.
 
 ### hitslop
-- Type:  `object`
-- Default: `undefined`
+| Type | Default |
+|------|---------|
+| `object` | `undefined` |
+
 - see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
 
 Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
 ### timingConfig 
-- Type: `object`
-- Default: `undefined`
+| Type | Default |
+|------|---------|
+| `object` | `undefined` |
+
 - see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
 
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position.
 
 ### resizeConfig
-- Type: [ResizeConfig](#resizeconfig-type)
-- Default: `undefined`
+| Type | Default |
+|------|---------|
+| `ResizeConfig` | `undefined` |
+
 - see [notes](#notes)
 
 Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases.
 
 ### gesturesEnabled
-- Type: `boolean`
-- Default: `true`
+| Type | Default |
+|------|---------|
+| `boolean` | `true` |
 
 Enables or disable gestures, when gestures are disabled your component can detect pointer events again.
 
 ### onTap
-- Type: `function`
-- Default: `undefiend`
+| Type | Default |
+|------|---------|
+| `function` | `undefined` |
 
 Callback triggered when a single tap is made.
 
 ### onDoubleTap
-- Type: `function`
-- Default: `undefiend`
+| Type | Default |
+|------|---------|
+| `function` | `undefined` |
 
 Callback triggered when a double tap is made.
 
 ### onPinchStart
-- Type: `function`
-- Default: `undefiend`
+| Type | Default |
+|------|---------|
+| `function` | `undefined` |
 
 callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
-- Type: `function`
-- Default: `undefiend`
+| Type | Default |
+|------|---------|
+| `function` | `undefined` |
 
 Callback triggered as soon as the user lift their fingers off the screen after pinching.
 
 ### onGestureActive
-- Type: [worklet function](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
-- Default: `undefined`
+| Type | Default |
+|------|---------|
+| `worklet function` | `undefined` |
 
-Callback triggered from the moment pinch gesture starts until the snap back animation finishes, receives the state of the gesture as argument, which includes the following properties
-- `x` position in the x axis starting from the top left corner of the screen
-- `y` position in the y axis starting from the top left corner of the screen
-- `width` width measurement of your component taken at the start of the pinch gesture
-- `height` height measurement of your component taken at the start of the pinch gesture
-- `resizedWidth` If resizeConfig property is not `undefined` this represents the current width of your component, otherwise it is `undefined`
-- `resizedHeight` If resizeConfig property is not `undefined` this represents the current height of your component, otherwise it is `undefined`
-- `translateX` current translateX transformation value
-- `translateY` current trasnlateY transformation value
-- `scale` current scale transformation value
+- see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
+
+Callback triggered from the moment pinch gesture starts until the snap back animation finishes, 
+ideal for mirroring the state of the gesture to some other component.
+
+Receives the state of the gesture as argument, which includes the following properties:
+
+| Name | Type | Description |
+|------|---------|----------|
+| `x`  | `number` | Position in the x axis starting from the top left corner of the screen |
+| `y`  | `number` | Position in the y axis starting from the top left corner of the screen |
+| `width` | `number` | Inital width measurement of your component |
+| `height` | `number` | Inital height measurement of your component |
+| `resizedWidth` | `number \| undefined` | Current width measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
+| `resizedWidth` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
+| `translateX` | `number` | Current translateX transformation value |
+| `translateY` | `number` | Current translateY transformation value |
+| `scale` | `number` | Current scale transformation value |
 
 This property is very useful when you need to mirror the current pinch gesture transformations to some other component.
 
@@ -149,7 +169,7 @@ Imagine you've got a lot of images you want to display as tiles of 200x200 pixel
 At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.
 
 ## Type Definitions
-### ResizeConfig Type
+### ResizeConfig
 
 | Property | type | description |
 |----------|------|-------------|

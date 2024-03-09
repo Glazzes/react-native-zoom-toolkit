@@ -3,20 +3,30 @@
 layout: home
 
 hero:
-  name: "React Native Zoom Toolkit"
-  text: "Smoothly zoom in any component you want"
+  name: React Native Zoom Toolkit
+  # text: Smoothly zoom in any component you want
   tagline: A set of components and utilities for common pinch to zoom requirements
   actions:
     - theme: brand
       text: Get Started
-      link: ./get-started
+      link: ./installation
+
+    - theme: alt
+      text: View on Github
+      link: https://github.com/Glazzes/react-native-zoomable/
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: SnapbackZoom
+    details: An ideal component for preview handling.
+    link: /components/snapbackzoom
+
+  - title: ResumableZoom
+    details: Pick up where you left! A handy component for detail and gallery screens.
+
+  - title: CropZoom
+    details: An ideal and unopinionated component for image and video cropping needs.
+    link: /components/cropzoom
+
+  
 
 ---
