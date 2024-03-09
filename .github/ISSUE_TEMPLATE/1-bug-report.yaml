@@ -1,5 +1,5 @@
 name: Bug Report
-description: Thanks for taking the time to fill out this form
+description: Did something unexpected happen? Let us know.
 title: "[BUG]: "
 labels:
   - "bug"

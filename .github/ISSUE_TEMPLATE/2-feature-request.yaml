@@ -1,5 +1,5 @@
 name: Feature Request
-description: Thanks for taking the time to fill out this form
+description: Didn't you find what you need? Let us know.
 title: "[FEATURE]: "
 labels:
   - "enhancement"
@@ -9,7 +9,7 @@ body:
       required: true
     attributes:
       label: Summary
-      description: Please describe the need and/or use cases for this feature.
+      description: Please describe the need and/or possible use cases for this feature.
 
   - type: textarea
     validations:

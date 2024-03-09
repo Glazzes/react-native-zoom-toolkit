@@ -2,7 +2,7 @@ name: Deploy documentation to Github Pages
 on:
   push:
     branches:
-      - "docs"
+      - main
 
   workflow_dispatch:
 
