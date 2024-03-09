@@ -4,16 +4,16 @@ outline: deep
 ---
 
 # Installation
-Install `@glazzes/react-native-zoomable` in your project
+Install `react-native-zoom-toolkit` in your project
 
 ::: code-group
 
 ```sh [npm]
-npm install @glazzes/react-native-zoomable
+npm install react-native-zoom-toolkit
 ```
 
 ```sh [yarn]
-yarn add @glazzes/react-native-zoomable
+yarn add react-native-zoom-toolkit
 ```
 
 :::

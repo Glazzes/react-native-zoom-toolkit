@@ -14,14 +14,14 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 </div>
 
 ## How to use
-Its usage is pretty straight forward, import SnapBackZoom component from `@glazzes/react-native-zoomable` and wrap a component of your choice with it.
+Its usage is pretty straight forward, import SnapBackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
 
 ::: danger Caution
 Do not use `position: "absolute"` directly in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
 :::
 
 ```jsx
-import { SnapBackZoom } from "@glazzes/react-native-zoomable"
+import { SnapBackZoom } from "react-native-zoom-toolkit"
 
 // Simple use case
 <SnapBackZoom>

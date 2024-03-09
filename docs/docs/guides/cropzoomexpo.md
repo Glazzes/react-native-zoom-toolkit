@@ -2,13 +2,13 @@
 outline: deep
 ---
 
-# Using Crop Zoom with Expo Image Manipulator
+# Use CropZoom with Expo Image Manipulator
 [Expo Image Manipulator](#https://docs.expo.dev/versions/latest/sdk/imagemanipulator/) is by far my favorite library for this particular use case because of its unoppinionated nature and feature set which includes horizontal flipping, vertical flipping, rotation and resizing image capabilities, in others words a feature set that aligns very well with one the provided by [CroopZoom](/components/cropzoom#crop).
 
-## What we'll be building
-We will be building a simple example in which we overlay the resulting crop image in top of CropZoom component so you can see results are accurate, in order to see both the crop and gesture detection areas we will make use of the [debug](/components/cropzoom#debug) property.
+## What you'll be building
+You'll build a simple example in which you'll overlay the resulting crop image on top of CropZoom component's crop area so you can see results are accurate, in order to see both the crop and gesture detection areas you will make use of the [debug](/components/cropzoom#debug) property.
 
-The next video footage is how the end result looks like.
+The next video footage shows what the end result looks like.
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/guideexpo.mp4" controls />
@@ -147,20 +147,23 @@ export default Controls;
 :::
 
 ## Crop Method
-In `Controls.tsx` we could see crop method is empty, lets address that by using [manipulateAsync](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/#imagemanipulatormanipulateasyncuri-actions-saveoptions) method from Expo Image Manipulator.
+In `Controls.tsx` you saw crop method is empty, lets address that by using [manipulateAsync](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/#imagemanipulatormanipulateasyncuri-actions-saveoptions) method from Expo Image Manipulator, this method allows you to apply the following actions to an image of your choice: `flip horizontally`, `flip vertically`, `rotate`, `resize` and `crop`.
 
-Although [manipulateAsync](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/#imagemanipulatormanipulateasyncuri-actions-saveoptions) method lets you apply actions in any order you want, we must follow a specific order to ensure both performance and the desired functionality:
+Although [manipulateAsync](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/#imagemanipulatormanipulateasyncuri-actions-saveoptions) method lets you apply actions in any order you want, you must follow an specific order to ensure both performance and the desired functionality:
 - Resize
 - Flip Horizontal
 - Flip Vertical
 - Rotate
 - Crop
 
-First we must call [crop method](/components/cropzoom#crop) from `cropRef` property as it will give us with all the info we need to perform a crop operation, all actions are optional except the crop action itself therefore we need to make some checks to ensure the desired result while maintaining the previous mentioned order.
+For this use case all actions are optional except the crop action, therefore you'll need to make some checks to maintain the previous mentioned order, so let's get to it.
+
+- Call [crop method](/components/cropzoom#crop) from `cropRef` property as it will give you all the information needed to perform a crop operation.
+- Perform the checks in the specified order.
 
 ```typescript
 const crop = async () => {
-  const result = cropRef.current?.crop(280);
+  const result = cropRef.current?.crop();
   if (result === undefined) {
     return;
   }
@@ -186,9 +189,9 @@ const crop = async () => {
 }
 ```
 
-With all actions in place all we need to do is crop our image and set the result with `setCrop` property, add the following to the bottom of `crop method`.
+With all actions checks in place all that remains is to crop the image and set the result with `setCrop` property, add the following to the end of `crop method`.
 
-```typescript
+```typescript:line-numbers=25
 const cropResult = await manipulateAsync(uri, actions);
 setCrop(cropResult.uri);
 
@@ -198,9 +201,10 @@ setTimeout(() => {
 }, 2500);
 ```
 
-## Whats is next?
+## What's next?
 This example is pretty basic, you can check out both [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)'s CroopZoom examples, however you can keep working in this example, how about:
 
-- Making it prettier.
-- Using different images.
-- Testing with different `cropSize` values, nobody said `width` and `height` properties must be equals.
+- Make it prettier.
+- Use different images.
+- Test with different `cropSize` values, nobody said `width` and `height` properties must be equals.
+- Use `fixedWidth` argument with CropZoom's [crop method](/components/cropzoom#crop) to enforce resulting crops to be of any size you want.

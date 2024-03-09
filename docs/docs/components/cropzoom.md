@@ -8,7 +8,7 @@ outline: deep
 An ideal, practical and unopinionated component for image and video cropping needs, among its features we can find the following:
 
 - Build your own custom UI on top of it.
-- Resumable and accurate zoom features, pan, pinch and even pan with the pinch gesture! It will resume where you left.
+- Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
 - For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
 - Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
 
@@ -192,7 +192,7 @@ ref.current?.crop(200);
 ```
 
 ### crop
-Maps all the transformations applied to your component by the pinch gesture into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
+Maps all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
 - Arguments
 
 | Name | Type | Default | Description |

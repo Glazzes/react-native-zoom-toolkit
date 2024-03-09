@@ -41,7 +41,7 @@ export default defineConfig({
       {
         text: 'Guides',
         items: [
-          {text: 'Use Crop Zoom with Expo Image Manipulator', link: '/guides/cropzoomexpo'},
+          {text: 'Use CropZoom with Expo Image Manipulator', link: '/guides/cropzoomexpo'},
         ]
       }
     ],
