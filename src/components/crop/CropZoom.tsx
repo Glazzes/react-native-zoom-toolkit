@@ -24,7 +24,7 @@ import {
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
-const containerColor = 'rgba(255, 242, 105, 0.5)';
+const containerColor = 'rgba(238, 66, 102, 0.5)';
 
 const CropZoom: React.FC<CropZoomProps> = (props) => {
   const {
