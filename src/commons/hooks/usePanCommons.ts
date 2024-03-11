@@ -1,21 +1,26 @@
+import { useWindowDimensions } from 'react-native';
 import {
   cancelAnimation,
   clamp,
   withTiming,
   type SharedValue,
+  useSharedValue,
+  withDecay,
 } from 'react-native-reanimated';
-import type { BoundsFuction, PanMode, Vector } from '../types';
 import type {
+  GestureStateChangeEvent,
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { friction } from '../utils/friction';
-import { useWindowDimensions } from 'react-native';
+import { PanMode, type BoundsFuction, type Vector } from '../types';
 
 type PanGestureUpdadeEvent = GestureUpdateEvent<
   PanGestureHandlerEventPayload & PanGestureChangeEventPayload
 >;
+
+type PanGestureEnd = GestureStateChangeEvent<PanGestureHandlerEventPayload>;
 
 type PanCommmonOptions = {
   translate: Vector<SharedValue<number>>;
@@ -23,8 +28,8 @@ type PanCommmonOptions = {
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
   scale: SharedValue<number>;
-  detectorScale: SharedValue<number>;
   boundFn: BoundsFuction;
+  decay?: boolean;
 };
 
 export const usePanCommons = (options: PanCommmonOptions) => {
@@ -36,34 +41,40 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     offset,
     panMode,
     scale,
-    detectorScale,
     boundFn,
+    decay,
   } = options;
+
+  const isWithinBoundX = useSharedValue<boolean>(false);
+  const isWithinBoundY = useSharedValue<boolean>(false);
 
   const onPanStart = () => {
     'worklet';
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
+    cancelAnimation(detectorTranslate.x);
+    cancelAnimation(detectorTranslate.y);
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
   };
 
-  const onChange = (e: PanGestureUpdadeEvent) => {
+  const onPanChange = (e: PanGestureUpdadeEvent) => {
     'worklet';
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    if (panMode === 'free') {
+    if (panMode === PanMode.FREE) {
       translate.x.value = toX;
       translate.y.value = toY;
       return;
     }
 
     const { x: boundX, y: boundY } = boundFn(scale.value);
-    const isWithinBoundX = toX >= -1 * boundX && toX <= boundX;
-    const isWithinBoundY = toY >= -1 * boundY && toY <= boundY;
-    if (panMode === 'friction') {
+    isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
+    isWithinBoundY.value = toY >= -1 * boundY && toY <= boundY;
+
+    if (panMode === PanMode.FRICTION) {
       if (isWithinBoundX) {
         translate.x.value = toX;
       } else {
@@ -87,19 +98,41 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     translate.y.value = clamp(toY, -1 * boundY, boundY);
   };
 
-  const onPanEnd = () => {
+  const onPanEnd = ({ velocityX, velocityY }: PanGestureEnd) => {
     'worklet';
+
     const { x: boundX, y: boundY } = boundFn(scale.value);
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
 
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = scale.value;
+    if (decay && isWithinBoundX.value) {
+      translate.x.value = withDecay(
+        {
+          velocity: velocityX,
+          clamp: [-1 * boundX, boundX],
+          deceleration: 0.993,
+        },
+        () => (detectorTranslate.x.value = translate.x.value)
+      );
+    } else {
+      translate.x.value = withTiming(toX);
+      detectorTranslate.x.value = toX;
+    }
 
-    translate.x.value = withTiming(toX);
-    translate.y.value = withTiming(toY);
+    if (decay && isWithinBoundY.value) {
+      translate.y.value = withDecay(
+        {
+          velocity: velocityY,
+          clamp: [-1 * boundY, boundY],
+          deceleration: 0.993,
+        },
+        () => (detectorTranslate.y.value = translate.y.value)
+      );
+    } else {
+      translate.y.value = withTiming(toY);
+      detectorTranslate.y.value = toY;
+    }
   };
 
-  return { onPanStart, onChange, onPanEnd };
+  return { onPanStart, onPanChange, onPanEnd };
 };

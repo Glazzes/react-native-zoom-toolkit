@@ -1,4 +1,5 @@
-export { default as SnapBackZoom } from './components/SnapBackZoom';
+export { default as SnapbackZoom } from './components/snapback/SnapbackZoom';
+export type * from './components/snapback/types';
 
 export { default as CropZoom } from './components/crop/CropZoom';
 export * from './components/crop/types';
@@ -11,6 +12,4 @@ export {
   type Source,
 } from './hooks/useImageResolution';
 
-export { getAspectRatioSize } from './utils/getAspectRatioSize';
-
-export type * from './types';
+export { default as getAspectRatioSize } from './utils/getAspectRatioSize';

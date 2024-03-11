@@ -1,4 +1,4 @@
-import { type ResizeConfig } from '../../types';
+import type { ResizeConfig } from '../../components/snapback/types';
 import { Extrapolation, interpolate } from 'react-native-reanimated';
 
 type ResizeOptions = {

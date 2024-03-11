@@ -80,7 +80,6 @@ export type CropZoomProps = React.PropsWithChildren<{
   mode?: CropMode;
   onGestureActive?: CropGestureEventCallBack;
   OverlayComponent?: () => React.ReactElement<any>;
-  reference?: React.ForwardedRef<CropZoomType>;
 }> &
   CommonResumableProps;
 

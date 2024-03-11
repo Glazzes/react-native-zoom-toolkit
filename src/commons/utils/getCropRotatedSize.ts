@@ -1,4 +1,4 @@
-import { getAspectRatioSize } from '../../utils/getAspectRatioSize';
+import getAspectRatioSize from '../../utils/getAspectRatioSize';
 import type { SizeVector } from '../types';
 
 type Options = {

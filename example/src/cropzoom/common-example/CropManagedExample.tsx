@@ -10,7 +10,7 @@ import {
   CropZoom,
   useImageResolution,
   type CropZoomType,
-} from '../../../../src';
+} from 'react-native-zoomable';
 import { StatusBar } from 'expo-status-bar';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import Controls from './Controls';

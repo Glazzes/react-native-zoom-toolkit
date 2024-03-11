@@ -21,26 +21,29 @@ import {
   type CropContextResult,
   type CropZoomType,
 } from './types';
-import withResumableValidation from '../../commons/hoc/withResumableValidation';
+import withCropValidation from '../../commons/hoc/withCropValidation';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';
 
+type Reference = React.ForwardedRef<CropZoomType> | undefined;
+
 const CropZoom: React.FC<CropZoomProps> = (props) => {
+  const ref = (props as any).reference as Reference;
+
   const {
-    reference,
-    mode = CropMode.MANAGED,
-    debug,
+    children,
     cropSize,
     resolution,
-    children,
+    debug = false,
     minScale = 1,
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
     panWithPinch = true,
-    onGestureActive,
-    OverlayComponent,
+    mode = CropMode.MANAGED,
+    onGestureActive = undefined,
+    OverlayComponent = undefined,
   } = props;
 
   const translate = useVector(0, 0);
@@ -68,8 +71,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       resolution
     );
 
-    return userMaxScale < 1 ? scaleValue : userMaxScale;
-  }, [container, userMaxScale]);
+    return userMaxScale < 0 ? scaleValue : userMaxScale;
+  }, [container, userMaxScale, resolution]);
 
   useDerivedValue(() => {
     const size = getCropRotatedSize({
@@ -132,12 +135,11 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     boundFn: boundsFn,
   });
 
-  const { onPanStart, onChange, onPanEnd } = usePanCommons({
+  const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
     translate,
     offset,
     scale,
     detectorTranslate,
-    detectorScale,
     panMode,
     boundFn: boundsFn,
   });
@@ -150,7 +152,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   const pan = Gesture.Pan()
     .maxPointers(1)
     .onStart(onPanStart)
-    .onChange(onChange)
+    .onChange(onPanChange)
     .onEnd(onPanEnd);
 
   const detectorStyle = useAnimatedStyle(() => {
@@ -278,7 +280,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     });
   };
 
-  useImperativeHandle(reference, () => ({
+  useImperativeHandle(ref, () => ({
     rotate: handleRotate,
     flipHorizontal: handleFlipHorizontal,
     flipVertical: handleFlipVertical,
@@ -345,4 +347,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withResumableValidation<CropZoomType, CropZoomProps>(CropZoom);
+export default withCropValidation<CropZoomType, CropZoomProps>(CropZoom);

@@ -3,13 +3,13 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import {
   CropZoom,
+  CropMode,
   PanMode,
   ScaleMode,
   useImageResolution,
   type CropZoomType,
   type CropGestureEventCallBack,
-  CropMode,
-} from '../../../../src';
+} from 'react-native-zoomable';
 import {
   Canvas,
   Image,
@@ -42,7 +42,7 @@ const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const SkiaCropZoom: React.FC = ({}) => {
-  const { resolution } = useImageResolution({ uri: IMAGE });
+  const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const ref = useRef<CropZoomType>(null);
@@ -87,7 +87,7 @@ const SkiaCropZoom: React.FC = ({}) => {
     rotation.value = e.rotate;
   };
 
-  if (image === null || resolution === undefined) {
+  if (isFetching || image === null || resolution === undefined) {
     return null;
   }
 
@@ -112,6 +112,10 @@ const SkiaCropZoom: React.FC = ({}) => {
         </Image>
       </Canvas>
 
+      <View style={StyleSheet.absoluteFill}>
+        <CropOverlay />
+      </View>
+
       <View style={styles.container}>
         <CropZoom
           ref={ref}
@@ -123,10 +127,6 @@ const SkiaCropZoom: React.FC = ({}) => {
           panMode={PanMode.FREE}
           panWithPinch={true}
         />
-      </View>
-
-      <View style={StyleSheet.absoluteFill}>
-        <CropOverlay />
       </View>
 
       <Controls

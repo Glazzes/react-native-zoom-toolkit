@@ -1,10 +1,15 @@
 import {
   clamp,
   withTiming,
-  type SharedValue,
   cancelAnimation,
+  type SharedValue,
 } from 'react-native-reanimated';
-import type { BoundsFuction, ScaleMode, SizeVector, Vector } from '../types';
+import {
+  ScaleMode,
+  type BoundsFuction,
+  type SizeVector,
+  type Vector,
+} from '../types';
 import type {
   GestureStateChangeEvent,
   GestureUpdateEvent,
@@ -95,7 +100,8 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchEnd = () => {
     'worklet';
-    if (scale.value <= minScale) {
+
+    if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
       scale.value = withTiming(minScale);
@@ -106,7 +112,7 @@ export const usePinchCommons = (options: PinchOptions) => {
       return;
     }
 
-    if (scale.value > maxScale.value && scaleMode === 'bounce') {
+    if (scale.value > maxScale.value && scaleMode === ScaleMode.BOUNCE) {
       const scaleDiff = Math.max(
         0,
         scaleOffset.value - (scale.value - scaleOffset.value) / 2

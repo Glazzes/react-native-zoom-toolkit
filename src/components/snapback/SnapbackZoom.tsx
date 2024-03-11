@@ -10,28 +10,15 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useVector } from '../commons/hooks/useVector';
-import { useSizeVector } from '../commons/hooks/useSizeVector';
-import { DEFAULT_HITSLOP } from '../constants';
-import { resizeToAspectRatio } from '../commons/utils/resizeToAspectRatio';
+import { useVector } from '../../commons/hooks/useVector';
+import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { DEFAULT_HITSLOP } from '../../constants';
+import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
+import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
-import type {
-  CommonZoomCallbackProps,
-  CommonZoomProps,
-  ResizeConfig,
-} from '../types';
+import type { SnapBackZoomProps } from './types';
 
-type Props = {
-  resizeConfig?: ResizeConfig;
-  gesturesEnabled?: boolean;
-  onGestureEnd?: () => void;
-};
-
-type SnapBackZoomProps = React.PropsWithChildren<Props> &
-  CommonZoomProps &
-  CommonZoomCallbackProps;
-
-const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
+const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
@@ -208,4 +195,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SnapBackZoom;
+export default withSnapbackValidation(SnapbackZoom);

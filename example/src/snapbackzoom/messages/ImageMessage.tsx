@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
 import { maxDimension, theme } from '../../constants';
 import {
-  SnapBackZoom,
+  SnapbackZoom,
   useImageResolution,
   getAspectRatioSize,
   type ResizeConfig,
-} from '../../../../src';
+} from 'react-native-zoomable';
 import Animated, {
   measure,
   runOnUI,
@@ -111,7 +111,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   return (
     <View style={styles.container}>
       <Animated.View ref={animatedRef} style={animatedStyle}>
-        <SnapBackZoom
+        <SnapbackZoom
           hitSlop={{ vertical: 20, horizontal: 20 }}
           resizeConfig={useResizeConfig ? resizeConfig : undefined}
           onPinchStart={onPinchStart}
@@ -123,7 +123,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
             resizeMode="cover"
             resizeMethod="scale"
           />
-        </SnapBackZoom>
+        </SnapbackZoom>
       </Animated.View>
     </View>
   );
