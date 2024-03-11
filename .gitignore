@@ -54,6 +54,10 @@ npm-debug.log
 yarn-debug.log
 yarn-error.log
 
+# docs
+docs/docs/.vitepress/cache
+docs/docs/.vitepress/dist
+
 # BUCK
 buck-out/
 \.buckd/
