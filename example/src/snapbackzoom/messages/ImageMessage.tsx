@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
 import { maxDimension, theme } from '../../constants';
 import {
-  SnapBackZoom,
-  useImageSize,
+  SnapbackZoom,
+  useImageResolution,
   getAspectRatioSize,
   type ResizeConfig,
-} from '../../../../src';
+} from 'react-native-zoomable';
 import Animated, {
   measure,
   runOnUI,
@@ -30,9 +30,13 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   activeIndex,
   useResizeConfig,
 }) => {
-  const { size, error } = useImageSize({ uri });
+  const animatedRef = useAnimatedRef();
 
-  const aspectRatio = error ? 0 : (size?.width ?? 1) / (size?.height ?? 1);
+  const { isFetching, resolution } = useImageResolution({ uri });
+  const aspectRatio = isFetching
+    ? 1
+    : (resolution?.width ?? 1) / (resolution?.height ?? 1);
+
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio,
     maxWidth: 250,
@@ -44,14 +48,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     scale: 1.75,
   };
 
-  const imageStyle: ImageStyle = {
-    width: imageWidth,
-    height: imageHeight,
-    borderRadius: 8,
-  };
-
-  const animatedRef = useAnimatedRef();
-  const backgroundColor = useSharedValue<string>(theme.colors.userMessage);
   const {
     width,
     height,
@@ -59,10 +55,11 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     x,
     y,
   } = useContext(ReflectionContext);
+  const backgroundColor = useSharedValue<string>(theme.colors.userMessage);
 
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: backgroundColor.value,
-    borderRadius: 8,
+    borderRadius: theme.spacing.s,
     padding: theme.spacing.xs / 2,
   }));
 
@@ -105,10 +102,16 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     y.value = -1 * maxDimension;
   };
 
+  const imageStyle: ImageStyle = {
+    width: imageWidth,
+    height: imageHeight,
+    borderRadius: theme.spacing.s,
+  };
+
   return (
     <View style={styles.container}>
       <Animated.View ref={animatedRef} style={animatedStyle}>
-        <SnapBackZoom
+        <SnapbackZoom
           hitSlop={{ vertical: 20, horizontal: 20 }}
           resizeConfig={useResizeConfig ? resizeConfig : undefined}
           onPinchStart={onPinchStart}
@@ -120,7 +123,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
             resizeMode="cover"
             resizeMethod="scale"
           />
-        </SnapBackZoom>
+        </SnapbackZoom>
       </Animated.View>
     </View>
   );

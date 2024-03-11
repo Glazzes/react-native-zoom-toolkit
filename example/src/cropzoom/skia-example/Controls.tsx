@@ -1,0 +1,154 @@
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  ActivityIndicator,
+  useWindowDimensions,
+} from 'react-native';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import type { CropZoomType } from '../../../../src/components/crop/types';
+import { theme } from '../../constants';
+import {
+  rect,
+  ImageFormat,
+  type SkiaDomView,
+  type SkImage,
+} from '@shopify/react-native-skia';
+import { cacheDirectory, writeAsStringAsync } from 'expo-file-system';
+import { cropSize } from '../commons/CropOverlay';
+import { withTiming, type SharedValue } from 'react-native-reanimated';
+import {
+  baseColor,
+  activeColor,
+  buttonSize,
+  indentity,
+  blackAndWhite,
+  controlSize,
+} from '../commons/contants';
+import EffectPreview from './EffectPreview';
+
+type EffectIndicatorProps = {
+  progress: SharedValue<number>;
+  image: SkImage;
+  setCrop: (uri: string | undefined) => void;
+  cropRef: React.RefObject<CropZoomType>;
+  canvasRef: React.RefObject<SkiaDomView>;
+};
+
+const matrices: number[][] = [indentity, blackAndWhite];
+
+const Controls: React.FC<EffectIndicatorProps> = ({
+  image,
+  progress,
+  cropRef,
+  canvasRef,
+  setCrop,
+}) => {
+  const { width, height } = useWindowDimensions();
+
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [isCropping, setIsCropping] = useState<boolean>(false);
+  const [rotated, setRotated] = useState<number>(0);
+
+  const rotate = () => {
+    cropRef?.current?.rotate();
+    setRotated((prev) => {
+      if (prev + 1 === 4) {
+        return 0;
+      }
+
+      return prev + 1;
+    });
+  };
+
+  const cropCanvas = async () => {
+    setIsCropping(true);
+
+    const canvasCrop = rect(
+      (width - cropSize) / 2,
+      (height - controlSize - cropSize) / 2,
+      cropSize,
+      cropSize
+    );
+    const canvasSnapshot = canvasRef.current?.makeImageSnapshot(canvasCrop);
+
+    if (canvasSnapshot !== undefined) {
+      const contents = canvasSnapshot.encodeToBase64(ImageFormat.PNG, 100);
+      const time = new Date().getTime();
+      const fileUri = `${cacheDirectory}picture${time}.png`;
+
+      writeAsStringAsync(fileUri, contents, { encoding: 'base64' }).then(() => {
+        setIsCropping(false);
+        setCrop(fileUri);
+      });
+    }
+  };
+
+  useEffect(() => {
+    progress.value = withTiming(activeIndex);
+  }, [activeIndex, progress]);
+
+  return (
+    <View style={styles.root}>
+      <View style={styles.previewContainer}>
+        {matrices.map((matrix, index) => {
+          return (
+            <EffectPreview
+              key={`matrix-${index}`}
+              index={index}
+              activeIndex={activeIndex}
+              setActiveIndex={setActiveIndex}
+              image={image}
+              matrix={matrix}
+            />
+          );
+        })}
+      </View>
+
+      <Pressable onPress={rotate}>
+        <Icon
+          name={'format-rotate-90'}
+          size={24}
+          color={rotated === 0 ? baseColor : activeColor}
+        />
+      </Pressable>
+
+      <Pressable style={styles.button} onPress={cropCanvas}>
+        {isCropping ? (
+          <ActivityIndicator size={'small'} color={baseColor} />
+        ) : (
+          <Icon name={'check'} size={24} color={'#fff'} />
+        )}
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  root: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingHorizontal: theme.spacing.m,
+    paddingBottom: theme.spacing.s,
+    gap: theme.spacing.l,
+    zIndex: 100,
+  },
+  previewContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: theme.spacing.m,
+  },
+  button: {
+    width: buttonSize,
+    height: buttonSize,
+    borderRadius: buttonSize / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#75DAEA',
+  },
+});
+
+export default Controls;

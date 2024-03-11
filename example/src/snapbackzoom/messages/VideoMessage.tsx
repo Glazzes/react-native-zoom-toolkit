@@ -11,7 +11,7 @@ import Animated, {
   runOnUI,
   measure,
 } from 'react-native-reanimated';
-import { SnapBackZoom } from '../../../../src';
+import { SnapbackZoom } from 'react-native-zoomable';
 import { ResizeMode, Video } from 'expo-av';
 import { maxDimension, theme } from '../../constants';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
@@ -91,7 +91,7 @@ const VideoMessage: React.FC<VideoMessageProps> = ({ index, activeIndex }) => {
   return (
     <View style={styles.container}>
       <Animated.View ref={animatedRef} style={animatedStyle}>
-        <SnapBackZoom
+        <SnapbackZoom
           onTap={playback}
           onPinchStart={onPinchStart}
           onGestureEnd={onGestureEnd}
@@ -115,7 +115,7 @@ const VideoMessage: React.FC<VideoMessageProps> = ({ index, activeIndex }) => {
               </View>
             </Animated.View>
           </View>
-        </SnapBackZoom>
+        </SnapbackZoom>
       </Animated.View>
     </View>
   );
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   video: {
     width: 200,
     height: 200,
-    // borderRadius: theme.spacing.s,
+    borderRadius: theme.spacing.s,
   },
   overlay: {
     width: '100%',
