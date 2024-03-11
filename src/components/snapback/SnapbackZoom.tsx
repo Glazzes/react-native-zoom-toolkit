@@ -10,28 +10,15 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { useVector } from '../hooks/useVector';
-import { useSize } from '../hooks/useSize';
-import { DEFAULT_HITSLOP } from '../constants';
-import { resizeToAspectRatio } from '../utils/resizeToAspectRatio';
+import { useVector } from '../../commons/hooks/useVector';
+import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { DEFAULT_HITSLOP } from '../../constants';
+import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
+import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
-import type {
-  CommonZoomCallbackProps,
-  CommonZoomProps,
-  ResizeConfig,
-} from '../types';
+import type { SnapBackZoomProps } from './types';
 
-type Props = {
-  resizeConfig?: ResizeConfig;
-  gesturesEnabled?: boolean;
-  onGestureEnd?: () => void;
-};
-
-type SnapBackZoomProps = React.PropsWithChildren<Props> &
-  CommonZoomProps &
-  CommonZoomCallbackProps;
-
-const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
+const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
@@ -46,8 +33,8 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
 }) => {
   const position = useVector(0, 0);
 
-  const childrenSize = useSize(0, 0);
-  const containerSize = useSize(
+  const childrenSize = useSizeVector(0, 0);
+  const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
@@ -72,19 +59,17 @@ const SnapBackZoom: React.FC<SnapBackZoomProps> = ({
   };
 
   useDerivedValue(() => {
-    if (onGestureActive !== undefined && isPinchActive.value) {
-      onGestureActive({
-        x: position.x.value,
-        y: position.y.value,
-        width: containerSize.width.value,
-        height: containerSize.height.value,
-        resizedWidth: childrenSize.width.value,
-        resizedHeight: childrenSize.height.value,
-        translateX: translate.x.value,
-        translateY: translate.y.value,
-        scale: scale.value,
-      });
-    }
+    onGestureActive?.({
+      x: position.x.value,
+      y: position.y.value,
+      width: containerSize.width.value,
+      height: containerSize.height.value,
+      resizedWidth: childrenSize.width.value,
+      resizedHeight: childrenSize.height.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    });
   }, [position, translate, scale, containerSize, childrenSize, isPinchActive]);
 
   const pinch = Gesture.Pinch()
@@ -210,4 +195,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SnapBackZoom;
+export default withSnapbackValidation(SnapbackZoom);

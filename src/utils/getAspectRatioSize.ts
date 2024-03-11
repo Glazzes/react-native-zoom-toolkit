@@ -1,4 +1,4 @@
-import type { CanvasSize } from '../types';
+import type { SizeVector } from '../commons/types';
 
 type Options = {
   aspectRatio: number;
@@ -6,24 +6,30 @@ type Options = {
   maxHeight?: number;
 };
 
-export const getAspectRatioSize = (options: Options): CanvasSize => {
+/**
+ *
+ * @param options An object describing the aspect ratio of an image/video, and optional width and height
+ * parameters, calculates height if this is undefined based on width and vice versa.
+ * @returns An object containing the computed width and height by the aspect ratio
+ */
+export default function (options: Options): SizeVector<number> {
   'worklet';
   const { aspectRatio, maxWidth, maxHeight } = options;
-  if (maxWidth) {
+  if (maxWidth === undefined && maxHeight === undefined) {
+    throw Error(
+      'maxWidth and maxHeight parameters are undefined, provide one of them'
+    );
+  }
+
+  if (maxWidth !== undefined) {
     return {
       width: Math.round(maxWidth),
       height: Math.round(maxWidth / aspectRatio),
     };
   }
 
-  if (maxHeight) {
-    return {
-      width: Math.round(maxHeight * aspectRatio),
-      height: Math.round(maxHeight),
-    };
-  }
-
-  throw Error(
-    'Missing maxWidth and maxHeight properties, consider adding one of them'
-  );
-};
+  return {
+    width: Math.round(maxHeight! * aspectRatio),
+    height: Math.round(maxHeight!),
+  };
+}
