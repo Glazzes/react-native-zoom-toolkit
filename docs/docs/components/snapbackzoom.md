@@ -17,7 +17,7 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 Its usage is pretty straight forward, import SnapBackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
 
 ::: danger Caution
-Do not use `position: "absolute"` directly in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
+Do not use `position: "absolute"` in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
 :::
 
 ```jsx
@@ -57,29 +57,27 @@ import { SnapBackZoom } from "react-native-zoom-toolkit"
 All properties for this component are optional.
 
 ### hitslop
-| Type | Default |
-|------|---------|
-| `object` | `undefined` |
-
-- see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop)
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
 
 Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
 ### timingConfig 
-| Type | Default |
-|------|---------|
-| `object` | `undefined` |
-
-- see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-)
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `object` | `undefined` | see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
 
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position.
 
-### resizeConfig
-| Type | Default |
-|------|---------|
-| `ResizeConfig` | `undefined` |
+::: tip Tip
+Be realistic with the timing configuration you use as you will not be able to resume the gesture once the snapback animation has started.
+:::
 
-- see [notes](#notes)
+### resizeConfig
+| Type | Default | Additional info |
+|------|---------|-----------------|
+| `ResizeConfig` | `undefined` | see [notes](#notes) |
 
 Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases.
 
@@ -119,11 +117,9 @@ callback triggered when the pinch gesture starts.
 Callback triggered as soon as the user lift their fingers off the screen after pinching.
 
 ### onGestureActive
-| Type | Default |
-|------|---------|
-| `worklet function` | `undefined` |
-
-- see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
+| Type | Default | Additional Info |
+|------|---------|----------------|
+| `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Callback triggered from the moment pinch gesture starts until the snap back animation finishes, 
 ideal for mirroring the state of the gesture to some other component.
@@ -145,8 +141,9 @@ Receives the state of the gesture as argument, which includes the following prop
 This property is very useful when you need to mirror the current pinch gesture transformations to some other component.
 
 ### onGestureEnd
-- Type: `function`
-- Default: `undefiend`
+| Type | Default |
+|------|---------|
+| `function` | `undefined` |
 
 Callback triggered once the snap back animation has finished.
 

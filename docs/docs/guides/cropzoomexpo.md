@@ -189,13 +189,13 @@ const crop = async () => {
 }
 ```
 
-With all actions checks in place all that remains is to crop the image and set the result with `setCrop` property, add the following to the end of `crop method`.
+With all action checks in place all that remains is to crop the image and set the result with `setCrop` property, add the following to the end of `crop method`.
 
 ```typescript:line-numbers=25
 const cropResult = await manipulateAsync(uri, actions);
 setCrop(cropResult.uri);
 
-// In case you want to keep testing add this property
+// Add this in case you want to keep testing
 setTimeout(() => {
   setCrop(undefined);
 }, 2500);

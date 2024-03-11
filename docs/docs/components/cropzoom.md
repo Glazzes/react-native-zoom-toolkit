@@ -28,8 +28,10 @@ Managed mode is the default mode and its designed for simple use cases as the on
 
 Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things to keep in mind:
 
+::: tip Tip
 - This component uses `flex: 1` style property therefore it will take all available space, its minimum dimensions are the values provided to `cropSize` property.
-- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` so they cover the gesture detection area properly.
+- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` properties so they cover the gesture detection area properly.
+:::
 
 ```jsx
 import {Image} from 'react-native';
@@ -69,19 +71,21 @@ In constrast to managed mode, overlay mode is designed to provide a barebones co
 
 There are some things to keep in mind
 
+::: tip Remember
 - You lose access to `OverlayComponent` and `children` properties.
 - The dimensions for this component are the values passed to `cropSize` property.
 - Use the `debug` property so you can see the crop and gesture detection areas as you develop.
 - Create your own [shared values](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/your-first-animation#defining-a-shared-value) and update them with `onGestureActive` worklet callback.
+:::
 
 For an overlay mode example, see Example App's [CropZoom Skia Example](https://github.com/Glazzes/react-native-zoomable/tree/dev/example/src/cropzoom/skia-example)
 
 ## Properties
 
 ### mode
-| Type | Default | Required |
-|------|---------|----------|
-| `CropMode` | `CropMode.MANAGED` | `No`   |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `CropMode` | `CropMode.MANAGED` | `No`   | see [CropMode](#cropmode-enum) |
 
 Selects which mode to use.
 
@@ -125,20 +129,16 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way max scale is a value just before images and videos start getting pixelated.
 
 ### panMode
-| Type | Default | Required |
-|------|---------|----------|
-| `PanMode` | `PanMode.FREE` | `No`    |
-
-- see [PanMode](#panmode-enum)
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `PanMode` | `PanMode.FREE` | `No`    | see [PanMode](#panmode-enum) |
 
 Which one of the three available pan modes to use.
 
 ### scaleMode
-| Type | Default | Required |
-|------|---------|----------|
-| `ScaleMode` | `ScaleMode.BOUNCE` | `No`    |
-
-- see [ScaleMode](#scalemode-enum)
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `ScaleMode` | `ScaleMode.BOUNCE` | `No`    | see [ScaleMode](#scalemode-enum) |
 
 Which one of the two available scale modes to use.
 
@@ -147,14 +147,12 @@ Which one of the two available scale modes to use.
 |------|---------|----------|
 | `boolean` | `true` | `No`    |
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch calculation at the cost of a subtle staircase feeling.
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling.
 
 ### onGestureActive
-| Type | Default | Required |
-|------|---------|----------|
-| `worklet function` | `undefined` | `No`    |
-
-- see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/)
+| Type | Default | Required | Addtional Info |
+|------|---------|----------|----------------|
+| `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Callback triggered as the user interacts with the component, it does also mean interacting through its [methods](#methods), ideal if you need to mirror the internal state of the component to some other component as it updates.
 
@@ -183,7 +181,7 @@ Previous condition: `mode` property is set to `CropMode.MANAGED` (default value)
 All methods are accessible through a ref object
 ```jsx
 import { useRef } from 'react';
-import { CropZoom, type CropZoomType } from '@glazzes/react-native-zoomable'
+import { CropZoom, type CropZoomType } from 'react-native-zoom-toolkit'
 
 const ref = useRef<CropZoomType>(null);
 ref.current?.crop(200);

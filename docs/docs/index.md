@@ -22,6 +22,7 @@ features:
 
   - title: ResumableZoom
     details: Pick up where you left! A handy component for detail and gallery screens.
+    link: /components/resumablezoom
 
   - title: CropZoom
     details: An ideal and unopinionated component for image and video cropping needs.
