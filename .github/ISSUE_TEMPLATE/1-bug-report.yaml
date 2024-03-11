@@ -1,5 +1,5 @@
 name: Bug Report
-description: Thanks for taking the time to fill out this form
+description: Create a report to help us improve.
 title: "[BUG]: "
 labels:
   - "bug"
@@ -49,8 +49,8 @@ body:
     attributes:
       label: Steps to Reproduce
       description: >-
-        If you can reproduce this bug consistenly, please describe the steps,
-        a reproduceable demo or an Expo Snack are welcome addtions.
+        If you can reproduce this bug consistently, please describe the steps,
+        a reproducible demo or an Expo Snack are welcome additions.
       placeholder: |
         1. Go to file X
         2. Add X property to component Y
@@ -62,4 +62,4 @@ body:
     attributes:
       label: Additional Context
       description: Anything else you consider relevant to this issue.
-      placeholder: Platform, Development enviroment, Package.json, etc.
+      placeholder: Platform, Development environment, Package.json, etc.

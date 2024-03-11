@@ -1,4 +1,4 @@
-# Contributing
+# React Native Zoom Toolkit's Contribution Guide
 
 Contributions are always welcome, no matter how large or small!
 
@@ -6,10 +6,14 @@ We want this community to be friendly and respectful to each other. Please follo
 
 ## Development workflow
 
+> [!WARNING]
+> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
+
 This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/features/workspaces). It contains the following packages:
 
 - The library package in the root directory.
-- An example app in the `example/` directory.
+- An example Expo managed application in the `example/` directory.
+- A [VitePress](https://vitepress.dev/) application in the `docs/` directory.
 
 To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
 
@@ -17,8 +21,7 @@ To get started with the project, run `yarn` in the root directory to install the
 yarn
 ```
 
-> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
-
+#### Example App
 The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
 
 It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
@@ -68,6 +71,23 @@ Remember to add tests for your change if possible. Run the unit tests by:
 yarn test
 ```
 
+#### Documentation Website
+The [documentation website](/docs/) is a [VitePress](https://vitepress.dev/) static generated site, we use its markdown feataures only.
+
+You can use various commands from the root directory to work with the project.
+
+To start the documentation website on a local dev server:
+
+```sh
+yarn docs docs:dev
+```
+
+To build an test the documentation website locally:
+```sh
+yarn docs docs:build
+yarn docs docs:preview
+```
+
 ### Commit message convention
 
 We follow the [conventional commits specification](https://www.conventionalcommits.org/en) for our commit messages:
@@ -110,6 +130,9 @@ The `package.json` file contains various scripts for common tasks:
 - `yarn example start`: start the Metro server for the example app.
 - `yarn example android`: run the example app on Android.
 - `yarn example ios`: run the example app on iOS.
+- `yarn docs docs:dev`: run the documentation website on a local dev server.
+- `yarn docs docs:build`: build the documentation website.
+- `yarn docs docs:preview`: run a documentation website production build on a local server.
 
 ### Sending a pull request
 
