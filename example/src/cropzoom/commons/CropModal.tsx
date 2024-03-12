@@ -23,7 +23,7 @@ const CropModal: React.FC<CropModalProps> = ({ uri, setCrop }) => {
       >
         <View style={[styles.modal, styles.center]}>
           <Text style={styles.title}>Your resulting crop</Text>
-          <Image source={{ uri }} style={styles.image} />
+          <Image source={{ uri }} style={styles.image} resizeMode="cover" />
           <Pressable style={[styles.button, styles.center]} onPress={resetCrop}>
             <Text style={styles.title}>Dismiss</Text>
           </Pressable>
@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   image: {
-    width: 150,
     height: 150,
-    borderRadius: 100,
+    width: 150,
+    borderRadius: 75,
   },
   button: {
     width: '100%',

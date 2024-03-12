@@ -1,6 +1,6 @@
 import { interpolate } from 'react-native-reanimated';
-import type { SizeVector, Vector } from '../../commons/types';
-import type { CropContextResult } from './types';
+import type { SizeVector, Vector } from '../../../commons/types';
+import type { CropContextResult } from '../types';
 
 type CanvasToSizeOptions = {
   context: CropContextResult['context'];
@@ -135,8 +135,8 @@ const canvasToSizePortrait = (context: FixedCropContext): CropContext => {
     y: finalY,
     width: finalWidth,
     height: finalHeight,
-    resizeWidth,
-    resizeHeight,
+    resizeWidth: Math.ceil(resizeWidth),
+    resizeHeight: Math.ceil(resizeHeight),
   };
 };
 
@@ -165,8 +165,8 @@ const canvasToSizeLandscape = (context: FixedCropContext): CropContext => {
     y: finalY,
     width: finalWidth,
     height: finalHeight,
-    resizeWidth,
-    resizeHeight,
+    resizeWidth: Math.ceil(resizeWidth),
+    resizeHeight: Math.ceil(resizeHeight),
   };
 };
 

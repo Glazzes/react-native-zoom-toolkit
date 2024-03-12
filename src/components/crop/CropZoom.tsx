@@ -14,7 +14,7 @@ import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
 import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
-import { canvasToSize } from './utils';
+import { canvasToSize } from './utils/canvasToSize';
 import {
   CropMode,
   type CropZoomProps,
