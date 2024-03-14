@@ -3,6 +3,7 @@ import {
   withTiming,
   cancelAnimation,
   type SharedValue,
+  runOnJS,
 } from 'react-native-reanimated';
 import {
   ScaleMode,
@@ -16,6 +17,7 @@ import type {
   PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { pinchTransform } from '../utils/pinchTransform';
+import { useState } from 'react';
 
 type PinchOptions = {
   detector: SizeVector<SharedValue<number>>;
@@ -58,10 +60,22 @@ export const usePinchCommons = (options: PinchOptions) => {
     boundFn,
   } = options;
 
+  const [gesturedEnabled, setGesturedEnabled] = useState<boolean>(true);
+  const toogle = () => {
+    setGesturedEnabled((prev) => !prev);
+  };
+
+  const toggleGestures = () => {
+    'worklet';
+    runOnJS(toogle)();
+  };
+
   const onPinchStart = (e: PinchGestureEvent) => {
     'worklet';
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
+    cancelAnimation(detectorTranslate.x);
+    cancelAnimation(detectorTranslate.y);
     cancelAnimation(scale);
 
     origin.x.value = e.focalX - detector.width.value / 2;
@@ -75,7 +89,7 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
     'worklet';
     let toScale = e.scale * scaleOffset.value;
-    if (scaleMode === 'clamp') {
+    if (scaleMode === ScaleMode.CLAMP) {
       toScale = clamp(toScale, minScale, maxScale.value);
     }
 
@@ -101,10 +115,12 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = () => {
     'worklet';
 
+    toggleGestures();
+
     if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
-      scale.value = withTiming(minScale);
+      scale.value = withTiming(minScale, undefined, toggleGestures);
 
       detectorTranslate.x.value = 0;
       detectorTranslate.y.value = 0;
@@ -135,7 +151,7 @@ export const usePinchCommons = (options: PinchOptions) => {
 
       translate.x.value = withTiming(toX);
       translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale.value);
+      scale.value = withTiming(maxScale.value, undefined, toggleGestures);
 
       detectorTranslate.x.value = toX;
       detectorTranslate.y.value = toY;
@@ -147,7 +163,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
 
-    translate.x.value = withTiming(toX);
+    translate.x.value = withTiming(toX, undefined, toggleGestures);
     translate.y.value = withTiming(toY);
 
     detectorTranslate.x.value = toX;
@@ -155,5 +171,5 @@ export const usePinchCommons = (options: PinchOptions) => {
     detectorScale.value = scale.value;
   };
 
-  return { onPinchStart, onPinchUpdate, onPinchEnd };
+  return { gesturedEnabled, onPinchStart, onPinchUpdate, onPinchEnd };
 };

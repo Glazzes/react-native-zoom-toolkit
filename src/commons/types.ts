@@ -2,6 +2,7 @@ import type {
   GestureStateChangeEvent,
   PinchGestureHandlerEventPayload,
   TapGestureHandlerEventPayload,
+  PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 import type { WithTimingConfig } from 'react-native-reanimated';
@@ -42,13 +43,19 @@ export type CommonResumableProps = {
   panWithPinch?: boolean;
 };
 
-export type TapEvent = GestureStateChangeEvent<TapGestureHandlerEventPayload>;
-export type PinchEvent =
+export type TapGestureEvent =
+  GestureStateChangeEvent<TapGestureHandlerEventPayload>;
+
+export type PinchGestureEvent =
   GestureStateChangeEvent<PinchGestureHandlerEventPayload>;
 
+export type PanGestureEvent =
+  GestureStateChangeEvent<PanGestureHandlerEventPayload>;
+
 export type CommonZoomCallbackProps = {
-  onTap?: (e: TapEvent) => void;
-  onDoubleTap?: (e: TapEvent) => void;
-  onPinchStart?: (e: PinchEvent) => void;
-  onPinchEnd?: (e: PinchEvent, success: boolean) => void;
+  onTap?: (e: TapGestureEvent) => void;
+  onDoubleTap?: (e: TapGestureEvent) => void;
+  onPanEnd?: (e: PanGestureEvent) => void;
+  onPinchStart?: (e: PinchGestureEvent) => void;
+  onPinchEnd?: (e: PinchGestureEvent, success: boolean) => void;
 };
