@@ -104,7 +104,7 @@
     "react-native-gesture-handler": "2.14.0",
     "react-native-reanimated": "3.6.2",
     "react-test-renderer": "18.2.0",
-    "release-it": "^15.0.0",
+    "release-it": "^15.11.0",
     "typescript": "^5.0.2"
   },
   "resolutions": {
@@ -143,23 +143,6 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
-    }
   },
   "eslintConfig": {
     "root": true,
