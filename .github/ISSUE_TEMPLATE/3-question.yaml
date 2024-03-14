@@ -9,4 +9,4 @@ body:
     attributes:
       label: What Would You Like to Know?
       description: All questions are valid questions!
-      placeholder: Does this library works with this other library?
+      placeholder: Can i use this library for some random task?
