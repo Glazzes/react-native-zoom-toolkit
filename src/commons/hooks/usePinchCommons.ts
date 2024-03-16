@@ -70,13 +70,32 @@ export const usePinchCommons = (options: PinchOptions) => {
     runOnJS(toogle)();
   };
 
-  const onPinchStart = (e: PinchGestureEvent) => {
+  const reset = (toX: number, toY: number, toScale: number) => {
     'worklet';
+
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
+    cancelAnimation(scale);
     cancelAnimation(detectorTranslate.x);
     cancelAnimation(detectorTranslate.y);
+    cancelAnimation(detectorScale);
+
+    translate.x.value = withTiming(toX);
+    translate.y.value = withTiming(toY);
+    scale.value = withTiming(toScale, undefined, toggleGestures);
+
+    detectorTranslate.x.value = toX;
+    detectorTranslate.y.value = toY;
+    detectorScale.value = toScale;
+  };
+
+  const onPinchStart = (e: PinchGestureEvent) => {
+    'worklet';
+
+    cancelAnimation(translate.x);
+    cancelAnimation(translate.y);
     cancelAnimation(scale);
+    cancelAnimation(detectorScale);
 
     origin.x.value = e.focalX - detector.width.value / 2;
     origin.y.value = e.focalY - detector.height.value / 2;
@@ -118,13 +137,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     toggleGestures();
 
     if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
-      translate.x.value = withTiming(0);
-      translate.y.value = withTiming(0);
-      scale.value = withTiming(minScale, undefined, toggleGestures);
-
-      detectorTranslate.x.value = 0;
-      detectorTranslate.y.value = 0;
-      detectorScale.value = minScale;
+      reset(0, 0, minScale);
       return;
     }
 
@@ -148,27 +161,15 @@ export const usePinchCommons = (options: PinchOptions) => {
       const { x: boundX, y: boundY } = boundFn(maxScale.value);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
+      reset(toX, toY, maxScale.value);
 
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale.value, undefined, toggleGestures);
-
-      detectorTranslate.x.value = toX;
-      detectorTranslate.y.value = toY;
-      detectorScale.value = maxScale.value;
       return;
     }
 
     const { x: boundX, y: boundY } = boundFn(scale.value);
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
-
-    translate.x.value = withTiming(toX, undefined, toggleGestures);
-    translate.y.value = withTiming(toY);
-
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = scale.value;
+    reset(toX, toY, scale.value);
   };
 
   return { gesturedEnabled, onPinchStart, onPinchUpdate, onPinchEnd };

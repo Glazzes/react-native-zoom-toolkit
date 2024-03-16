@@ -2,12 +2,12 @@ import {
   cancelAnimation,
   clamp,
   withTiming,
-  type SharedValue,
   useSharedValue,
   withDecay,
+  type SharedValue,
+  runOnJS,
 } from 'react-native-reanimated';
 import type {
-  GestureStateChangeEvent,
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
   PanGestureHandlerEventPayload,
@@ -18,13 +18,9 @@ import {
   type BoundsFuction,
   type Vector,
   type SizeVector,
+  type PanGestureEventCallback,
+  type PanGestureEvent,
 } from '../types';
-
-type PanGestureUpdadeEvent = GestureUpdateEvent<
-  PanGestureHandlerEventPayload & PanGestureChangeEventPayload
->;
-
-type PanGestureEnd = GestureStateChangeEvent<PanGestureHandlerEventPayload>;
 
 type PanCommmonOptions = {
   translate: Vector<SharedValue<number>>;
@@ -33,12 +29,24 @@ type PanCommmonOptions = {
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
   scale: SharedValue<number>;
+  minScale: number;
+  maxScale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
-  onHorizontalBoundsExceeded?: (value: number) => void;
+  userCallbacks?: Partial<{
+    onSwipeLeft: () => void;
+    onSwipeRight: () => void;
+    onPanStart: PanGestureEventCallback;
+    onPanEnd: PanGestureEventCallback;
+    onHorizontalBoundsExceeded: (value: number) => void;
+  }>;
 };
 
-const deceleration = 0.994;
+type PanGestureUpdadeEvent = GestureUpdateEvent<
+  PanGestureHandlerEventPayload & PanGestureChangeEventPayload
+>;
+
+const DECELERATION = 0.994;
 
 export const usePanCommons = (options: PanCommmonOptions) => {
   const {
@@ -48,16 +56,22 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     offset,
     panMode,
     scale,
+    minScale,
+    maxScale,
     decay,
     boundFn,
-    onHorizontalBoundsExceeded,
+    userCallbacks,
   } = options;
+
+  const time = useSharedValue<number>(0);
+  const x = useSharedValue<number>(0);
 
   const isWithinBoundX = useSharedValue<boolean>(false);
   const isWithinBoundY = useSharedValue<boolean>(false);
 
-  const onPanStart = () => {
+  const onPanStart = (e: PanGestureEvent) => {
     'worklet';
+
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
     cancelAnimation(detectorTranslate.x);
@@ -65,6 +79,13 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
+
+    time.value = performance.now();
+    x.value = e.absoluteX;
+
+    if (userCallbacks?.onPanStart) {
+      runOnJS(userCallbacks.onPanStart)(e);
+    }
   };
 
   const onPanChange = (e: PanGestureUpdadeEvent) => {
@@ -76,9 +97,9 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
     isWithinBoundY.value = toY >= -1 * boundY && toY <= boundY;
 
-    if (!isWithinBoundX.value && onHorizontalBoundsExceeded) {
+    if (!isWithinBoundX.value && userCallbacks?.onHorizontalBoundsExceeded) {
       const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
-      onHorizontalBoundsExceeded(exceededBy);
+      userCallbacks.onHorizontalBoundsExceeded(exceededBy);
     }
 
     if (panMode === PanMode.FREE) {
@@ -114,10 +135,39 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     translate.y.value = clamp(toY, -1 * boundY, boundY);
   };
 
-  const onPanEnd = ({ velocityX, velocityY }: PanGestureEnd) => {
+  const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    const canSwipe = scale.value === minScale && panMode === PanMode.CLAMP;
+
+    const velocity = Math.abs(e.velocityX);
+    const deltaTime = Math.abs(performance.now() - time.value);
+    const deltaX = Math.abs(x.value - e.absoluteX);
+    const direction = Math.sign(e.absoluteX - x.value);
+
+    if (velocity >= 500 && deltaX >= 20 && deltaTime < 175 && canSwipe) {
+      if (direction === -1 && userCallbacks?.onSwipeLeft) {
+        runOnJS(userCallbacks.onSwipeLeft)();
+        return;
+      }
+
+      if (direction === 1 && userCallbacks?.onSwipeRight) {
+        runOnJS(userCallbacks.onSwipeRight)();
+        return;
+      }
+    }
+
+    /*
+     * In fucked up phones like mine its possible to trigger a pan gesture in the middle of a pinch
+     * gesture somehow, this resulting in the picture being displaced from the desired boundaries,
+     * therefore I've had to clamp the final scale in order to prevent this behavior.
+     */
+    const toScale = clamp(scale.value, minScale, maxScale.value);
+
+    const { x: boundX, y: boundY } = boundFn(toScale);
+    const clampX: [number, number] = [-1 * boundX, boundX];
+    const clampY: [number, number] = [-1 * boundY, boundY];
+
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
 
@@ -125,38 +175,42 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       detectorTranslate.x.value = translate.x.value;
 
       translate.x.value = withDecay({
-        velocity: velocityX,
-        clamp: [-1 * boundX, boundX],
-        deceleration,
+        velocity: e.velocityX,
+        clamp: clampX,
+        deceleration: DECELERATION,
       });
 
       detectorTranslate.x.value = withDecay({
-        velocity: velocityX,
-        clamp: [-1 * boundX, boundX],
-        deceleration,
+        velocity: e.velocityX,
+        clamp: clampX,
+        deceleration: DECELERATION,
       });
     } else {
       translate.x.value = withTiming(toX);
-      detectorTranslate.x.value = toX;
+      detectorTranslate.x.value = withTiming(toX);
     }
 
     if (decay && isWithinBoundY.value) {
       detectorTranslate.y.value = translate.y.value;
 
       translate.y.value = withDecay({
-        velocity: velocityY,
-        clamp: [-1 * boundY, boundY],
-        deceleration,
+        velocity: e.velocityY,
+        clamp: clampY,
+        deceleration: DECELERATION,
       });
 
       detectorTranslate.y.value = withDecay({
-        velocity: velocityY,
-        clamp: [-1 * boundY, boundY],
-        deceleration,
+        velocity: e.velocityY,
+        clamp: clampY,
+        deceleration: DECELERATION,
       });
     } else {
       translate.y.value = withTiming(toY);
       detectorTranslate.y.value = toY;
+    }
+
+    if (userCallbacks?.onPanEnd) {
+      runOnJS(userCallbacks.onPanEnd)(e);
     }
   };
 
