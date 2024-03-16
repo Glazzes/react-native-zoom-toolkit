@@ -2726,6 +2726,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo/metro-runtime@npm:~3.1.3":
+  version: 3.1.3
+  resolution: "@expo/metro-runtime@npm:3.1.3"
+  peerDependencies:
+    react-native: "*"
+  checksum: 58f959c05c0c70cee45e7792354ef0c1a5c81c9ea02a3a05e4e3db47633503de304fe911a342877d67ae0a78fc39f6c61a0b3c03f33197eb23bd35382d366f8d
+  languageName: node
+  linkType: hard
+
 "@expo/osascript@npm:^2.0.31":
   version: 2.1.0
   resolution: "@expo/osascript@npm:2.1.0"
@@ -4494,6 +4503,13 @@ __metadata:
     "@types/qs": "*"
     "@types/serve-static": "*"
   checksum: fb238298630370a7392c7abdc80f495ae6c716723e114705d7e3fb67e3850b3859bbfd29391463a3fb8c0b32051847935933d99e719c0478710f8098ee7091c5
+  languageName: node
+  linkType: hard
+
+"@types/fbemitter@npm:^2.0.35":
+  version: 2.0.35
+  resolution: "@types/fbemitter@npm:2.0.35"
+  checksum: c481042c81913ff153e04b976d7489166f0a7a7cc3391744893f5487c6d197542c1139b86f0b3afcf21be512fd1ec3ce176e457043bced42a056436327343564
   languageName: node
   linkType: hard
 
@@ -9445,14 +9461,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:~1.10.6":
-  version: 1.10.6
-  resolution: "expo-image@npm:1.10.6"
+"expo-image@npm:^1.10.6":
+  version: 1.11.0
+  resolution: "expo-image@npm:1.11.0"
   dependencies:
     "@react-native/assets-registry": ~0.73.1
   peerDependencies:
     expo: "*"
-  checksum: c847caf52e507d75a8d66a2f1f56d0c05669fe565510a9c24e4a5644e521a638e7171cfa67a4af89cc2db20f6d6a9cb25ee75471a9b2a4e167b91eb48d8eed35
+  checksum: b93445e1ae2dead50d0ad02a8bfe678c83762f9545f4e4712951894411ebf217ed6385033940f02fdb721e5cc6cf69bca7afb8e5736c5771a358b07e9c8f7e12
   languageName: node
   linkType: hard
 
@@ -16128,15 +16144,18 @@ __metadata:
   resolution: "react-native-zoomable-example@workspace:example"
   dependencies:
     "@babel/core": ^7.20.0
+    "@expo/metro-runtime": ~3.1.3
     "@expo/webpack-config": ^18.0.1
     "@shopify/react-native-skia": 0.1.221
+    "@types/fbemitter": ^2.0.35
     babel-loader: ^8.1.0
     babel-plugin-module-resolver: ^5.0.0
     expo: 50.0.5
     expo-av: 13.10.4
-    expo-image: ~1.10.6
+    expo-image: ^1.10.6
     expo-image-manipulator: ~11.8.0
     expo-status-bar: ~1.11.1
+    fbemitter: ^3.0.0
     react: 18.2.0
     react-dom: 18.2.0
     react-native: 0.73.4

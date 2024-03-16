@@ -102,8 +102,3 @@ export type CropZoomProps = React.PropsWithChildren<{
   PanGestureCallbacks &
   PinchGestureCallbacks &
   CommonResumableProps;
-
-export type RotateTransitionCallback = (
-  animate?: boolean,
-  callback?: (value: number) => void
-) => void;

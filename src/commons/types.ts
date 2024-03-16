@@ -57,16 +57,16 @@ export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
 
 export type PanGestureCallbacks = Partial<{
-  onPanStart?: PanGestureEventCallback;
-  onPanEnd?: PanGestureEventCallback;
+  onPanStart: PanGestureEventCallback;
+  onPanEnd: PanGestureEventCallback;
 }>;
 
 export type PinchGestureCallbacks = Partial<{
-  onPinchStart?: PinchGestureEventCallback;
-  onPinchEnd?: PinchGestureEventCallback;
+  onPinchStart: PinchGestureEventCallback;
+  onPinchEnd: PinchGestureEventCallback;
 }>;
 
 export type TapGestureCallbacks = Partial<{
-  onTap?: TapGestureEventCallback;
-  onDoubleTap?: TapGestureEventCallback;
+  onTap: TapGestureEventCallback;
+  onDoubleTap: TapGestureEventCallback;
 }>;
