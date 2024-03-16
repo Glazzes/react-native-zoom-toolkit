@@ -1,23 +1,25 @@
+import { useState } from 'react';
 import {
-  clamp,
   withTiming,
   cancelAnimation,
-  type SharedValue,
   runOnJS,
+  type SharedValue,
 } from 'react-native-reanimated';
+import type {
+  GestureStateChangeEvent,
+  GestureUpdateEvent,
+  PinchGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
+
+import { clamp } from '../utils/clamp';
+import { pinchTransform } from '../utils/pinchTransform';
+
 import {
   ScaleMode,
   type BoundsFuction,
   type SizeVector,
   type Vector,
 } from '../types';
-import type {
-  GestureStateChangeEvent,
-  GestureUpdateEvent,
-  PinchGestureHandlerEventPayload,
-} from 'react-native-gesture-handler';
-import { pinchTransform } from '../utils/pinchTransform';
-import { useState } from 'react';
 
 type PinchOptions = {
   detector: SizeVector<SharedValue<number>>;

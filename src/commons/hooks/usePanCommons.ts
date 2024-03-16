@@ -1,18 +1,20 @@
 import {
   cancelAnimation,
-  clamp,
   withTiming,
   useSharedValue,
   withDecay,
-  type SharedValue,
   runOnJS,
+  type SharedValue,
 } from 'react-native-reanimated';
 import type {
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+
+import { clamp } from '../utils/clamp';
 import { friction } from '../utils/friction';
+
 import {
   PanMode,
   type BoundsFuction,
@@ -66,8 +68,8 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const time = useSharedValue<number>(0);
   const x = useSharedValue<number>(0);
 
-  const isWithinBoundX = useSharedValue<boolean>(false);
-  const isWithinBoundY = useSharedValue<boolean>(false);
+  const isWithinBoundX = useSharedValue<boolean>(true);
+  const isWithinBoundY = useSharedValue<boolean>(true);
 
   const onPanStart = (e: PanGestureEvent) => {
     'worklet';
@@ -112,7 +114,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       const overScrollFraction =
         Math.max(detector.width.value, detector.height.value) * 1.5;
 
-      if (isWithinBoundX) {
+      if (isWithinBoundX.value) {
         translate.x.value = toX;
       } else {
         const fraction = (Math.abs(toX) - boundX) / overScrollFraction;
@@ -120,7 +122,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         translate.x.value += e.changeX * frictionX;
       }
 
-      if (isWithinBoundY) {
+      if (isWithinBoundY.value) {
         translate.y.value = toY;
       } else {
         const fraction = (Math.abs(toY) - boundY) / overScrollFraction;
