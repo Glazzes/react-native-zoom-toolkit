@@ -10,7 +10,7 @@ export type ResizeConfig = {
   scale: number;
 };
 
-export type SnapbackPinchContextEvent = {
+export type SnapbackZoomState = {
   x: number;
   y: number;
   width: number;
@@ -25,8 +25,8 @@ export type SnapbackPinchContextEvent = {
 export type SnapBackZoomProps = React.PropsWithChildren<{
   resizeConfig?: ResizeConfig;
   gesturesEnabled?: boolean;
-  onGestureActive?: (e: SnapbackPinchContextEvent) => void;
+  onGestureActive?: (e: SnapbackZoomState) => void;
   onGestureEnd?: () => void;
 }> &
   CommonZoomProps &
-  CommonZoomCallbackProps;
+  Omit<CommonZoomCallbackProps, 'onPanStart' | 'onPanEnd'>;

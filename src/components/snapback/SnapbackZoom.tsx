@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { DEFAULT_HITSLOP } from '../../constants';
+import { DEFAULT_HITSLOP } from '../../commons/constants';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
@@ -43,8 +43,6 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   const origin = useVector(0, 0);
   const scale = useSharedValue<number>(1);
 
-  const isPinchActive = useSharedValue<boolean>(false);
-
   const containerRef = useAnimatedRef();
   const measurePinchContainer = () => {
     'worklet';
@@ -70,7 +68,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [position, translate, scale, containerSize, childrenSize, isPinchActive]);
+  }, [position, translate, scale, containerSize, childrenSize]);
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
@@ -83,7 +81,6 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       measurePinchContainer();
       origin.x.value = e.focalX - containerSize.width.value / 2;
       origin.y.value = e.focalY - containerSize.height.value / 2;
-      isPinchActive.value = true;
     })
     .onUpdate((e) => {
       const deltaX = e.focalX - containerSize.width.value / 2 - origin.x.value;
@@ -96,16 +93,14 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translate.y.value = toY;
       scale.value = e.scale;
     })
-    .onEnd((e, success) => {
+    .onEnd((e) => {
       if (onPinchEnd !== undefined) {
-        runOnJS(onPinchEnd)(e, success);
+        runOnJS(onPinchEnd)(e);
       }
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        isPinchActive.value = false;
-
         if (onGestureEnd !== undefined) {
           runOnJS(onGestureEnd)();
         }
@@ -115,23 +110,15 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   const tap = Gesture.Tap()
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onEnd((e) => {
-      if (onTap !== undefined) {
-        runOnJS(onTap)(e);
-      }
-    });
+    .runOnJS(true)
+    .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onEnd((e) => {
-      if (onDoubleTap !== undefined) {
-        runOnJS(onDoubleTap)(e);
-      }
-    });
-
-  const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
+    .runOnJS(true)
+    .onEnd((e) => onDoubleTap?.(e));
 
   const containerStyle = useAnimatedStyle(() => {
     const width = containerSize.width.value;
@@ -165,6 +152,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       ],
     };
   });
+
+  const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
   return (
     <Animated.View style={[containerStyle, styles.center]}>
