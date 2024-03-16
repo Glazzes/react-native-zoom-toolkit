@@ -10,6 +10,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { DEFAULT_HITSLOP } from '../../commons/constants';
@@ -31,14 +32,13 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureActive,
   onGestureEnd,
 }) => {
-  const position = useVector(0, 0);
-
   const childrenSize = useSizeVector(0, 0);
   const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
 
+  const position = useVector(0, 0);
   const translate = useVector(0, 0);
   const origin = useVector(0, 0);
   const scale = useSharedValue<number>(1);
@@ -125,10 +125,10 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     const height = containerSize.height.value;
 
     return {
-      width: width === 0 ? undefined : containerSize.width.value,
-      height: height === 0 ? undefined : containerSize.height.value,
+      width: width === 0 ? undefined : width,
+      height: height === 0 ? undefined : height,
     };
-  });
+  }, [containerSize]);
 
   const childrenStyle = useAnimatedStyle(() => {
     const resized = resizeToAspectRatio({
@@ -151,22 +151,23 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
         { scale: scale.value },
       ],
     };
-  });
+  }, [resizeConfig, containerSize, childrenSize, translate, scale]);
 
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
   return (
     <Animated.View style={[containerStyle, styles.center]}>
+      <Animated.View ref={containerRef} style={childrenStyle}>
+        {children}
+      </Animated.View>
+
       <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
         <Animated.View
+          collapsable={false}
           pointerEvents={gesturesEnabled ? undefined : 'none'}
           style={styles.absolute}
         />
       </GestureDetector>
-
-      <Animated.View ref={containerRef} style={childrenStyle}>
-        {children}
-      </Animated.View>
     </Animated.View>
   );
 };
@@ -180,7 +181,6 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     position: 'absolute',
-    zIndex: 1,
   },
 });
 
