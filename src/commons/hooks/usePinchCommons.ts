@@ -6,7 +6,6 @@ import {
   type SharedValue,
 } from 'react-native-reanimated';
 import type {
-  GestureStateChangeEvent,
   GestureUpdateEvent,
   PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
@@ -19,6 +18,8 @@ import {
   type BoundsFuction,
   type SizeVector,
   type Vector,
+  type PinchGestureEventCallback,
+  type PinchGestureEvent,
 } from '../types';
 
 type PinchOptions = {
@@ -36,10 +37,11 @@ type PinchOptions = {
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
   panWithPinch?: boolean;
+  userCallbacks?: Partial<{
+    onPinchStart: PinchGestureEventCallback;
+    onPinchEnd: PinchGestureEventCallback;
+  }>;
 };
-
-type PinchGestureEvent =
-  GestureStateChangeEvent<PinchGestureHandlerEventPayload>;
 
 type PinchGestueUpdateEvent =
   GestureUpdateEvent<PinchGestureHandlerEventPayload>;
@@ -60,6 +62,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     panWithPinch,
     origin,
     boundFn,
+    userCallbacks,
   } = options;
 
   const [gesturedEnabled, setGesturedEnabled] = useState<boolean>(true);
@@ -105,6 +108,10 @@ export const usePinchCommons = (options: PinchOptions) => {
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
     scaleOffset.value = scale.value;
+
+    if (userCallbacks?.onPinchStart) {
+      runOnJS(userCallbacks.onPinchStart)(e);
+    }
   };
 
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
@@ -133,10 +140,14 @@ export const usePinchCommons = (options: PinchOptions) => {
     scale.value = toScale;
   };
 
-  const onPinchEnd = () => {
+  const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
     toggleGestures();
+
+    if (userCallbacks?.onPinchEnd) {
+      runOnJS(userCallbacks.onPinchEnd)(e);
+    }
 
     if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
       reset(0, 0, minScale);

@@ -44,6 +44,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     mode = CropMode.MANAGED,
     onGestureActive = undefined,
     OverlayComponent = undefined,
+    onPanStart: onUserPanStart,
+    onPanEnd: onUserPanEnd,
+    onPinchStart: onUserPinchStart,
+    onPinchEnd: onUserPinchEnd,
   } = props;
 
   const translate = useVector(0, 0);
@@ -133,6 +137,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panWithPinch,
     scaleMode,
     boundFn: boundsFn,
+    userCallbacks: {
+      onPinchStart: onUserPinchStart,
+      onPinchEnd: onUserPinchEnd,
+    },
   });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
@@ -145,6 +153,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     detectorTranslate,
     panMode,
     boundFn: boundsFn,
+    userCallbacks: {
+      onPanStart: onUserPanStart,
+      onPanEnd: onUserPanEnd,
+    },
   });
 
   const pinch = Gesture.Pinch()

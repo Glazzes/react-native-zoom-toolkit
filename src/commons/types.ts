@@ -56,11 +56,17 @@ export type PanGestureEventCallback = (e: PanGestureEvent) => void;
 export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
 
-export type CommonZoomCallbackProps = {
-  onTap?: TapGestureEventCallback;
-  onDoubleTap?: TapGestureEventCallback;
+export type PanGestureCallbacks = Partial<{
   onPanStart?: PanGestureEventCallback;
   onPanEnd?: PanGestureEventCallback;
+}>;
+
+export type PinchGestureCallbacks = Partial<{
   onPinchStart?: PinchGestureEventCallback;
   onPinchEnd?: PinchGestureEventCallback;
-};
+}>;
+
+export type TapGestureCallbacks = Partial<{
+  onTap?: TapGestureEventCallback;
+  onDoubleTap?: TapGestureEventCallback;
+}>;

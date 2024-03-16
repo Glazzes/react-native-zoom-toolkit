@@ -1,7 +1,8 @@
 import type {
-  CommonZoomCallbackProps,
   CommonZoomProps,
+  PinchGestureCallbacks,
   SizeVector,
+  TapGestureCallbacks,
 } from '../../commons/types';
 
 export type ResizeConfig = {
@@ -15,8 +16,8 @@ export type SnapbackZoomState = {
   y: number;
   width: number;
   height: number;
-  resizedWidth: number;
-  resizedHeight: number;
+  resizedWidth: number | undefined;
+  resizedHeight: number | undefined;
   translateX: number;
   translateY: number;
   scale: number;
@@ -28,5 +29,6 @@ export type SnapBackZoomProps = React.PropsWithChildren<{
   onGestureActive?: (e: SnapbackZoomState) => void;
   onGestureEnd?: () => void;
 }> &
-  CommonZoomProps &
-  Omit<CommonZoomCallbackProps, 'onPanStart' | 'onPanEnd'>;
+  PinchGestureCallbacks &
+  TapGestureCallbacks &
+  CommonZoomProps;

@@ -32,16 +32,24 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureActive,
   onGestureEnd,
 }) => {
-  const childrenSize = useSizeVector(0, 0);
+  const position = useVector(0, 0);
+  const translate = useVector(0, 0);
+  const origin = useVector(0, 0);
+  const scale = useSharedValue<number>(1);
+
   const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
 
-  const position = useVector(0, 0);
-  const translate = useVector(0, 0);
-  const origin = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
+  const childrenSize = useDerivedValue(() => {
+    return resizeToAspectRatio({
+      resizeConfig,
+      width: containerSize.width.value,
+      height: containerSize.height.value,
+      scale: scale.value,
+    });
+  }, [resizeConfig, scale, containerSize]);
 
   const containerRef = useAnimatedRef();
   const measurePinchContainer = () => {
@@ -57,13 +65,15 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   };
 
   useDerivedValue(() => {
+    const { width, height } = childrenSize.value;
+
     onGestureActive?.({
       x: position.x.value,
       y: position.y.value,
       width: containerSize.width.value,
       height: containerSize.height.value,
-      resizedWidth: childrenSize.width.value,
-      resizedHeight: childrenSize.height.value,
+      resizedWidth: resizeConfig ? width : undefined,
+      resizedHeight: resizeConfig ? height : undefined,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
@@ -131,20 +141,11 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   }, [containerSize]);
 
   const childrenStyle = useAnimatedStyle(() => {
-    const resized = resizeToAspectRatio({
-      resizeConfig,
-      width: containerSize.width.value,
-      height: containerSize.height.value,
-      scale: scale.value,
-    });
-
-    const { width: finalWidth, height: finalHeight, deltaX, deltaY } = resized;
-    childrenSize.width.value = finalWidth;
-    childrenSize.height.value = finalHeight;
+    const { width, height, deltaX, deltaY } = childrenSize.value;
 
     return {
-      width: finalWidth === 0 ? undefined : finalWidth,
-      height: finalHeight === 0 ? undefined : finalHeight,
+      width: width === 0 ? undefined : width,
+      height: height === 0 ? undefined : height,
       transform: [
         { translateX: translate.x.value - deltaX },
         { translateY: translate.y.value - deltaY },
