@@ -80,6 +80,7 @@ const ResumableGalleryExample: React.FC = () => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         scrollEnabled={false}
+        showsHorizontalScrollIndicator={true}
         horizontal={true}
       />
       <ScrollPreview

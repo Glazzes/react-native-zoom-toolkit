@@ -117,16 +117,16 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       if (isWithinBoundX.value) {
         translate.x.value = toX;
       } else {
-        const fraction = (Math.abs(toX) - boundX) / overScrollFraction;
-        const frictionX = friction(clamp(0, 1, fraction));
+        const fraction = Math.abs(Math.abs(toX) - boundX) / overScrollFraction;
+        const frictionX = friction(clamp(fraction, 0, 1));
         translate.x.value += e.changeX * frictionX;
       }
 
       if (isWithinBoundY.value) {
         translate.y.value = toY;
       } else {
-        const fraction = (Math.abs(toY) - boundY) / overScrollFraction;
-        const frictionY = friction(clamp(0, 1, fraction));
+        const fraction = Math.abs(Math.abs(toY) - boundY) / overScrollFraction;
+        const frictionY = friction(clamp(fraction, 0, 1));
         translate.y.value += e.changeY * frictionY;
       }
 
@@ -208,7 +208,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       });
     } else {
       translate.y.value = withTiming(toY);
-      detectorTranslate.y.value = toY;
+      detectorTranslate.y.value = withTiming(toY);
     }
 
     if (userCallbacks?.onPanEnd) {

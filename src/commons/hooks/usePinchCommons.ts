@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   withTiming,
   cancelAnimation,
@@ -65,16 +64,6 @@ export const usePinchCommons = (options: PinchOptions) => {
     userCallbacks,
   } = options;
 
-  const [gesturedEnabled, setGesturedEnabled] = useState<boolean>(true);
-  const toogle = () => {
-    setGesturedEnabled((prev) => !prev);
-  };
-
-  const toggleGestures = () => {
-    'worklet';
-    runOnJS(toogle)();
-  };
-
   const reset = (toX: number, toY: number, toScale: number) => {
     'worklet';
 
@@ -87,11 +76,11 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scale.value = withTiming(toScale, undefined, toggleGestures);
+    scale.value = withTiming(toScale);
 
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = toScale;
+    detectorTranslate.x.value = withTiming(toX);
+    detectorTranslate.y.value = withTiming(toY);
+    detectorScale.value = withTiming(toScale);
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
@@ -143,8 +132,6 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
-    toggleGestures();
-
     if (userCallbacks?.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);
     }
@@ -185,5 +172,5 @@ export const usePinchCommons = (options: PinchOptions) => {
     reset(toX, toY, scale.value);
   };
 
-  return { gesturedEnabled, onPinchStart, onPinchUpdate, onPinchEnd };
+  return { onPinchStart, onPinchUpdate, onPinchEnd };
 };

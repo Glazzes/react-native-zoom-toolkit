@@ -93,7 +93,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
     detector.width.value = isFlipped ? size.height : size.width;
     detector.height.value = isFlipped ? size.width : size.height;
-  }, [cropSize, resolution, sizeAngle, rotation]);
+  }, [cropSize, resolution, sizeAngle, rotation, container, detector]);
 
   useDerivedValue(() => {
     onGestureActive?.({
@@ -182,7 +182,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         { scale: detectorScale.value },
       ],
     };
-  });
+  }, [detector, debug, detectorTranslate, detectorScale]);
 
   const containerStyle = useAnimatedStyle(() => {
     return {
@@ -197,7 +197,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         { rotateY: `${rotate.y.value}rad` },
       ],
     };
-  });
+  }, [translate, scale, rotation, rotate]);
 
   // Reference handling section
   const canAnimate = useSharedValue<boolean>(true);

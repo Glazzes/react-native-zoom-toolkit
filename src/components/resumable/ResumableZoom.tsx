@@ -111,27 +111,26 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     });
   }, [translate, detector, scale]);
 
-  const { gesturedEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
-    usePinchCommons({
-      detector,
-      detectorTranslate,
-      detectorScale,
-      translate,
-      offset,
-      origin,
-      scale,
-      scaleOffset,
-      minScale,
-      maxScale,
-      delta,
-      panWithPinch,
-      scaleMode,
-      boundFn: boundsFn,
-      userCallbacks: {
-        onPinchStart: onUserPinchStart,
-        onPinchEnd: onUserPinchEnd,
-      },
-    });
+  const { onPinchStart, onPinchUpdate, onPinchEnd } = usePinchCommons({
+    detector,
+    detectorTranslate,
+    detectorScale,
+    translate,
+    offset,
+    origin,
+    scale,
+    scaleOffset,
+    minScale,
+    maxScale,
+    delta,
+    panWithPinch,
+    scaleMode,
+    boundFn: boundsFn,
+    userCallbacks: {
+      onPinchStart: onUserPinchStart,
+      onPinchEnd: onUserPinchEnd,
+    },
+  });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
     detector,
@@ -154,14 +153,14 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
-    .enabled(pinchEnabled && gesturedEnabled)
+    .enabled(pinchEnabled)
     .hitSlop(hitSlop)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
-    .enabled(panEnabled && gesturedEnabled)
+    .enabled(panEnabled)
     .hitSlop(hitSlop)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -169,7 +168,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
-    .enabled(tapsEnabled && gesturedEnabled)
+    .enabled(tapsEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
     .hitSlop(hitSlop)
@@ -177,7 +176,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
-    .enabled(tapsEnabled && gesturedEnabled)
+    .enabled(tapsEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
     .hitSlop(hitSlop)
@@ -206,9 +205,9 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       translate.y.value = withTiming(toY);
       scale.value = withTiming(maxScale.value);
 
-      detectorTranslate.x.value = toX;
-      detectorTranslate.y.value = toY;
-      detectorScale.value = maxScale.value;
+      detectorTranslate.x.value = withTiming(toX);
+      detectorTranslate.y.value = withTiming(toY);
+      detectorScale.value = withTiming(maxScale.value);
     });
 
   const measureRoot = (e: LayoutChangeEvent) => {
