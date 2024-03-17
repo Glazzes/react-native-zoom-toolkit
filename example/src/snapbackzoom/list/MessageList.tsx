@@ -10,7 +10,7 @@ import ImageMessage from '../messages/ImageMessage';
 import Appbar from './Appbar';
 import { FlatList } from 'react-native-gesture-handler';
 import { theme } from '../../constants';
-import CellRenderer from './CellRenderer';
+import CellRenderer from '../messages/CellRenderer';
 import { useSharedValue } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import TextArea from './TextArea';

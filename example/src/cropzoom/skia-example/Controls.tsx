@@ -24,7 +24,7 @@ import {
   buttonSize,
   indentity,
   blackAndWhite,
-  controlSize,
+  CONTROLS_HEIGHT,
 } from '../commons/contants';
 import EffectPreview from './EffectPreview';
 
@@ -62,12 +62,17 @@ const Controls: React.FC<EffectIndicatorProps> = ({
     });
   };
 
+  /*
+   * In contast to image files where we use crop method from cropZoom it does not make any sense
+   * to use it here, as we do not have access to a file, just take a snapshot of the canvas where
+   * our crop size is,starting  from the posiiton in the top left corner
+   */
   const cropCanvas = async () => {
     setIsCropping(true);
 
     const canvasCrop = rect(
       (width - cropSize) / 2,
-      (height - controlSize - cropSize) / 2,
+      (height - CONTROLS_HEIGHT - cropSize) / 2,
       cropSize,
       cropSize
     );

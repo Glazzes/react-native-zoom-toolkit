@@ -30,18 +30,18 @@ export enum ScaleMode {
   BOUNCE = 'bounce',
 }
 
-export type CommonZoomProps = {
-  hitSlop?: HitSlop;
-  timingConfig?: WithTimingConfig;
-};
+export type CommonZoomProps = Partial<{
+  hitSlop: HitSlop;
+  timingConfig: WithTimingConfig;
+}>;
 
-export type CommonResumableProps = {
-  minScale?: number;
-  maxScale?: number;
-  panMode?: PanMode;
-  scaleMode?: ScaleMode;
-  panWithPinch?: boolean;
-};
+export type CommonResumableProps = Partial<{
+  minScale: number;
+  maxScale: number;
+  panMode: PanMode;
+  scaleMode: ScaleMode;
+  panWithPinch: boolean;
+}>;
 
 export type TapGestureEvent =
   GestureStateChangeEvent<TapGestureHandlerEventPayload>;
