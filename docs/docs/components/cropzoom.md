@@ -7,10 +7,10 @@ outline: deep
 # CropZoom
 An ideal, practical and unopinionated component for image and video cropping needs, among its features we can find the following:
 
-- Build your own custom UI on top of it.
-- Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
-- For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
-- Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
+- **Custom UI:** Build your own custom UI on top of it.
+- **Resuamble:** Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
+- **Barebones:** For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
+- **Fixed size:** Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
 
 This component comes with a handy algorithm to perform cropping operations for you, however you will need the help a of deidicated library for this task.
 - see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo)
@@ -29,7 +29,7 @@ Managed mode is the default mode and its designed for simple use cases as the on
 Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things to keep in mind:
 
 ::: tip Remember
-- This component uses `flex: 1` style property therefore it will take all available space, its minimum dimensions are the values provided to `cropSize` property.
+- This component uses `flex: 1` style property therefore it will attempt to take all available space, its minimum dimensions are the values provided to `cropSize` property.
 - This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` properties so they cover the gesture detection area properly.
 :::
 
@@ -55,6 +55,7 @@ if(resolution === undefined) {
 
 <CropZoom 
   ref={ref}
+  debug={true}
   cropSize={cropSize} 
   resolution={resolution} 
   OverlayComponent={renderOverlay}>
@@ -126,7 +127,7 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 |------|---------|----------|
 | `number` | `-1` | `No`    |
 
-Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way max scale is a value just before images and videos start getting pixelated.
+Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
 
 ### panMode
 | Type | Default | Required | Additional Info |
@@ -178,7 +179,7 @@ callback triggered when the pinch gesture starts, receives pinch gesture event a
 Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
 ### onGestureActive
-| Type | Default | Required | Addtional Info |
+| Type | Default | Required | Additional Info |
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
@@ -211,47 +212,54 @@ ref.current?.crop(200);
 ```
 
 ### crop
-Maps all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
+Map all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
 - Arguments
 
 | Name | Type | Default | Description |
 |------|------|-------------|---------|
 | fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is inferred by the computed aspect ratio of CropZoom's `cropSize` property. |
 
-- Returns
-[CropContextResult](#cropcontextresult)
+- Returns [CropContextResult](#cropcontextresult)
 
 ### rotate
-Rotates the component 90 degrees clockwise in a range from 0 to 360 degrees.
+Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+- Returns `void`
 
 ### flipHorizontal
-Flips the component horizontally.
+Flip the component horizontally.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+- Returns `void`
 
 ### flipVertical
-Flips the component vertically.
+Flip the component vertically.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
+- Returns `void`
+
 ### reset
-Resets all transformations to their initial state.
+Reset all transformations to their initial state.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|---------|------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+- Returns `void`
 
 ## Type Definitions
 
@@ -283,12 +291,12 @@ Determines how your component must behave when it reaches the specified boundari
 | `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determines how your component must behave when it reaches the specified boundaries by `minScale` and `maxScale` properties.
+Determines how your component must behave when it reaches/exceeds the specified boundaries by `minScale` and `maxScale` properties.
 
 | Property |Description |
 |----------|------------|
-| `CLAMP`  | Prevents the scale from going above and below the scale threshold. |
-| `BOUNCE` | Lets the user scale above and below the scale threshold values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
+| `CLAMP`  | Prevents the scale from going above and below the scale boundaries. |
+| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
 
 ### CropContextResult
 

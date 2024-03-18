@@ -16,7 +16,7 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 ## How to use
 Its usage is pretty straight forward, import SnapBackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
 
-::: danger Caution
+::: tip Tip
 Do not use `position: "absolute"` in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
 :::
 
@@ -93,28 +93,28 @@ Enables or disable gestures, when gestures are disabled your component can detec
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a single tap is made, receives tap gesture event as its only argument.
+Callback triggered when a single tap is made, receives a tap gesture event as its only argument.
 
 ### onDoubleTap
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a double tap is made, receives tap gesture event as its only argument.
+Callback triggered when a double tap is made, receives a tap gesture event as its only argument.
 
 ### onPinchStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
+callback triggered when the pinch gesture starts, receives a pinch gesture event as its only argument.
 
 ### onPinchEnd
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
+Callback triggered as soon as the user lifts their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
 ### onGestureActive
 | Type | Default | Additional Info |
