@@ -27,7 +27,7 @@ import Controls from './Controls';
 import {
   buttonSize,
   blackAndWhite,
-  controlSize,
+  CONTROLS_HEIGHT,
   indentity,
 } from '../commons/contants';
 import { theme } from '../../constants';
@@ -41,6 +41,14 @@ const useVector = (x: number, y?: number) => {
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
+/*
+ * Dealing with Skia components is more complicated as it involves creating your own
+ * shared values and update them with onGestureActive callback property.
+ *
+ * It also requires you to
+ * - Calculate where the image is initally located
+ * - Where is the center of your image so transformations are applicated properly
+ */
 const SkiaCropZoom: React.FC = ({}) => {
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -102,7 +110,7 @@ const SkiaCropZoom: React.FC = ({}) => {
           height={height}
           image={image}
           fit={'cover'}
-          origin={vec(screenWidth / 2, (screenHeight - controlSize) / 2)}
+          origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT) / 2)}
           transform={transform}
         >
           <Lerp t={progress}>

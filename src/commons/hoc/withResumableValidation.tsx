@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResumableZoomProps } from '../../components/resumable/types';
 import { forwardRef } from 'react';
+import { getInvalidChildrenMessage } from '../utils/messages';
 
 export default function withResumableValidation<
   T,
@@ -9,11 +10,17 @@ export default function withResumableValidation<
   return forwardRef<T, P>((props, ref) => {
     const { minScale, maxScale, children } = props;
 
+    const expectedChildren = 1;
     const childrenCount = React.Children.count(children);
-    if (childrenCount !== 1) {
-      throw new Error(
-        `ResumableZoom expected a single child, but received ${childrenCount}`
-      );
+
+    if (childrenCount !== expectedChildren) {
+      const message = getInvalidChildrenMessage({
+        name: 'ResumableZoom',
+        expected: expectedChildren,
+        actual: childrenCount,
+      });
+
+      throw new Error(message);
     }
 
     if (minScale !== undefined && minScale < 1) {

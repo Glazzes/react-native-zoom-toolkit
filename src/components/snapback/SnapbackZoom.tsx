@@ -10,9 +10,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { DEFAULT_HITSLOP } from '../../constants';
+import { DEFAULT_HITSLOP } from '../../commons/constants';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
@@ -32,18 +33,23 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureEnd,
 }) => {
   const position = useVector(0, 0);
+  const translate = useVector(0, 0);
+  const origin = useVector(0, 0);
+  const scale = useSharedValue<number>(1);
 
-  const childrenSize = useSizeVector(0, 0);
   const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
 
-  const translate = useVector(0, 0);
-  const origin = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
-
-  const isPinchActive = useSharedValue<boolean>(false);
+  const childrenSize = useDerivedValue(() => {
+    return resizeToAspectRatio({
+      resizeConfig,
+      width: containerSize.width.value,
+      height: containerSize.height.value,
+      scale: scale.value,
+    });
+  }, [resizeConfig, scale, containerSize]);
 
   const containerRef = useAnimatedRef();
   const measurePinchContainer = () => {
@@ -59,18 +65,20 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   };
 
   useDerivedValue(() => {
+    const { width, height } = childrenSize.value;
+
     onGestureActive?.({
       x: position.x.value,
       y: position.y.value,
       width: containerSize.width.value,
       height: containerSize.height.value,
-      resizedWidth: childrenSize.width.value,
-      resizedHeight: childrenSize.height.value,
+      resizedWidth: resizeConfig ? width : undefined,
+      resizedHeight: resizeConfig ? height : undefined,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [position, translate, scale, containerSize, childrenSize, isPinchActive]);
+  }, [position, translate, scale, containerSize, childrenSize]);
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
@@ -83,7 +91,6 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       measurePinchContainer();
       origin.x.value = e.focalX - containerSize.width.value / 2;
       origin.y.value = e.focalY - containerSize.height.value / 2;
-      isPinchActive.value = true;
     })
     .onUpdate((e) => {
       const deltaX = e.focalX - containerSize.width.value / 2 - origin.x.value;
@@ -96,16 +103,14 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translate.y.value = toY;
       scale.value = e.scale;
     })
-    .onEnd((e, success) => {
+    .onEnd((e) => {
       if (onPinchEnd !== undefined) {
-        runOnJS(onPinchEnd)(e, success);
+        runOnJS(onPinchEnd)(e);
       }
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        isPinchActive.value = false;
-
         if (onGestureEnd !== undefined) {
           runOnJS(onGestureEnd)();
         }
@@ -115,69 +120,55 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   const tap = Gesture.Tap()
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onEnd((e) => {
-      if (onTap !== undefined) {
-        runOnJS(onTap)(e);
-      }
-    });
+    .runOnJS(true)
+    .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .maxDuration(250)
     .enabled(gesturesEnabled)
-    .onEnd((e) => {
-      if (onDoubleTap !== undefined) {
-        runOnJS(onDoubleTap)(e);
-      }
-    });
-
-  const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
+    .runOnJS(true)
+    .onEnd((e) => onDoubleTap?.(e));
 
   const containerStyle = useAnimatedStyle(() => {
     const width = containerSize.width.value;
     const height = containerSize.height.value;
 
     return {
-      width: width === 0 ? undefined : containerSize.width.value,
-      height: height === 0 ? undefined : containerSize.height.value,
+      width: width === 0 ? undefined : width,
+      height: height === 0 ? undefined : height,
     };
-  });
+  }, [containerSize]);
 
   const childrenStyle = useAnimatedStyle(() => {
-    const resized = resizeToAspectRatio({
-      resizeConfig,
-      width: containerSize.width.value,
-      height: containerSize.height.value,
-      scale: scale.value,
-    });
-
-    const { width: finalWidth, height: finalHeight, deltaX, deltaY } = resized;
-    childrenSize.width.value = finalWidth;
-    childrenSize.height.value = finalHeight;
+    const { width, height, deltaX, deltaY } = childrenSize.value;
 
     return {
-      width: finalWidth === 0 ? undefined : finalWidth,
-      height: finalHeight === 0 ? undefined : finalHeight,
+      width: width === 0 ? undefined : width,
+      height: height === 0 ? undefined : height,
       transform: [
         { translateX: translate.x.value - deltaX },
         { translateY: translate.y.value - deltaY },
         { scale: scale.value },
       ],
     };
-  });
+  }, [resizeConfig, containerSize, childrenSize, translate, scale]);
+
+  const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
   return (
     <Animated.View style={[containerStyle, styles.center]}>
+      <Animated.View ref={containerRef} style={childrenStyle}>
+        {children}
+      </Animated.View>
+
       <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
         <Animated.View
+          collapsable={false}
           pointerEvents={gesturesEnabled ? undefined : 'none'}
           style={styles.absolute}
         />
       </GestureDetector>
-
-      <Animated.View ref={containerRef} style={childrenStyle}>
-        {children}
-      </Animated.View>
     </Animated.View>
   );
 };
@@ -191,7 +182,6 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     position: 'absolute',
-    zIndex: 1,
   },
 });
 

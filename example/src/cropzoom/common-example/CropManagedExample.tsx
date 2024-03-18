@@ -15,7 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import Controls from './Controls';
 import CropModal from '../commons/CropModal';
-import { controlSize } from '../commons/contants';
+import { CONTROLS_HEIGHT } from '../commons/contants';
 
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -26,8 +26,9 @@ const CropManagedExample = ({}) => {
 
   const { width, height } = useWindowDimensions();
   const { resolution } = useImageResolution({ uri: IMAGE });
+
   const cropSize = width * 0.9;
-  const overlayHeight = height - controlSize;
+  const overlayHeight = height - CONTROLS_HEIGHT;
 
   const renderOverlay = useCallback(() => {
     const center = { x: width / 2, y: overlayHeight / 2 };
@@ -90,8 +91,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   image: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
   },
 });
 

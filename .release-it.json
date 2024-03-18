@@ -1,0 +1,21 @@
+{
+  "git": {
+    "requireBranch": "main",
+    "commitMessage": "chore: release ${version}",
+    "tagName": "v${version}"
+  },
+  "hooks": {
+    "before:init": ["git pull", "yarn lint", "yarn test"]
+  },
+  "npm": {
+    "publish": true
+  },
+  "github": {
+    "release": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular"
+    }
+  }
+}

@@ -1,9 +1,9 @@
 import React from 'react';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
-import { CropManagedExample } from './src/cropzoom';
+import { ResumableZoomGalleryExample } from './src/resumable';
 
 const App: React.FC = ({}) => {
-  return <CropManagedExample />;
+  return <ResumableZoomGalleryExample />;
 };
 
 export default gestureHandlerRootHOC(App);

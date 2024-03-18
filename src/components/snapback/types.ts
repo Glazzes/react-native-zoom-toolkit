@@ -1,7 +1,8 @@
 import type {
-  CommonZoomCallbackProps,
   CommonZoomProps,
+  PinchGestureCallbacks,
   SizeVector,
+  TapGestureCallbacks,
 } from '../../commons/types';
 
 export type ResizeConfig = {
@@ -10,13 +11,13 @@ export type ResizeConfig = {
   scale: number;
 };
 
-export type SnapbackPinchContextEvent = {
+export type SnapbackZoomState = {
   x: number;
   y: number;
   width: number;
   height: number;
-  resizedWidth: number;
-  resizedHeight: number;
+  resizedWidth: number | undefined;
+  resizedHeight: number | undefined;
   translateX: number;
   translateY: number;
   scale: number;
@@ -25,8 +26,9 @@ export type SnapbackPinchContextEvent = {
 export type SnapBackZoomProps = React.PropsWithChildren<{
   resizeConfig?: ResizeConfig;
   gesturesEnabled?: boolean;
-  onGestureActive?: (e: SnapbackPinchContextEvent) => void;
+  onGestureActive?: (e: SnapbackZoomState) => void;
   onGestureEnd?: () => void;
 }> &
-  CommonZoomProps &
-  CommonZoomCallbackProps;
+  PinchGestureCallbacks &
+  TapGestureCallbacks &
+  CommonZoomProps;

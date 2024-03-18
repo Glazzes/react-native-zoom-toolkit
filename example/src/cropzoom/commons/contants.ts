@@ -1,7 +1,7 @@
 import { theme } from '../../constants';
 
 export const buttonSize = 50;
-export const controlSize = buttonSize + theme.spacing.s;
+export const CONTROLS_HEIGHT = buttonSize + theme.spacing.s;
 export const baseColor = '#fff';
 export const activeColor = '#75DAEA';
 export const borderWidth = 2;

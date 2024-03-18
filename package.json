@@ -77,13 +77,20 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/runtime": "^7.24.0",
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
     "@react-native/eslint-config": "^0.72.2",
     "@release-it/conventional-changelog": "^5.0.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.4.3",
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.70.0",
+    "@types/react-test-renderer": "^18.0.0",
+    "babel-jest": "^29.7.0",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
     "eslint": "^8.4.1",
@@ -96,7 +103,8 @@
     "react-native-builder-bob": "^0.20.0",
     "react-native-gesture-handler": "2.14.0",
     "react-native-reanimated": "3.6.2",
-    "release-it": "^15.0.0",
+    "react-test-renderer": "18.2.0",
+    "release-it": "^15.11.0",
     "typescript": "^5.0.2"
   },
   "resolutions": {
@@ -116,6 +124,16 @@
   },
   "jest": {
     "preset": "react-native",
+    "testTimeout": 10000,
+    "setupFilesAfterEnv": [
+      "./jest-setup.js"
+    ],
+    "setupFiles": [
+      "./node_modules/react-native-gesture-handler/jestSetup.js"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-native-reanimated)\\/.*$"
+    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
@@ -125,23 +143,6 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
-    }
   },
   "eslintConfig": {
     "root": true,

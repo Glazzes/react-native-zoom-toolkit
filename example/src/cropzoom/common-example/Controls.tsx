@@ -67,10 +67,11 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
 
     actions.push({ crop: cropResult.crop });
 
-    manipulateAsync(uri, actions).then((manipulationResult) => {
-      setCrop(manipulationResult.uri);
-      setIsCropping(false);
-    });
+    manipulateAsync(uri, actions)
+      .then((manipulationResult) => {
+        setCrop(manipulationResult.uri);
+      })
+      .finally(() => setIsCropping(false));
   };
 
   return (

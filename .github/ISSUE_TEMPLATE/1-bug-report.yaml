@@ -30,17 +30,13 @@ body:
       placeholder: My component should not go out of the screen bounds.
 
   - type: textarea
-    id: versions
+    id: additional-context
     validations:
       required: true
     attributes:
-      label: Versions
-      description: What versions of Reanimated, Gesture Handler and this library are you using?
-      placeholder: |
-        1. React Native version
-        2. Reanimated version
-        3. Gesture Handler version
-        4. react-native-zoom-toolkit version
+      label: Environment
+      description: Provide relevant information about your environment.
+      placeholder: Platform, Package.json or anything you consider relevant to your issue.
 
   - type: textarea
     id: steps-to-reproduce
@@ -55,11 +51,10 @@ body:
         1. Go to file X
         2. Add X property to component Y
 
-  - type: textarea
-    id: additional-context
-    validations:
-      required: false
+  - type: checkboxes
+    id: willingness
     attributes:
-      label: Additional Context
-      description: Anything else you consider relevant to this issue.
-      placeholder: Platform, Development environment, Package.json, etc.
+      label: Can you provide any help?
+      options:
+        - label: I may help fixing this issue.
+          required: false

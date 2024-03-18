@@ -16,7 +16,7 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 ## How to use
 Its usage is pretty straight forward, import SnapBackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
 
-::: danger Caution
+::: tip Tip
 Do not use `position: "absolute"` in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
 :::
 
@@ -61,12 +61,12 @@ All properties for this component are optional.
 |------|---------|-----------------|
 | `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
 
-Increase the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
+Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
 ### timingConfig 
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `object` | `undefined` | see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
+| `object` | `undefined` | see [TimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
 
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position.
 
@@ -89,56 +89,42 @@ Dynamically recalculates `SnapBackZoom` component's `width` and `height` style p
 Enables or disable gestures, when gestures are disabled your component can detect pointer events again.
 
 ### onTap
-| Type | Default |
-|------|---------|
-| `function` | `undefined` |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a single tap is made.
+Callback triggered when a single tap is made, receives a tap gesture event as its only argument.
 
 ### onDoubleTap
-| Type | Default |
-|------|---------|
-| `function` | `undefined` |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a double tap is made.
+Callback triggered when a double tap is made, receives a tap gesture event as its only argument.
 
 ### onPinchStart
-| Type | Default |
-|------|---------|
-| `function` | `undefined` |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-callback triggered when the pinch gesture starts.
+callback triggered when the pinch gesture starts, receives a pinch gesture event as its only argument.
 
 ### onPinchEnd
-| Type | Default |
-|------|---------|
-| `function` | `undefined` |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-Callback triggered as soon as the user lift their fingers off the screen after pinching.
+Callback triggered as soon as the user lifts their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
 ### onGestureActive
 | Type | Default | Additional Info |
-|------|---------|----------------|
+|------|---------|-----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Callback triggered from the moment pinch gesture starts until the snap back animation finishes, 
-ideal for mirroring the state of the gesture to some other component.
+receives an object of type [SnapbackZoomState](#snapbackzoomstate) as its only argument.
 
-Receives the state of the gesture as argument, which includes the following properties:
-
-| Name | Type | Description |
-|------|---------|----------|
-| `x`  | `number` | Position in the x axis starting from the top left corner of the screen |
-| `y`  | `number` | Position in the y axis starting from the top left corner of the screen |
-| `width` | `number` | Inital width measurement of your component |
-| `height` | `number` | Inital height measurement of your component |
-| `resizedWidth` | `number \| undefined` | Current width measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
-| `resizedWidth` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
-| `translateX` | `number` | Current translateX transformation value |
-| `translateY` | `number` | Current translateY transformation value |
-| `scale` | `number` | Current scale transformation value |
-
-This property is very useful when you need to mirror the current pinch gesture transformations to some other component.
+Ideal if you need to mirror the current state of the gesture to some other component.
 
 ### onGestureEnd
 | Type | Default |
@@ -173,3 +159,17 @@ At a scale of one your image is a tile of 200x200 pixel size, in other words a s
 | size     | `{width: number; height: number;}` | Fields specify the width and height of your component. |
 | aspectRatio | `number` | Aspect ratio of your image/video/component. |
 | scale       | `number` | At which scale your component will be fully resized to meet the aspect ratio. |
+
+### SnapbackZoomState
+
+| Name | Type | Description |
+|------|---------|----------|
+| `x`  | `number` | Position in the x axis starting from the top left corner of the screen |
+| `y`  | `number` | Position in the y axis starting from the top left corner of the screen |
+| `width` | `number` | Inital width measurement of your component |
+| `height` | `number` | Inital height measurement of your component |
+| `resizedWidth` | `number \| undefined` | Current width measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
+| `resizedWidth` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
+| `translateX` | `number` | Current translateX transformation value |
+| `translateY` | `number` | Current translateY transformation value |
+| `scale` | `number` | Current scale transformation value |

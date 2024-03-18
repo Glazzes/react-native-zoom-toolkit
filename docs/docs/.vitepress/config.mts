@@ -13,7 +13,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {text: '1.0.0', items: [
-        {text: 'Changelog', link: 'https://www.youtube.com/'},
+        {text: 'Releases', link: 'https://www.youtube.com/'},
         {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoomable/blob/main/CONTRIBUTING.md'},
       ]}
     ],
@@ -36,7 +36,8 @@ export default defineConfig({
       {
         text: 'Utilities',
         items: [
-          {text: 'useImageResolution', link: '/utilities/useimageresolution'}
+          {text: 'useImageResolution', link: '/utilities/useimageresolution'},
+          {text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize'}
         ]
       },
       {

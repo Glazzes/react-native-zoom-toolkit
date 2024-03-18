@@ -20,23 +20,9 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
   const maxWidth = sinWidth + cosWidth;
   const maxHeight = sinHeight + cosHeight;
 
-  const { width, height } = getAspectRatioSize({
+  return getAspectRatioSize({
     aspectRatio: aspectRatio,
-    maxWidth: aspectRatio >= 1 ? undefined : maxWidth,
-    maxHeight: aspectRatio > 1 ? maxHeight : undefined,
+    width: aspectRatio >= 1 ? undefined : maxWidth,
+    height: aspectRatio > 1 ? maxHeight : undefined,
   });
-
-  if (aspectRatio <= 1 && size.height > height) {
-    throw new Error(
-      "Impossible crop: cropSize's height property is bigger than the computed height by resolution property's aspect ratio"
-    );
-  }
-
-  if (aspectRatio > 1 && size.width > width) {
-    throw new Error(
-      "Impossible crop: cropSize's width property is bigger than the computed width by resolution property's aspect ratio"
-    );
-  }
-
-  return { width, height };
 };

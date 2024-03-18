@@ -1,5 +1,5 @@
 ---
-title: CroopZoom
+title: Croop Zoom
 description: An ideal and unopinionated component for image and video cropping needs.
 outline: deep
 ---
@@ -7,10 +7,10 @@ outline: deep
 # CropZoom
 An ideal, practical and unopinionated component for image and video cropping needs, among its features we can find the following:
 
-- Build your own custom UI on top of it.
-- Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
-- For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
-- Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
+- **Custom UI:** Build your own custom UI on top of it.
+- **Resuamble:** Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
+- **Barebones:** For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
+- **Fixed size:** Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
 
 This component comes with a handy algorithm to perform cropping operations for you, however you will need the help a of deidicated library for this task.
 - see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo)
@@ -28,9 +28,9 @@ Managed mode is the default mode and its designed for simple use cases as the on
 
 Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things to keep in mind:
 
-::: tip Tip
-- This component uses `flex: 1` style property therefore it will take all available space, its minimum dimensions are the values provided to `cropSize` property.
-- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` properties so they cover the gesture detection area properly.
+::: tip Remember
+- This component uses `flex: 1` style property therefore it will attempt to take all available space, its minimum dimensions are the values provided to `cropSize` property.
+- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use `{ flex: 1 }` style property so they cover the gesture detection area properly.
 :::
 
 ```jsx
@@ -55,12 +55,12 @@ if(resolution === undefined) {
 
 <CropZoom 
   ref={ref}
+  debug={true}
   cropSize={cropSize} 
   resolution={resolution} 
-  OverlayComponent={renderOverlay}>
-  <Image 
-    source={{uri: iamgeUrl }} 
-    style={{width: '100%', height: '100%'}} />
+  OverlayComponent={renderOverlay}
+>
+  <Image source={{uri: iamgeUrl }} style={{flex: 1}} />
 </CropZoom>
 ```
 
@@ -126,7 +126,7 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 |------|---------|----------|
 | `number` | `-1` | `No`    |
 
-Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way max scale is a value just before images and videos start getting pixelated.
+Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
 
 ### panMode
 | Type | Default | Required | Additional Info |
@@ -147,25 +147,45 @@ Which one of the two available scale modes to use.
 |------|---------|----------|
 | `boolean` | `true` | `No`    |
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling.
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling, disable for a smoother but less accurate experience.
+
+### onPanStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+callback triggered when the pan gesture starts, receives pan gesture event as its only argument.
+
+### onPanEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+Callback triggered when the pan gestures ends, receives pan gesture event as its only argument.
+
+### onPinchStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
+
+### onPinchEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
 ### onGestureActive
-| Type | Default | Required | Addtional Info |
+| Type | Default | Required | Additional Info |
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered as the user interacts with the component, it does also mean interacting through its [methods](#methods), ideal if you need to mirror the internal state of the component to some other component as it updates.
+Callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
-As an argument receives the internal state of the component, with includes the following properties:
-| Name | Type    | Description |
-|------|---------|-------------|
-| `width` | `number` | Current width of the gesture detection area |
-| `height`| `number` | Current height of the gesture detection area |
-| `translateX` | `number` | Current translateX transformation value |
-| `translateY` | `number` | Current translateY transformation  value |
-| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
-| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
-| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+Ideal if you need to mirror the internal state of the component to some other component as it updates.
+
 
 ### OverlayComponent
 | Type | Default | Required |
@@ -178,7 +198,8 @@ Previous condition: `mode` property is set to `CropMode.MANAGED` (default value)
 
 
 ## Methods
-All methods are accessible through a ref object
+All methods are accessible through a ref object.
+
 ```jsx
 import { useRef } from 'react';
 import { CropZoom, type CropZoomType } from 'react-native-zoom-toolkit'
@@ -190,49 +211,72 @@ ref.current?.crop(200);
 ```
 
 ### crop
-Maps all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
+Map all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
 - Arguments
 
 | Name | Type | Default | Description |
 |------|------|-------------|---------|
 | fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is inferred by the computed aspect ratio of CropZoom's `cropSize` property. |
 
-- Returns
-[CropContextResult](#cropcontextresult)
+- Returns [CropContextResult](#cropcontextresult)
+
+::: warning Beware
+All crops resulting from this method may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+:::
 
 ### rotate
-Rotates the component 90 degrees clockwise in a range from 0 to 360 degrees.
+Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+- Returns `void`
 
 ### flipHorizontal
-Flips the component horizontally.
+Flip the component horizontally.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+
+- Returns `void`
 
 ### flipVertical
-Flips the component vertically.
+Flip the component vertically.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
+- Returns `void`
+
 ### reset
-Resets all transformations to their initial state.
+Reset all transformations to their initial state.
 - Arguments
 
 | Name | Type | Default |Description |
 |------|------|---------|------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
+- Returns `void`
+
 ## Type Definitions
+
+### CropZoomState
+| Name | Type    | Description |
+|------|---------|-------------|
+| `width` | `number` | Current width of the gesture detection area |
+| `height`| `number` | Current height of the gesture detection area |
+| `translateX` | `number` | Current translateX transformation value |
+| `translateY` | `number` | Current translateY transformation  value |
+| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
+| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
+| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+
 ### CropMode Enum
 
 | Property |Description |
@@ -250,12 +294,12 @@ Determines how your component must behave when it reaches the specified boundari
 | `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determines how your component must behave when it reaches the specified boundaries by `minScale` and `maxScale` properties.
+Determines how your component must behave when it reaches/exceeds the specified boundaries by `minScale` and `maxScale` properties.
 
 | Property |Description |
 |----------|------------|
-| `CLAMP`  | Prevents the scale from going above and below the scale threshold. |
-| `BOUNCE` | Lets the user scale above and below the scale threshold values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
+| `CLAMP`  | Prevents the scale from going above and below the scale boundaries. |
+| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
 
 ### CropContextResult
 

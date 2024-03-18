@@ -14,7 +14,7 @@ import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
 import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
-import { canvasToSize } from './utils';
+import { canvasToSize } from './utils/canvasToSize';
 import {
   CropMode,
   type CropZoomProps,
@@ -44,6 +44,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     mode = CropMode.MANAGED,
     onGestureActive = undefined,
     OverlayComponent = undefined,
+    onPanStart: onUserPanStart,
+    onPanEnd: onUserPanEnd,
+    onPinchStart: onUserPinchStart,
+    onPinchEnd: onUserPinchEnd,
   } = props;
 
   const translate = useVector(0, 0);
@@ -89,7 +93,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
     detector.width.value = isFlipped ? size.height : size.width;
     detector.height.value = isFlipped ? size.width : size.height;
-  }, [cropSize, resolution, sizeAngle, rotation]);
+  }, [cropSize, resolution, sizeAngle, rotation, container, detector]);
 
   useDerivedValue(() => {
     onGestureActive?.({
@@ -133,15 +137,26 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panWithPinch,
     scaleMode,
     boundFn: boundsFn,
+    userCallbacks: {
+      onPinchStart: onUserPinchStart,
+      onPinchEnd: onUserPinchEnd,
+    },
   });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
     translate,
     offset,
     scale,
+    minScale,
+    maxScale,
+    detector,
     detectorTranslate,
     panMode,
     boundFn: boundsFn,
+    userCallbacks: {
+      onPanStart: onUserPanStart,
+      onPanEnd: onUserPanEnd,
+    },
   });
 
   const pinch = Gesture.Pinch()
@@ -167,7 +182,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         { scale: detectorScale.value },
       ],
     };
-  });
+  }, [detector, debug, detectorTranslate, detectorScale]);
 
   const containerStyle = useAnimatedStyle(() => {
     return {
@@ -182,7 +197,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         { rotateY: `${rotate.y.value}rad` },
       ],
     };
-  });
+  }, [translate, scale, rotation, rotate]);
 
   // Reference handling section
   const canAnimate = useSharedValue<boolean>(true);

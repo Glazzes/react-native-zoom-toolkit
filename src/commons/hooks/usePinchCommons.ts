@@ -1,21 +1,25 @@
 import {
-  clamp,
   withTiming,
   cancelAnimation,
+  runOnJS,
   type SharedValue,
 } from 'react-native-reanimated';
+import type {
+  GestureUpdateEvent,
+  PinchGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
+
+import { clamp } from '../utils/clamp';
+import { pinchTransform } from '../utils/pinchTransform';
+
 import {
   ScaleMode,
   type BoundsFuction,
   type SizeVector,
   type Vector,
+  type PinchGestureEventCallback,
+  type PinchGestureEvent,
 } from '../types';
-import type {
-  GestureStateChangeEvent,
-  GestureUpdateEvent,
-  PinchGestureHandlerEventPayload,
-} from 'react-native-gesture-handler';
-import { pinchTransform } from '../utils/pinchTransform';
 
 type PinchOptions = {
   detector: SizeVector<SharedValue<number>>;
@@ -32,10 +36,11 @@ type PinchOptions = {
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
   panWithPinch?: boolean;
+  userCallbacks?: Partial<{
+    onPinchStart: PinchGestureEventCallback;
+    onPinchEnd: PinchGestureEventCallback;
+  }>;
 };
-
-type PinchGestureEvent =
-  GestureStateChangeEvent<PinchGestureHandlerEventPayload>;
 
 type PinchGestueUpdateEvent =
   GestureUpdateEvent<PinchGestureHandlerEventPayload>;
@@ -56,13 +61,35 @@ export const usePinchCommons = (options: PinchOptions) => {
     panWithPinch,
     origin,
     boundFn,
+    userCallbacks,
   } = options;
 
-  const onPinchStart = (e: PinchGestureEvent) => {
+  const reset = (toX: number, toY: number, toScale: number) => {
     'worklet';
+
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
     cancelAnimation(scale);
+    cancelAnimation(detectorTranslate.x);
+    cancelAnimation(detectorTranslate.y);
+    cancelAnimation(detectorScale);
+
+    translate.x.value = withTiming(toX);
+    translate.y.value = withTiming(toY);
+    scale.value = withTiming(toScale);
+
+    detectorTranslate.x.value = withTiming(toX);
+    detectorTranslate.y.value = withTiming(toY);
+    detectorScale.value = withTiming(toScale);
+  };
+
+  const onPinchStart = (e: PinchGestureEvent) => {
+    'worklet';
+
+    cancelAnimation(translate.x);
+    cancelAnimation(translate.y);
+    cancelAnimation(scale);
+    cancelAnimation(detectorScale);
 
     origin.x.value = e.focalX - detector.width.value / 2;
     origin.y.value = e.focalY - detector.height.value / 2;
@@ -70,12 +97,16 @@ export const usePinchCommons = (options: PinchOptions) => {
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
     scaleOffset.value = scale.value;
+
+    if (userCallbacks?.onPinchStart) {
+      runOnJS(userCallbacks.onPinchStart)(e);
+    }
   };
 
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
     'worklet';
     let toScale = e.scale * scaleOffset.value;
-    if (scaleMode === 'clamp') {
+    if (scaleMode === ScaleMode.CLAMP) {
       toScale = clamp(toScale, minScale, maxScale.value);
     }
 
@@ -98,17 +129,15 @@ export const usePinchCommons = (options: PinchOptions) => {
     scale.value = toScale;
   };
 
-  const onPinchEnd = () => {
+  const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
-    if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
-      translate.x.value = withTiming(0);
-      translate.y.value = withTiming(0);
-      scale.value = withTiming(minScale);
+    if (userCallbacks?.onPinchEnd) {
+      runOnJS(userCallbacks.onPinchEnd)(e);
+    }
 
-      detectorTranslate.x.value = 0;
-      detectorTranslate.y.value = 0;
-      detectorScale.value = minScale;
+    if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
+      reset(0, 0, minScale);
       return;
     }
 
@@ -132,27 +161,15 @@ export const usePinchCommons = (options: PinchOptions) => {
       const { x: boundX, y: boundY } = boundFn(maxScale.value);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
+      reset(toX, toY, maxScale.value);
 
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale.value);
-
-      detectorTranslate.x.value = toX;
-      detectorTranslate.y.value = toY;
-      detectorScale.value = maxScale.value;
       return;
     }
 
     const { x: boundX, y: boundY } = boundFn(scale.value);
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
-
-    translate.x.value = withTiming(toX);
-    translate.y.value = withTiming(toY);
-
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = scale.value;
+    reset(toX, toY, scale.value);
   };
 
   return { onPinchStart, onPinchUpdate, onPinchEnd };
