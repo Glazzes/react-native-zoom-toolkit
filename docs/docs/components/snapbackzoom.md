@@ -66,7 +66,7 @@ Increase (Android only) or decrease the gesture detection area around your compo
 ### timingConfig 
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `object` | `undefined` | see [WithTimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
+| `object` | `undefined` | see [TimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
 
 Custom [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)'s timing configuration used to snap back to the original position.
 

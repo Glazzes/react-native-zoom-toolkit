@@ -5,7 +5,17 @@ import type {
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
-import type { WithTimingConfig } from 'react-native-reanimated';
+import type {
+  EasingFunction,
+  EasingFunctionFactory,
+  ReduceMotion,
+} from 'react-native-reanimated';
+
+type TimingConfig = Partial<{
+  duration: number;
+  easing: EasingFunction | EasingFunctionFactory;
+  reduceMotion: ReduceMotion;
+}>;
 
 export type Vector<T> = {
   x: T;
@@ -32,7 +42,7 @@ export enum ScaleMode {
 
 export type CommonZoomProps = Partial<{
   hitSlop: HitSlop;
-  timingConfig: WithTimingConfig;
+  timingConfig: TimingConfig;
 }>;
 
 export type CommonResumableProps = Partial<{
