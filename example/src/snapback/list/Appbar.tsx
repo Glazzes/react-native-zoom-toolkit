@@ -9,6 +9,9 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 const barHeight = Constants.statusBarHeight;
 const pictureSize = barHeight * 2 * 0.8;
 
+/*
+ * Just an Appbar component, nothing relevant here.
+ */
 const Appbar: React.FC = () => {
   return (
     <View style={styles.appbar}>

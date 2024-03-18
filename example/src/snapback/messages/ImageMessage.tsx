@@ -39,7 +39,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
 
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio,
-    maxWidth: 250,
+    width: 250,
   });
 
   const resizeConfig: ResizeConfig = {

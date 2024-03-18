@@ -15,6 +15,10 @@ type AppbarProps = {
 const barHeight = Constants.statusBarHeight;
 const appbarHeight = barHeight * 3.1;
 
+/*
+ * Just an appbar component that hides when you tap on the image.
+ * Nothing relevant for interesting here.
+ */
 const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

@@ -2,8 +2,8 @@ import type { SizeVector } from '../commons/types';
 
 type Options = {
   aspectRatio: number;
-  maxWidth?: number;
-  maxHeight?: number;
+  width?: number;
+  height?: number;
 };
 
 /**
@@ -14,10 +14,10 @@ type Options = {
  */
 export default function (options: Options): SizeVector<number> {
   'worklet';
-  const { aspectRatio, maxWidth, maxHeight } = options;
+  const { aspectRatio, width: maxWidth, height: maxHeight } = options;
   if (maxWidth === undefined && maxHeight === undefined) {
     throw Error(
-      'maxWidth and maxHeight parameters are undefined, provide one of them'
+      'maxWidth and maxHeight parameters are undefined, provide at least one of them'
     );
   }
 

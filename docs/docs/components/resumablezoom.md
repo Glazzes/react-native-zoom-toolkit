@@ -23,7 +23,7 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 Its usage is pretty straight forward, just wrap a component of your choice with it, the following example is a full screen image detail component.
 
 ::: tip Remember
-- This component uses `flex: 1` therefore it will attempt to take all available space, its minium dimensions are the dimensions of the enclosed component.
+- This component uses `flex: 1` therefore it will attempt to take all available space.
 - This component is best utilized when at least one of the two dimensions of the wrapped component is bigger than equals the space it's occupying in the screen, for instance if it's a full screen image detail screen, your image should be as wide or as tall as the size of your screen.
 :::
 
@@ -114,7 +114,7 @@ Whether to apply or not a decay animation when the pan gesture ends.
 |------|---------|
 | `boolean` | `true` |
 
-Enables and disables both pan and swipe gestures, as well as the `onHorizontalBoundsExceeded` callback property.
+Enables and disables both pan and swipe gestures.
 
 ### pinchEnabled
 | Type | Default |

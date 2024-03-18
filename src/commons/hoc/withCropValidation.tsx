@@ -58,8 +58,8 @@ export default function withCropValidation<T, P extends CropZoomProps>(
     let cropSize: SizeVector<number> = props.cropSize;
     const { width, height } = getAspectRatioSize({
       aspectRatio: resolution.width / resolution.height,
-      maxWidth: isPortrait ? cropSize.width : undefined,
-      maxHeight: isPortrait ? undefined : cropSize.height,
+      width: isPortrait ? cropSize.width : undefined,
+      height: isPortrait ? undefined : cropSize.height,
     });
 
     if (isPortrait && cropSize.height > height) {

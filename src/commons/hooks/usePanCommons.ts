@@ -99,7 +99,11 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
     isWithinBoundY.value = toY >= -1 * boundY && toY <= boundY;
 
-    if (!isWithinBoundX.value && userCallbacks?.onHorizontalBoundsExceeded) {
+    if (
+      !isWithinBoundX.value &&
+      userCallbacks?.onHorizontalBoundsExceeded &&
+      panMode === PanMode.CLAMP
+    ) {
       const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
       userCallbacks.onHorizontalBoundsExceeded(exceededBy);
     }

@@ -30,7 +30,7 @@ Its usage is pretty straight forward, just wrap a component of your choice with 
 
 ::: tip Remember
 - This component uses `flex: 1` style property therefore it will attempt to take all available space, its minimum dimensions are the values provided to `cropSize` property.
-- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` properties so they cover the gesture detection area properly.
+- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use `{ flex: 1 }` style property so they cover the gesture detection area properly.
 :::
 
 ```jsx
@@ -58,10 +58,9 @@ if(resolution === undefined) {
   debug={true}
   cropSize={cropSize} 
   resolution={resolution} 
-  OverlayComponent={renderOverlay}>
-  <Image 
-    source={{uri: iamgeUrl }} 
-    style={{width: '100%', height: '100%'}} />
+  OverlayComponent={renderOverlay}
+>
+  <Image source={{uri: iamgeUrl }} style={{flex: 1}} />
 </CropZoom>
 ```
 
@@ -220,6 +219,10 @@ Map all the transformations applied to your component into a simple and ready to
 | fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is inferred by the computed aspect ratio of CropZoom's `cropSize` property. |
 
 - Returns [CropContextResult](#cropcontextresult)
+
+::: warning Beware
+All crops resulting from this method may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+:::
 
 ### rotate
 Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.

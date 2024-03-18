@@ -38,7 +38,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     panEnabled = true,
     pinchEnabled = true,
     minScale = 1,
-    maxScale: userMaxScale = 5,
+    maxScale: userMaxScale = 6,
     panMode = PanMode.CLAMP,
     scaleMode = ScaleMode.BOUNCE,
     panWithPinch = true,

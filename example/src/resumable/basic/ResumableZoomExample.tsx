@@ -39,8 +39,8 @@ const ResumableZoomExample: React.FC = ({}) => {
 
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio: resolution.width / resolution.height,
-    maxWidth: isPortrait ? width : undefined,
-    maxHeight: isPortrait ? undefined : height,
+    width: isPortrait ? width : undefined,
+    height: isPortrait ? undefined : height,
   });
 
   const imageStyle: ImageStyle = {

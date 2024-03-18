@@ -41,8 +41,8 @@ const ListImage: React.FC<ListImageProps> = ({
   const isPortratit = height > width;
   const image = getAspectRatioSize({
     aspectRatio: (resolution?.width ?? 1) / (resolution?.height ?? 1),
-    maxWidth: isPortratit ? SCROLL_SIZE : undefined,
-    maxHeight: isPortratit ? undefined : height,
+    width: isPortratit ? SCROLL_SIZE : undefined,
+    height: isPortratit ? undefined : height,
   });
 
   const reset = () => {
@@ -50,7 +50,7 @@ const ListImage: React.FC<ListImageProps> = ({
   };
 
   // Updates the scroll value based on how much the pan gesture has been exceeded based on
-  // its components boundaries
+  // its components boundaries, such value its then used to update the scroll position.
   const onBoundsExceeded = (bounds: number) => {
     'worklet';
     const toScroll = scrollOffset.value + bounds;
@@ -77,7 +77,7 @@ const ListImage: React.FC<ListImageProps> = ({
     });
   };
 
-  // if no swipe gesture has been detected  determine whether to scroll to next or previous item
+  // if no swipe gesture has been detected  determine whether to scroll to next or previous item.
   // scrollOffset is updated at the end of every animation so next time we start "scrolling" again
   // it will start where we left.
   const onPanEnd = (e: PanGestureEvent) => {
@@ -110,6 +110,9 @@ const ListImage: React.FC<ListImageProps> = ({
     }
   };
 
+  // You can tap on the small preview images to go to the image you want to look at, however
+  // if you pinched an image before tapping a preview image you will need to reset its
+  // transformations.
   useEffect(() => {
     const sub = subscribeToIndexChangeEvent((currentIndex) => {
       if (currentIndex !== index) {

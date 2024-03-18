@@ -8,7 +8,7 @@
 
 | SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
-|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/bf94db65-9350-432d-a7f6-09bbf01ba3b0" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/e73d5082-385b-4b20-8edb-3442b3fdfd5a" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/91763525-45e8-45c0-bc8a-e89a5e8f6e63" width="100%" controls> |
+|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/ac604b9e-39e1-417e-bd22-9e7489371165" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
  
 ## Motivation
 Pinch to zoom is a must have feature for any application that displays images to the user, this one can be found in a wide variety of use cases:

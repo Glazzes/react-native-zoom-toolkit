@@ -8,7 +8,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
  * so they can be used here.
  *
  * Why do we need this reflection? Each message has a background around it, when we pinch such component
- * the entire component needs to update its zIndex value, becaue of the parent-child relationship
+ * the entire component needs to update its zIndex value, because of the parent-child relationship
  * of the zIndex property, this background will overlay the appbar, giving a poor user experience
  */
 const Reflection: React.FC = () => {

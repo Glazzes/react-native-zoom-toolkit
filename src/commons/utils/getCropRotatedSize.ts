@@ -22,7 +22,7 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
 
   return getAspectRatioSize({
     aspectRatio: aspectRatio,
-    maxWidth: aspectRatio >= 1 ? undefined : maxWidth,
-    maxHeight: aspectRatio > 1 ? maxHeight : undefined,
+    width: aspectRatio >= 1 ? undefined : maxWidth,
+    height: aspectRatio > 1 ? maxHeight : undefined,
   });
 };

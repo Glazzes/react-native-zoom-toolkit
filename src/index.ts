@@ -9,6 +9,8 @@ export * from './components/resumable/types';
 
 export { PanMode, ScaleMode } from './commons/types';
 export type {
+  Vector,
+  SizeVector,
   PanGestureEvent,
   PanGestureEventCallback,
   PinchGestureEvent,

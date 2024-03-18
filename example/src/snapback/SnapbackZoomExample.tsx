@@ -15,6 +15,7 @@ const SnapbackZoomExample: React.FC = ({}) => {
           imageStyle={styles.image}
         >
           <Reflection />
+          {/* Reflection must be placed before the list because of zIndex */}
           <MessageList />
         </ImageBackground>
       </ReflectionProvider>

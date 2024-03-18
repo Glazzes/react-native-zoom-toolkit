@@ -37,12 +37,15 @@ type MapContextOptions = {
   hasFixedWidth: boolean;
 };
 
-export const canvasToSize = (
-  options: CanvasToSizeOptions
-): CropContextResult => {
-  const { cropSize, canvas, resolution, position, scale, fixedWidth, context } =
-    options;
-
+export const canvasToSize = ({
+  cropSize,
+  canvas,
+  resolution,
+  position,
+  scale,
+  fixedWidth,
+  context,
+}: CanvasToSizeOptions): CropContextResult => {
   const isFlipped = context.rotationAngle % Math.PI !== 0;
 
   let currentCanvasSize = canvas;
@@ -109,7 +112,7 @@ export const canvasToSize = (
 
   return mapContext({
     context: cropContext,
-    additionalContext: options.context,
+    additionalContext: context,
     hasFixedWidth: fixedWidth !== undefined,
   });
 };
@@ -134,7 +137,7 @@ const canvasToSizePortrait = (context: FixedCropContext): CropContext => {
     x: finalX,
     y: finalY,
     width: finalWidth,
-    height: finalHeight,
+    height: Math.floor(finalHeight),
     resizeWidth: Math.ceil(resizeWidth),
     resizeHeight: Math.ceil(resizeHeight),
   };
@@ -164,9 +167,9 @@ const canvasToSizeLandscape = (context: FixedCropContext): CropContext => {
     x: finalX,
     y: finalY,
     width: finalWidth,
-    height: finalHeight,
-    resizeWidth: Math.ceil(resizeWidth),
-    resizeHeight: Math.ceil(resizeHeight),
+    height: Math.floor(finalHeight),
+    resizeWidth: resizeWidth,
+    resizeHeight: resizeHeight,
   };
 };
 

@@ -34,6 +34,8 @@ const ScrollPreview: React.FC<ScrollPreviewProps> = ({
     }
   );
 
+  // Go to the image the user wants to see, and signal what is the current index so previous
+  // images will reset its transformations to their initail state.
   const scrollTo = (index: number) => {
     const scrollWidth = width * index;
     scrollX.value = scrollWidth;

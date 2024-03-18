@@ -8,6 +8,9 @@ import Animated from 'react-native-reanimated';
 
 const barHeight = Constants.statusBarHeight;
 
+/*
+ * Just a text area component nothing relevant here.
+ */
 const TextArea: React.FC = () => {
   return (
     <Animated.View style={styles.root}>
