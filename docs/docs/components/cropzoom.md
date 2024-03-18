@@ -1,5 +1,5 @@
 ---
-title: CroopZoom
+title: Croop Zoom
 description: An ideal and unopinionated component for image and video cropping needs.
 outline: deep
 ---
@@ -28,7 +28,7 @@ Managed mode is the default mode and its designed for simple use cases as the on
 
 Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things to keep in mind:
 
-::: tip Tip
+::: tip Remember
 - This component uses `flex: 1` style property therefore it will take all available space, its minimum dimensions are the values provided to `cropSize` property.
 - This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use the style `{width: '100%', height: '100%'}` properties so they cover the gesture detection area properly.
 :::
@@ -147,25 +147,45 @@ Which one of the two available scale modes to use.
 |------|---------|----------|
 | `boolean` | `true` | `No`    |
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling.
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling, disable for a smoother but less accurate experience.
+
+### onPanStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+callback triggered when the pan gesture starts, receives pan gesture event as its only argument.
+
+### onPanEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+Callback triggered when the pan gestures ends, receives pan gesture event as its only argument.
+
+### onPinchStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
+
+### onPinchEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
 ### onGestureActive
 | Type | Default | Required | Addtional Info |
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered as the user interacts with the component, it does also mean interacting through its [methods](#methods), ideal if you need to mirror the internal state of the component to some other component as it updates.
+Callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
-As an argument receives the internal state of the component, with includes the following properties:
-| Name | Type    | Description |
-|------|---------|-------------|
-| `width` | `number` | Current width of the gesture detection area |
-| `height`| `number` | Current height of the gesture detection area |
-| `translateX` | `number` | Current translateX transformation value |
-| `translateY` | `number` | Current translateY transformation  value |
-| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
-| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
-| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+Ideal if you need to mirror the internal state of the component to some other component as it updates.
+
 
 ### OverlayComponent
 | Type | Default | Required |
@@ -178,7 +198,8 @@ Previous condition: `mode` property is set to `CropMode.MANAGED` (default value)
 
 
 ## Methods
-All methods are accessible through a ref object
+All methods are accessible through a ref object.
+
 ```jsx
 import { useRef } from 'react';
 import { CropZoom, type CropZoomType } from 'react-native-zoom-toolkit'
@@ -233,6 +254,18 @@ Resets all transformations to their initial state.
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
 ## Type Definitions
+
+### CropZoomState
+| Name | Type    | Description |
+|------|---------|-------------|
+| `width` | `number` | Current width of the gesture detection area |
+| `height`| `number` | Current height of the gesture detection area |
+| `translateX` | `number` | Current translateX transformation value |
+| `translateY` | `number` | Current translateY transformation  value |
+| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
+| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
+| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+
 ### CropMode Enum
 
 | Property |Description |
