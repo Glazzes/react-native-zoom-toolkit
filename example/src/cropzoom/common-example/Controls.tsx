@@ -17,10 +17,12 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
 
   const [isFlippedH, setIsFlippedH] = useState<boolean>(false);
   const [isFlippedV, setIsFlippedV] = useState<boolean>(false);
-  const [rotated, setRotated] = useState<number>(0);
+  const [isRotated, setIsRotated] = useState<boolean>(false);
 
   const rotate = () => {
-    cropRef?.current?.rotate(true, setRotated);
+    cropRef?.current?.rotate(true, (angle) => {
+      setIsRotated(angle !== 0);
+    });
   };
 
   const flipHorizontal = () => {
@@ -75,7 +77,7 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
         <Icon
           name={'format-rotate-90'}
           size={24}
-          color={rotated === 0 ? baseColor : activeColor}
+          color={isRotated ? activeColor : baseColor}
         />
       </Pressable>
 

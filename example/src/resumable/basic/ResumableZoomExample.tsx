@@ -18,7 +18,7 @@ import type { ResumableZoomType } from '../../../../src/components/resumable/typ
 
 const barHeight = Constants.statusBarHeight;
 const IMAGE =
-  'https://www.zooplus.es/magazine/wp-content/uploads/2019/04/labrador-3-Farben.jpg';
+  'https://media.formula1.com/image/upload/v1705423544/fom-website/2023/McLaren/Formula%201%20header%20template%20%2835%29.png';
 
 const ResumableZoomExample: React.FC = ({}) => {
   const ref = useRef<ResumableZoomType>(null);

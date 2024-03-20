@@ -87,18 +87,23 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     return { x: boundX, y: boundY };
   };
 
-  const reset = (animate: boolean = true) => {
+  const reset = (
+    toX: number,
+    toY: number,
+    toScale: number,
+    animate: boolean = true
+  ) => {
     'worklet';
     detectorTranslate.x.value = translate.x.value;
     detectorTranslate.y.value = translate.y.value;
     detectorScale.value = scale.value;
 
-    translate.x.value = animate ? withTiming(0) : 0;
-    translate.y.value = animate ? withTiming(0) : 0;
-    scale.value = animate ? withTiming(1) : 1;
-    detectorTranslate.x.value = animate ? withTiming(0) : 0;
-    detectorTranslate.y.value = animate ? withTiming(0) : 0;
-    detectorScale.value = animate ? withTiming(1) : 1;
+    translate.x.value = animate ? withTiming(toX) : toX;
+    translate.y.value = animate ? withTiming(toY) : toY;
+    scale.value = animate ? withTiming(toScale) : toScale;
+    detectorTranslate.x.value = animate ? withTiming(toX) : toX;
+    detectorTranslate.y.value = animate ? withTiming(toY) : toY;
+    detectorScale.value = animate ? withTiming(toScale) : toScale;
   };
 
   useDerivedValue(() => {
@@ -182,7 +187,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .hitSlop(hitSlop)
     .onEnd((e) => {
       if (scale.value >= maxScale.value * 0.8) {
-        reset();
+        reset(0, 0, 1, true);
         return;
       }
 
@@ -201,13 +206,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
 
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale.value);
-
-      detectorTranslate.x.value = withTiming(toX);
-      detectorTranslate.y.value = withTiming(toY);
-      detectorScale.value = withTiming(maxScale.value);
+      reset(toX, toY, maxScale.value, true);
     });
 
   const measureRoot = (e: LayoutChangeEvent) => {
@@ -256,7 +255,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   };
 
   useImperativeHandle(ref, () => ({
-    reset: reset,
+    reset: (animate) => reset(0, 0, 1, animate),
     requestState: requestState,
   }));
 

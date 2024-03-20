@@ -95,7 +95,7 @@ const ResumableGalleryExample: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#000000',
   },
 });
 
