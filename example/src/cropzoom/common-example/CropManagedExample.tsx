@@ -6,13 +6,15 @@ import {
   useWindowDimensions,
   type ViewStyle,
 } from 'react-native';
+import { Canvas, Path, Skia } from '@shopify/react-native-skia';
+import { StatusBar } from 'expo-status-bar';
+
 import {
   CropZoom,
   useImageResolution,
   type CropZoomType,
 } from 'react-native-zoomable';
-import { StatusBar } from 'expo-status-bar';
-import { Canvas, Path, Skia } from '@shopify/react-native-skia';
+
 import Controls from './Controls';
 import CropModal from '../commons/CropModal';
 import { CONTROLS_HEIGHT } from '../commons/contants';

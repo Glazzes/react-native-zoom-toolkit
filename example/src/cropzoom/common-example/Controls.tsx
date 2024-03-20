@@ -20,24 +20,19 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
   const [rotated, setRotated] = useState<number>(0);
 
   const rotate = () => {
-    cropRef?.current?.rotate();
-    setRotated((prev) => {
-      if (prev + 1 === 4) {
-        return 0;
-      }
-
-      return prev + 1;
-    });
+    cropRef?.current?.rotate(true, setRotated);
   };
 
   const flipHorizontal = () => {
-    cropRef?.current?.flipHorizontal();
-    setIsFlippedH((prev) => !prev);
+    cropRef?.current?.flipHorizontal(true, (angle) => {
+      setIsFlippedH(angle === 180);
+    });
   };
 
   const flipVertical = () => {
-    cropRef.current?.flipVertical();
-    setIsFlippedV((prev) => !prev);
+    cropRef.current?.flipVertical(true, (angle) => {
+      setIsFlippedV(angle === 180);
+    });
   };
 
   const crop = async () => {

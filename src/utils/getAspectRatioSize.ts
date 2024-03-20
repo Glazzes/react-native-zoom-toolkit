@@ -23,8 +23,8 @@ export default function (options: Options): SizeVector<number> {
 
   if (maxWidth !== undefined) {
     return {
-      width: Math.round(maxWidth),
-      height: Math.round(maxWidth / aspectRatio),
+      width: maxWidth,
+      height: maxWidth / aspectRatio,
     };
   }
 

@@ -4,6 +4,7 @@ import type {
   PanGestureCallbacks,
   PinchGestureCallbacks,
   SizeVector,
+  TapGestureCallbacks,
 } from '../../commons/types';
 
 export enum CropMode {
@@ -26,30 +27,45 @@ export type CropContextResult = {
   resize?: SizeVector<number>;
 };
 
+export type RotateTransitionCallback = (
+  animate?: boolean,
+  cb?: (value: number) => void
+) => void;
+
+export type ResetTransitionCallback = (
+  animate?: boolean,
+  cb?: () => void
+) => void;
+
 export type CropZoomType = {
   /**
    * @description Rotates in steps of 90 degrees at a time in a range from 0 to 360 degrees
    * @param {boolean} animate whether to animate the transition or not
+   * @param cb callback to trigger at beggining of the transition.
    */
-  rotate: (animate?: boolean) => void;
+  rotate: RotateTransitionCallback;
 
   /**
    * @description Rotates the Y axis from 0 to 180 degrees and vice versa
-   * @param {boolean} animate whether to animate the transition or not
+   * @param {boolean} animate whether to animate the transition or not.
+   * @param cb callback to trigger at beggining of the transition
    */
-  flipHorizontal: (animate?: boolean) => void;
+  flipHorizontal: RotateTransitionCallback;
 
   /**
-   * @description Rotates the X axis from 0 to 180 degrees and vice versa
-   * @param {boolean} animate whether to animate the transition or not
+   * @description Rotates the X axis from 0 to 180 degrees and vice versa.
+   * @param {boolean} animate whether to animate the transition or not.
+   * @param cb callback to trigger at beggining of the transition
    */
-  flipVertical: (animate?: boolean) => void;
+  flipVertical: RotateTransitionCallback;
 
   /**
-   * @description Resets all transformations to their initail state
-   * @param {boolean} animate whether to animate the transition or not
+   * @description Resets all transformations to their initail state.
+   * @param {boolean} animate whether to animate the transition or not.
+   * @param cb callback to trigger at the end of the transition, its only called if animate parameter
+   * is set to true.
    */
-  reset: (animate?: boolean) => void;
+  reset: ResetTransitionCallback;
 
   /**
    * @description Calculates the position and size of the pinch gesture transformations relative to
@@ -60,20 +76,14 @@ export type CropZoomType = {
    * is infered by the computed CroopZoom's cropSize property aspect ratio.
    *
    * @returns {object} An object representing the crop position and size, as well as  the necesary context to
-   * achieve the crop
+   * achieve the crop:
    *
-   * context property: object reprenseting the actions required before cropping, these must executed
-   * in the following order:
-   * - rotationAngle property indicate to what angle the image/video must be rotated, this one is
-   * measured in degrees
-   * - resizeWidth and resizeHeight properties indicate to what dimensions a image/video must be
-   * resized to be cropped properly
-   * - flipHorizontal and flipVertical properties indicate wheter to flip the image vertically
-   * and/or horizontally
-   *
-   * crop property includes position and size for the desired crop
-   * - position in x and y
-   * - width and height of the desired crop
+   * crop property: Top left corner and size of the crop.
+   * context property: Fields specify if the image/video needs to flipped and to what angle must
+   * be rotated, the angle is measured in degrees.
+   * resize property: Fields specify the size your image/video must be resized to before cropping,
+   * if this property is undefined it means no resizing is necessary. This property is always
+   * undefined if you called this method without fixedWidth argument.
    */
   crop: (fixedWidth?: number) => CropContextResult;
 };
@@ -101,4 +111,5 @@ export type CropZoomProps = React.PropsWithChildren<{
 }> &
   PanGestureCallbacks &
   PinchGestureCallbacks &
+  Omit<TapGestureCallbacks, 'onDoubleTap'> &
   CommonResumableProps;
