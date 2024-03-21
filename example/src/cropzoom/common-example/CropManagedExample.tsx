@@ -6,7 +6,7 @@ import {
   CropZoom,
   useImageResolution,
   type CropZoomType,
-} from 'react-native-zoomable';
+} from 'react-native-zoom-toolkit';
 
 import Controls from './Controls';
 import CropModal from '../commons/CropModal';

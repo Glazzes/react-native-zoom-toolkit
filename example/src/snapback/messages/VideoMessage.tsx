@@ -11,8 +11,10 @@ import Animated, {
   runOnUI,
   measure,
 } from 'react-native-reanimated';
-import { SnapbackZoom } from 'react-native-zoomable';
 import { ResizeMode, Video } from 'expo-av';
+
+import { SnapbackZoom } from 'react-native-zoom-toolkit';
+
 import { maxDimension, theme } from '../../constants';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { ReflectionContext } from '../reflection/ReflectionContext';
@@ -149,4 +151,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VideoMessage;
+export default React.memo(VideoMessage);

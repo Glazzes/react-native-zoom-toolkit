@@ -11,10 +11,18 @@ import Appbar from './Appbar';
 import { FlatList } from 'react-native-gesture-handler';
 import { theme } from '../../constants';
 import CellRenderer from '../messages/CellRenderer';
-import { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  type SharedValue,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import TextArea from './TextArea';
 import VideoMessage from '../messages/VideoMessage';
+
+type MessageListProps = {
+  keyboardTranslateY: SharedValue<number>;
+};
 
 const barHeight = Constants.statusBarHeight * 2;
 
@@ -33,20 +41,28 @@ const images = [
   'https://www.akc.org/wp-content/uploads/2017/11/Dalmatian-History-09.jpg',
 ];
 
-const MessageList: React.FC = () => {
+const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
   const { height } = useWindowDimensions();
   const activeIndex = useSharedValue<number>(-1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: keyboardTranslateY.value }],
+  }));
 
   // I just add the appbar and text area into a single component for simplicity
   const renderAppbar = useCallback(() => {
     return (
       <View>
-        <Appbar />
+        <Animated.View style={animatedStyle}>
+          <Appbar />
+        </Animated.View>
+
         <View style={[styles.textArea, { top: height - barHeight }]}>
           <TextArea />
         </View>
       </View>
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
 
   const cellRenderer = useCallback(

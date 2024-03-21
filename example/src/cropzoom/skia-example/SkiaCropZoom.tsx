@@ -2,15 +2,6 @@ import React, { useRef, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import {
-  CropZoom,
-  CropMode,
-  PanMode,
-  ScaleMode,
-  useImageResolution,
-  type CropZoomType,
-  type CropGestureEventCallBack,
-} from 'react-native-zoomable';
-import {
   Canvas,
   Image,
   useImage,
@@ -21,6 +12,17 @@ import {
   type Transforms2d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
+
+import {
+  CropZoom,
+  CropMode,
+  PanMode,
+  ScaleMode,
+  useImageResolution,
+  type CropZoomType,
+  type CropGestureEventCallBack,
+} from 'react-native-zoom-toolkit';
+
 import CropModal from '../commons/CropModal';
 import CropOverlay from '../commons/CropOverlay';
 import Controls from './Controls';

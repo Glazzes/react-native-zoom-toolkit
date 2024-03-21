@@ -11,7 +11,7 @@ import {
   getAspectRatioSize,
   useImageResolution,
   type ResumableZoomType,
-} from 'react-native-zoomable';
+} from 'react-native-zoom-toolkit';
 
 import { SCROLL_SIZE, TIMING_CONFIG, images } from './constants';
 import { snapPoint, subscribeToIndexChangeEvent } from './utils';

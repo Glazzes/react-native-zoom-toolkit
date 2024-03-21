@@ -10,11 +10,15 @@ import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import { setStatusBarHidden } from 'expo-status-bar';
-import { getAspectRatioSize, useImageResolution } from 'react-native-zoomable';
+
+import {
+  ResumableZoom,
+  getAspectRatioSize,
+  useImageResolution,
+  type ResumableZoomType,
+} from 'react-native-zoom-toolkit';
 
 import Appbar from './Appbar';
-import ResumableZoom from '../../../../src/components/resumable/ResumableZoom';
-import type { ResumableZoomType } from '../../../../src/components/resumable/types';
 
 const barHeight = Constants.statusBarHeight;
 const IMAGE =
