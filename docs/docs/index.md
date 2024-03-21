@@ -13,7 +13,7 @@ hero:
 
     - theme: alt
       text: View on Github
-      link: https://github.com/Glazzes/react-native-zoomable/
+      link: https://github.com/Glazzes/react-native-zoom-toolkit/
 
 features:
   - title: SnapbackZoom

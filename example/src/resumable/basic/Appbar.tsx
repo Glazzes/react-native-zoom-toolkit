@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import Constants from 'expo-constants';
 import Animated, {
@@ -7,6 +7,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 import { theme } from '../../constants';
+import { useRouter } from 'expo-router';
 
 type AppbarProps = {
   translateY: SharedValue<number>;
@@ -17,9 +18,17 @@ const appbarHeight = barHeight * 3.1;
 
 /*
  * Just an appbar component that hides when you tap on the image.
- * Nothing relevant for interesting here.
+ * Nothing relevant or interesting here.
  */
 const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
+  const router = useRouter();
+
+  const goBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
@@ -27,7 +36,9 @@ const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
   return (
     <Animated.View style={[animatedStyle, styles.root]}>
       <View style={styles.container}>
-        <Icon name={'arrow-left'} size={24} color={'#fff'} />
+        <Pressable onPress={goBack}>
+          <Icon name={'arrow-left'} size={24} color={'#fff'} />
+        </Pressable>
         <View style={styles.usernameContainer}>
           <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
             React Native Zoom Toolkit

@@ -10,15 +10,19 @@ import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import { setStatusBarHidden } from 'expo-status-bar';
-import { getAspectRatioSize, useImageResolution } from 'react-native-zoomable';
+
+import {
+  ResumableZoom,
+  getAspectRatioSize,
+  useImageResolution,
+  type ResumableZoomType,
+} from 'react-native-zoom-toolkit';
 
 import Appbar from './Appbar';
-import ResumableZoom from '../../../../src/components/resumable/ResumableZoom';
-import type { ResumableZoomType } from '../../../../src/components/resumable/types';
 
 const barHeight = Constants.statusBarHeight;
 const IMAGE =
-  'https://www.zooplus.es/magazine/wp-content/uploads/2019/04/labrador-3-Farben.jpg';
+  'https://media.formula1.com/image/upload/v1705423544/fom-website/2023/McLaren/Formula%201%20header%20template%20%2835%29.png';
 
 const ResumableZoomExample: React.FC = ({}) => {
   const ref = useRef<ResumableZoomType>(null);

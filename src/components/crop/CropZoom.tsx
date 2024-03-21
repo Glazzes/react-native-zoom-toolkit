@@ -20,8 +20,11 @@ import {
   type CropZoomProps,
   type CropContextResult,
   type CropZoomType,
+  type RotateTransitionCallback,
+  type ResetTransitionCallback,
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
+import { RAD2DEG } from '../../commons/constants';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';
@@ -48,6 +51,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onPanEnd: onUserPanEnd,
     onPinchStart: onUserPinchStart,
     onPinchEnd: onUserPinchEnd,
+    onTap,
   } = props;
 
   const translate = useVector(0, 0);
@@ -170,6 +174,12 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     .onChange(onPanChange)
     .onEnd(onPanEnd);
 
+  const tap = Gesture.Tap()
+    .maxDuration(250)
+    .numberOfTaps(1)
+    .runOnJS(true)
+    .onEnd((e) => onTap?.(e));
+
   const detectorStyle = useAnimatedStyle(() => {
     return {
       width: detector.width.value,
@@ -200,35 +210,27 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   }, [translate, scale, rotation, rotate]);
 
   // Reference handling section
-  const canAnimate = useSharedValue<boolean>(true);
-
-  const resetDetectorTransformations = () => {
-    'worklet';
-    detectorTranslate.x.value = 0;
-    detectorTranslate.y.value = 0;
-    detectorScale.value = 1;
-  };
-
-  const handleRotate = (animate: boolean = true) => {
-    if (!canAnimate.value) {
-      return;
-    }
-
-    canAnimate.value = false;
+  const canRotate = useSharedValue<boolean>(true);
+  const handleRotate: RotateTransitionCallback = (animate = true, cb) => {
+    if (!canRotate.value) return;
 
     const toAngle = rotation.value + Math.PI / 2;
     sizeAngle.value = toAngle;
+    if (cb !== undefined) cb(toAngle % (Math.PI * 2));
+
     if (animate) {
+      canRotate.value = false;
+
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
+      detectorTranslate.x.value = withTiming(0);
+      detectorTranslate.y.value = withTiming(0);
       scale.value = withTiming(1);
-      resetDetectorTransformations();
+      detectorScale.value = withTiming(1);
 
       rotation.value = withTiming(toAngle, undefined, (_) => {
-        canAnimate.value = true;
-        if (rotation.value === Math.PI * 2) {
-          rotation.value = 0;
-        }
+        canRotate.value = true;
+        if (rotation.value === Math.PI * 2) rotation.value = 0;
       });
 
       return;
@@ -236,31 +238,39 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
     translate.x.value = 0;
     translate.y.value = 0;
+    detectorTranslate.x.value = 0;
+    detectorTranslate.y.value = 0;
     scale.value = 1;
-    resetDetectorTransformations();
+    detectorScale.value = 1;
   };
 
-  const handleFlipHorizontal = (animate: boolean = true) => {
+  const flipHorizontal: RotateTransitionCallback = (animate = true, cb) => {
+    const toAngle = rotate.y.value !== Math.PI ? Math.PI : 0;
+    if (cb !== undefined) cb(toAngle * RAD2DEG);
+
     if (animate) {
-      const toAngle = rotate.y.value !== Math.PI ? Math.PI : 0;
       rotate.y.value = withTiming(toAngle);
       return;
     }
 
-    rotate.y.value = rotate.y.value !== Math.PI ? 0 : Math.PI;
+    rotate.y.value = toAngle;
   };
 
-  const handleFlipVertical = (animate: boolean = true) => {
+  const flipVertical: RotateTransitionCallback = (animate = true, cb) => {
+    const toAngle = rotate.x.value !== Math.PI ? Math.PI : 0;
+    if (cb !== undefined) cb(toAngle * RAD2DEG);
+
     if (animate) {
-      const toAngle = rotate.x.value !== Math.PI ? Math.PI : 0;
       rotate.x.value = withTiming(toAngle);
       return;
     }
 
-    rotate.x.value = rotate.x.value !== Math.PI ? 0 : Math.PI;
+    rotate.x.value = toAngle;
   };
 
-  const handleReset = (animate: boolean = true) => {
+  const handleReset: ResetTransitionCallback = (animate = true, cb) => {
+    if (cb !== undefined) cb();
+
     if (animate) {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
@@ -268,6 +278,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       rotate.x.value = withTiming(0);
       rotate.y.value = withTiming(0);
       scale.value = withTiming(1);
+
       return;
     }
 
@@ -280,9 +291,9 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
-    const angle = rotation.value;
-    const flipHorizontal = rotate.y.value === Math.PI;
-    const flipVertical = rotate.x.value === Math.PI;
+    const angle = rotation.value * RAD2DEG;
+    const flipH = rotate.y.value === Math.PI;
+    const flipV = rotate.x.value === Math.PI;
 
     return canvasToSize({
       cropSize: cropSize,
@@ -290,15 +301,19 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       canvas: { width: container.width.value, height: container.height.value },
       position: { x: translate.x.value, y: translate.y.value },
       scale: scale.value,
-      context: { rotationAngle: angle, flipHorizontal, flipVertical },
+      context: {
+        rotationAngle: angle,
+        flipHorizontal: flipH,
+        flipVertical: flipV,
+      },
       fixedWidth,
     });
   };
 
   useImperativeHandle(ref, () => ({
     rotate: handleRotate,
-    flipHorizontal: handleFlipHorizontal,
-    flipVertical: handleFlipVertical,
+    flipHorizontal: flipHorizontal,
+    flipVertical: flipVertical,
     reset: handleReset,
     crop: handleCrop,
   }));
@@ -329,7 +344,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
           {OverlayComponent?.()}
         </View>
 
-        <GestureDetector gesture={Gesture.Race(pinch, pan)}>
+        <GestureDetector gesture={Gesture.Race(pinch, pan, tap)}>
           <Animated.View style={detectorStyle} />
         </GestureDetector>
       </View>

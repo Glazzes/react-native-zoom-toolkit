@@ -1,21 +1,16 @@
 import React, { useCallback, useRef, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  useWindowDimensions,
-  type ViewStyle,
-} from 'react-native';
+import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+
 import {
   CropZoom,
   useImageResolution,
   type CropZoomType,
-} from 'react-native-zoomable';
-import { StatusBar } from 'expo-status-bar';
-import { Canvas, Path, Skia } from '@shopify/react-native-skia';
+} from 'react-native-zoom-toolkit';
+
 import Controls from './Controls';
 import CropModal from '../commons/CropModal';
-import { CONTROLS_HEIGHT } from '../commons/contants';
+import CropOverlay from '../commons/CropOverlay';
 
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -24,34 +19,15 @@ const CropManagedExample = ({}) => {
   const ref = useRef<CropZoomType>(null);
   const [result, setResult] = useState<string | undefined>(undefined);
 
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const cropSize = width * 0.9;
+
   const { resolution } = useImageResolution({ uri: IMAGE });
 
-  const cropSize = width * 0.9;
-  const overlayHeight = height - CONTROLS_HEIGHT;
-
+  // Renders an svg with a hole in it
   const renderOverlay = useCallback(() => {
-    const center = { x: width / 2, y: overlayHeight / 2 };
-
-    const path = Skia.Path.MakeFromSVGString(
-      `M 0 0 h ${width} v ${overlayHeight} h ${-width} v ${-overlayHeight} M ${
-        center.x - cropSize / 2
-      } ${center.y} a 1 1 0 0 0 ${cropSize} 0 a 1 1 0 0 0 ${-1 * cropSize} 0`
-    )!;
-
-    const overlayStyle: ViewStyle = {
-      width: width,
-      height: overlayHeight,
-    };
-
-    return (
-      <Canvas style={overlayStyle}>
-        <Path path={path} color={'rgba(0, 0, 0, 0.4)'} />
-      </Canvas>
-    );
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height]);
+    return <CropOverlay cropSize={cropSize} />;
+  }, [cropSize]);
 
   if (resolution === undefined) {
     return null;
@@ -76,6 +52,9 @@ const CropManagedExample = ({}) => {
        */}
       <Controls uri={IMAGE} cropRef={ref} setCrop={setResult} />
 
+      {/*
+       * Display a modal with the resulting crop, nothing relevant in that component
+       */}
       {result !== undefined ? (
         <CropModal uri={result} setCrop={setResult} />
       ) : null}

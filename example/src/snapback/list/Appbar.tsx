@@ -1,10 +1,11 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../constants';
 
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { useRouter } from 'expo-router';
 
 const barHeight = Constants.statusBarHeight;
 const pictureSize = barHeight * 2 * 0.8;
@@ -13,15 +14,25 @@ const pictureSize = barHeight * 2 * 0.8;
  * Just an Appbar component, nothing relevant here.
  */
 const Appbar: React.FC = () => {
+  const router = useRouter();
+
+  const goBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
   return (
     <View style={styles.appbar}>
       <StatusBar style={'light'} backgroundColor={'transparent'} />
 
-      <Icon
-        name={'arrow-left'}
-        color={theme.colors.icon}
-        size={theme.sizes.iconSize}
-      />
+      <Pressable onPress={goBack}>
+        <Icon
+          name={'arrow-left'}
+          color={theme.colors.icon}
+          size={theme.sizes.iconSize}
+        />
+      </Pressable>
 
       <View style={styles.userContainer}>
         <Image

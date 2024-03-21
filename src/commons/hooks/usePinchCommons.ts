@@ -78,9 +78,9 @@ export const usePinchCommons = (options: PinchOptions) => {
     translate.y.value = withTiming(toY);
     scale.value = withTiming(toScale);
 
-    detectorTranslate.x.value = withTiming(toX);
-    detectorTranslate.y.value = withTiming(toY);
-    detectorScale.value = withTiming(toScale);
+    detectorTranslate.x.value = toX;
+    detectorTranslate.y.value = toY;
+    detectorScale.value = toScale;
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {

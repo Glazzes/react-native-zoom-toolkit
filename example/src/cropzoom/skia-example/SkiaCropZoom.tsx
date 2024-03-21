@@ -2,15 +2,6 @@ import React, { useRef, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import {
-  CropZoom,
-  CropMode,
-  PanMode,
-  ScaleMode,
-  useImageResolution,
-  type CropZoomType,
-  type CropGestureEventCallBack,
-} from 'react-native-zoomable';
-import {
   Canvas,
   Image,
   useImage,
@@ -21,8 +12,19 @@ import {
   type Transforms2d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
+
+import {
+  CropZoom,
+  CropMode,
+  PanMode,
+  ScaleMode,
+  useImageResolution,
+  type CropZoomType,
+  type CropGestureEventCallBack,
+} from 'react-native-zoom-toolkit';
+
 import CropModal from '../commons/CropModal';
-import CropOverlay, { cropSize } from '../commons/CropOverlay';
+import CropOverlay from '../commons/CropOverlay';
 import Controls from './Controls';
 import {
   buttonSize,
@@ -51,7 +53,9 @@ const IMAGE =
  */
 const SkiaCropZoom: React.FC = ({}) => {
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
+
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const cropSize = screenWidth * 0.9;
 
   const ref = useRef<CropZoomType>(null);
   const canvasRef = useCanvasRef();
@@ -121,7 +125,7 @@ const SkiaCropZoom: React.FC = ({}) => {
       </Canvas>
 
       <View style={StyleSheet.absoluteFill}>
-        <CropOverlay />
+        <CropOverlay cropSize={cropSize} />
       </View>
 
       <View style={styles.container}>
@@ -138,6 +142,7 @@ const SkiaCropZoom: React.FC = ({}) => {
       </View>
 
       <Controls
+        cropSize={cropSize}
         progress={progress}
         image={image}
         canvasRef={canvasRef}

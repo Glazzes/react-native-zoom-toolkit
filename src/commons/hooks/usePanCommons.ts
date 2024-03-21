@@ -111,6 +111,16 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     if (panMode === PanMode.FREE) {
       translate.x.value = toX;
       translate.y.value = toY;
+      detectorTranslate.x.value = toX;
+      detectorTranslate.y.value = toY;
+      return;
+    }
+
+    if (panMode === PanMode.CLAMP) {
+      translate.x.value = clamp(toX, -1 * boundX, boundX);
+      translate.y.value = clamp(toY, -1 * boundY, boundY);
+      detectorTranslate.x.value = clamp(toX, -1 * boundX, boundX);
+      detectorTranslate.y.value = clamp(toX, -1 * boundY, boundY);
       return;
     }
 
@@ -136,9 +146,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
       return;
     }
-
-    translate.x.value = clamp(toX, -1 * boundX, boundX);
-    translate.y.value = clamp(toY, -1 * boundY, boundY);
   };
 
   const onPanEnd = (e: PanGestureEvent) => {

@@ -6,7 +6,7 @@ import {
   useImageResolution,
   getAspectRatioSize,
   type ResizeConfig,
-} from 'react-native-zoomable';
+} from 'react-native-zoom-toolkit';
 import Animated, {
   measure,
   runOnUI,
@@ -74,8 +74,8 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
    */
   const onPinchStart = () => {
     activeIndex.value = index;
-    reflectionColor.value = backgroundColor.value;
 
+    reflectionColor.value = backgroundColor.value;
     runOnUI(() => {
       'worklet';
       const measurement = measure(animatedRef);
@@ -141,8 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   flex: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     borderRadius: 8,
   },
 });

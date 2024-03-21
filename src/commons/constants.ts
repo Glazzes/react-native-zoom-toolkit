@@ -4,3 +4,5 @@ export const DEFAULT_HITSLOP: HitSlop = {
   vertical: 0,
   horizontal: 0,
 };
+
+export const RAD2DEG = 180 / Math.PI;
