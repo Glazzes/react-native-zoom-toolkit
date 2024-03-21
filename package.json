@@ -85,7 +85,7 @@
     "babel-jest": "^29.7.0",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
-    "eslint": "^8.4.1",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^28.1.1",
