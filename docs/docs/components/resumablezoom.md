@@ -13,7 +13,7 @@ Among its more remarkable features you will find:
 - **Double Tap:** Tap twice in a point of interest to trigger a zoom animation.
 - **Swipe Gesture:** Implements swipe to the right and swipe to the left gestures, ideal for galleries.
 
-The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example).
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/resumablezoom.mp4" controls />
@@ -84,7 +84,7 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 |------|---------|
 | `SizeVector<number> \| number` | `6` |
 
-Maximum scale value allowed by the pinch gesture, expects values bigger than one.
+Maximum scale value allowed by the pinch gesture, expects values bigger than or equals one.
 
 Alternatively you can pass a resolution object, for instance an HD image resolution `{ width: 1920, height: 1080 }`; this will instruct the component to calculate `maxScale` in such a way it's a value just before images and videos start getting pixelated.
 
@@ -107,7 +107,7 @@ Which one of the two available scale modes to use.
 |------|---------|-----------------|
 | `boolean` | `true` | see [WithDecay](https://docs.swmansion.com/react-native-reanimated/docs/animations/withDecay/) |
 
-Whether to apply or not a decay animation when the pan gesture ends.
+Whether to apply a decay animation when the pan gesture ends or not.
 
 ### panEnabled
 | Type | Default |
@@ -264,12 +264,12 @@ Determine how your component must behave when it reaches the specified boundarie
 |----------|------------|
 | `CLAMP`  | Prevents the user from dragging the component out of the specified boundaries. |
 | `FREE`   | Lets the user drag the component around freely, when the pan gesture ends the component will return to a position within the specified boundaries. |
-| `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
+| `FRICTION` | Lets the user drag the component around freely applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determine how your component must behave when it reaches/exceeds the specified boundaries by `minScale` and `maxScale` properties.
+Determine how your component must behave when the pinch gesture's scale value exceeds the specified boundaries by `minScale` and `maxScale` properties.
 
 | Property |Description |
 |----------|------------|
-| `CLAMP`  | Prevents the scale from going above and below the scale boundaries. |
-| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
+| `CLAMP`  | Prevents the user from exceeding the scale boundaries. |
+| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale` respectively. |

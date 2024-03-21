@@ -15,7 +15,7 @@ An ideal, practical and unopinionated component for image and video cropping nee
 This component comes with a handy algorithm to perform cropping operations for you, however you will need the help a of deidicated library for this task.
 - see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo)
 
-The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example).
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/cropzoom.mp4" controls />
@@ -149,6 +149,13 @@ Which one of the two available scale modes to use.
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle staircase feeling, disable for a smoother but less accurate experience.
 
+### onTap
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when a tap is made, receives a tap gesture event as its only argument.
+
 ### onPanStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
@@ -231,6 +238,7 @@ Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (at 360 degrees it's clamped to 0). |
 
 - Returns `void`
 
@@ -241,6 +249,7 @@ Flip the component horizontally.
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, values are 0 or 180. |
 
 - Returns `void`
 
@@ -251,6 +260,7 @@ Flip the component vertically.
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, values are 0 or 180. |
 
 - Returns `void`
 
@@ -294,12 +304,12 @@ Determines how your component must behave when it reaches the specified boundari
 | `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determines how your component must behave when it reaches/exceeds the specified boundaries by `minScale` and `maxScale` properties.
+Determine how your component must behave when the pinch gesture's scale value exceeds the specified boundaries by `minScale` and `maxScale` properties.
 
 | Property |Description |
 |----------|------------|
-| `CLAMP`  | Prevents the scale from going above and below the scale boundaries. |
-| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale`. |
+| `CLAMP`  | Prevents the scale from exceeding the scale boundaries. |
+| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale` respectively. |
 
 ### CropContextResult
 

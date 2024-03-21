@@ -7,7 +7,7 @@ outline: deep
 # SnapbackZoom
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
 
-The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example)
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/snapbackzoom.mp4" controls />

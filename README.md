@@ -8,7 +8,7 @@
 
 | SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
-|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/ac604b9e-39e1-417e-bd22-9e7489371165" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
+|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/f07a8916-e115-4af5-ae6d-932fa86a5e53" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
  
 ## Motivation
 Pinch to zoom is a must have feature for any application that displays images to the user, this one can be found in a wide variety of use cases:
@@ -29,7 +29,7 @@ The idea behind this library is to provide a set of components and utilities for
 - **Expo Go Compatible**: This library has been written in typescript and supported modules by the expo go app.
 
 ## Documentation
-To check out the docs, visit https://glazzes.github.io/react-native-zoomable/
+To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
 
 ## License
 [MIT](./LICENSE) License.

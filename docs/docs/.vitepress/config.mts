@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "React Native Zoom Toolkit",
   description: "A set of components and utilities for common pinch to zoom requirements",
-  base: '/react-native-zoomable/',
+  base: '/react-native-zoom-toolkit/',
   markdown: {
     lineNumbers: true
   },
@@ -14,7 +14,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       {text: '1.0.0', items: [
         {text: 'Releases', link: 'https://www.youtube.com/'},
-        {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoomable/blob/main/CONTRIBUTING.md'},
+        {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/blob/main/CONTRIBUTING.md'},
       ]}
     ],
 
@@ -57,7 +57,7 @@ export default defineConfig({
     }, 
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Glazzes/react-native-zoomable/' }
+      { icon: 'github', link: 'https://github.com/Glazzes/react-native-zoom-toolkit' }
     ]
   }
 })
