@@ -1,3 +1,6 @@
+> [!NOTE]
+> Are you looking to contribute? The examples have been recorded on an Android device as I do not have an IOS device, therefore some examples may look a bit off in IOS devices, I'm not talking about the library but the appbars seen in the examples below, the way both platforms handle the status bar height is "different", so if you have an iphone and want to ensure (and probably fix) they look the same in both platforms I'd be very grateful, thank you.
+
 <div>
   <h1 align="center">React Native Zoom Toolkit's Example App</h1>
 </div>
@@ -6,9 +9,9 @@
 |--------------|---------------|----------|
 |<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/f07a8916-e115-4af5-ae6d-932fa86a5e53" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
 
-| ResumableZoom Gallery Example | CropZoom Skia Example |
-|--------------|---------------|
-|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/ac604b9e-39e1-417e-bd22-9e7489371165" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/c45de549-2288-41a0-a52e-9a04fdaacb91" width="100%" controls> |
+| ResumableZoom Gallery Example | CropZoom Skia Example | All Examples |
+|-------------------------------|-----------------------|--------------|
+|<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/ac604b9e-39e1-417e-bd22-9e7489371165" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/c45de549-2288-41a0-a52e-9a04fdaacb91" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/ca4c9297-1717-41b6-ae15-3303e2147a90" width="100%" controls />
 
 ## About
 

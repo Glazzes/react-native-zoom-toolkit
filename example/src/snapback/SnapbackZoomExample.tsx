@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import {
   ImageBackground,
   Keyboard,
-  SafeAreaView,
+  View,
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
@@ -42,7 +42,7 @@ const SnapbackZoomExample: React.FC = ({}) => {
 
   return (
     <ReflectionProvider>
-      <SafeAreaView style={{ width, height }}>
+      <View style={{ width, height }}>
         <ImageBackground
           source={require('../../assets/pattern.png')}
           style={styles.root}
@@ -55,7 +55,7 @@ const SnapbackZoomExample: React.FC = ({}) => {
             <MessageList keyboardTranslateY={keyboardTranslateY} />
           </Animated.View>
         </ImageBackground>
-      </SafeAreaView>
+      </View>
     </ReflectionProvider>
   );
 };

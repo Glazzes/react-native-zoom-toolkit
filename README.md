@@ -31,5 +31,8 @@ The idea behind this library is to provide a set of components and utilities for
 ## Documentation
 To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
 
+## Examples
+To check out examples of this library, see the [Example app](./example/);
+
 ## License
 [MIT](./LICENSE) License.
