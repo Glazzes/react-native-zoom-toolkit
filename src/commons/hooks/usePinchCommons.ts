@@ -19,6 +19,7 @@ import {
   type Vector,
   type PinchGestureEventCallback,
   type PinchGestureEvent,
+  PanMode,
 } from '../types';
 import { useState } from 'react';
 
@@ -36,6 +37,7 @@ type PinchOptions = {
   minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
+  panMode?: PanMode;
   panWithPinch?: boolean;
   userCallbacks?: Partial<{
     onPinchStart: PinchGestureEventCallback;
@@ -59,6 +61,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     minScale,
     maxScale,
     scaleMode,
+    panMode,
     panWithPinch,
     origin,
     boundFn,
@@ -138,7 +141,10 @@ export const usePinchCommons = (options: PinchOptions) => {
       },
     });
 
-    translate.x.value = toX;
+    const { x: boundX } = boundFn(toScale);
+    const clampedX = clamp(toX, -1 * boundX, boundX);
+
+    translate.x.value = panMode === PanMode.CLAMP ? clampedX : toX;
     translate.y.value = toY;
     scale.value = toScale;
   };

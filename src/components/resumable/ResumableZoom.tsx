@@ -131,6 +131,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       delta,
       panWithPinch,
       scaleMode,
+      panMode,
       boundFn: boundsFn,
       userCallbacks: {
         onPinchStart: onUserPinchStart,
