@@ -92,6 +92,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
   const onPanChange = (e: PanGestureUpdadeEvent) => {
     'worklet';
+
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
@@ -154,7 +155,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const canSwipe = scale.value === minScale && panMode === PanMode.CLAMP;
 
     const velocity = Math.abs(e.velocityX);
-    const deltaTime = Math.abs(performance.now() - time.value);
+    const deltaTime = performance.now() - time.value;
     const deltaX = Math.abs(x.value - e.absoluteX);
     const direction = Math.sign(e.absoluteX - x.value);
 

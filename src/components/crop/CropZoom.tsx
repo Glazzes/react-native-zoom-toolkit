@@ -21,7 +21,6 @@ import {
   type CropContextResult,
   type CropZoomType,
   type RotateTransitionCallback,
-  type ResetTransitionCallback,
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 import { RAD2DEG } from '../../commons/constants';
@@ -126,26 +125,27 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     return { x: boundX, y: boundY };
   };
 
-  const { onPinchStart, onPinchUpdate, onPinchEnd } = usePinchCommons({
-    detector,
-    detectorTranslate,
-    detectorScale,
-    translate,
-    offset,
-    origin,
-    scale,
-    scaleOffset,
-    minScale,
-    maxScale,
-    delta,
-    panWithPinch,
-    scaleMode,
-    boundFn: boundsFn,
-    userCallbacks: {
-      onPinchStart: onUserPinchStart,
-      onPinchEnd: onUserPinchEnd,
-    },
-  });
+  const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
+    usePinchCommons({
+      detector,
+      detectorTranslate,
+      detectorScale,
+      translate,
+      offset,
+      origin,
+      scale,
+      scaleOffset,
+      minScale,
+      maxScale,
+      delta,
+      panWithPinch,
+      scaleMode,
+      boundFn: boundsFn,
+      userCallbacks: {
+        onPinchStart: onUserPinchStart,
+        onPinchEnd: onUserPinchEnd,
+      },
+    });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
     translate,
@@ -164,17 +164,20 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
+    .enabled(gesturesEnabled)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .enabled(gesturesEnabled)
     .maxPointers(1)
     .onStart(onPanStart)
     .onChange(onPanChange)
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
+    .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
     .runOnJS(true)
@@ -268,9 +271,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     rotate.x.value = toAngle;
   };
 
-  const handleReset: ResetTransitionCallback = (animate = true, cb) => {
-    if (cb !== undefined) cb();
-
+  const handleReset = (animate: boolean = true) => {
     if (animate) {
       translate.x.value = withTiming(0);
       translate.y.value = withTiming(0);
@@ -369,6 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   absolute: {
+    flex: 1,
     position: 'absolute',
   },
   center: {

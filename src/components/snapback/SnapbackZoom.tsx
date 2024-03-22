@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -32,6 +32,11 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureActive,
   onGestureEnd,
 }) => {
+  const [internalGesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
+  const toggleGestures = () => {
+    setGesturesEnabled((prev) => !prev);
+  };
+
   const position = useVector(0, 0);
   const translate = useVector(0, 0);
   const origin = useVector(0, 0);
@@ -82,7 +87,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
-    .enabled(gesturesEnabled)
+    .enabled(gesturesEnabled && internalGesturesEnabled)
     .onStart((e) => {
       if (onPinchStart !== undefined) {
         runOnJS(onPinchStart)(e);
@@ -104,6 +109,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       scale.value = e.scale;
     })
     .onEnd((e) => {
+      runOnJS(toggleGestures)();
+
       if (onPinchEnd !== undefined) {
         runOnJS(onPinchEnd)(e);
       }
@@ -111,6 +118,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
+        runOnJS(toggleGestures)();
+
         if (onGestureEnd !== undefined) {
           runOnJS(onGestureEnd)();
         }
@@ -118,15 +127,16 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     });
 
   const tap = Gesture.Tap()
+    .enabled(gesturesEnabled && internalGesturesEnabled)
     .maxDuration(250)
-    .enabled(gesturesEnabled)
+    .numberOfTaps(1)
     .runOnJS(true)
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
+    .enabled(gesturesEnabled && internalGesturesEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
-    .enabled(gesturesEnabled)
     .runOnJS(true)
     .onEnd((e) => onDoubleTap?.(e));
 
