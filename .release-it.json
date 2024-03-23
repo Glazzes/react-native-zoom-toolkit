@@ -4,15 +4,13 @@
     "commitMessage": "chore: release ${version}",
     "tagName": "v${version}"
   },
+  "hooks": {
+    "before:init": ["yarn lint", "yarn test", "yarn prepare"]
+  },
   "npm": {
     "publish": true
   },
   "github": {
     "release": true
-  },
-  "plugins": {
-    "@release-it/conventional-changelog": {
-      "preset": "angular"
-    }
   }
 }
