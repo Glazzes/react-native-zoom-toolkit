@@ -78,23 +78,22 @@ export const usePinchCommons = (options: PinchOptions) => {
   const reset = (toX: number, toY: number, toScale: number) => {
     'worklet';
 
-    const worklet = runOnJS(toggleGestures);
-    worklet();
-
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
     cancelAnimation(scale);
-    cancelAnimation(detectorTranslate.x);
-    cancelAnimation(detectorTranslate.y);
-    cancelAnimation(detectorScale);
 
+    detectorTranslate.x.value = translate.x.value;
+    detectorTranslate.y.value = translate.y.value;
+    detectorScale.value = scale.value;
+
+    detectorTranslate.x.value = withTiming(toX);
+    detectorTranslate.y.value = withTiming(toY);
+    detectorScale.value = withTiming(toScale);
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scale.value = withTiming(toScale, undefined, worklet);
-
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = toScale;
+    scale.value = withTiming(toScale, undefined, () => {
+      runOnJS(toggleGestures)();
+    });
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
@@ -152,11 +151,13 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
+    runOnJS(toggleGestures)();
+
     if (userCallbacks?.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);
     }
 
-    if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
+    if (scale.value < minScale && scaleMode === ScaleMode.BOUNCE) {
       reset(0, 0, minScale);
       return;
     }
@@ -181,14 +182,6 @@ export const usePinchCommons = (options: PinchOptions) => {
       const { x: boundX, y: boundY } = boundFn(maxScale.value);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
-
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      scale.value = withTiming(maxScale.value);
-
-      detectorTranslate.x.value = toX;
-      detectorTranslate.y.value = toY;
-      detectorScale.value = maxScale.value;
       reset(toX, toY, maxScale.value);
 
       return;
