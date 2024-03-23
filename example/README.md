@@ -15,7 +15,7 @@
 
 ## About
 
-This an Expo managed application which contains five different examples that demonstrate some of the possible uses cases for this library, among those examples you will find the following.
+This is an Expo managed application which contains five different examples that demonstrate some of the possible use cases for this library, among those examples you will find the following.
 
 **SnapbackZoom Example:** A complex example using [SnapbackZoom](https://glazzes.github.io/react-native-zoom-toolkit/components/snapbackzoom.html) to enable zoomable in chat message previews, this example is used along with a Flatlist to demonstrate a more realistic approach.
 
