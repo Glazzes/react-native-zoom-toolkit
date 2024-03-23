@@ -1,7 +1,7 @@
 {
   "name": "react-native-zoom-toolkit",
   "version": "1.0.0",
-  "description": "Performant zoom for images, videos and other components",
+  "description": "Smoothly zoom any image, video or component you want in a performant way!",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
@@ -42,12 +42,13 @@
     "react-native-zoomable",
     "react-native-image-cropper",
     "react-native-image-zoom",
+    "react-native-video-zoom",
     "react-native-zoom-view",
     "react-native-zoom",
     "image-zoom",
     "video-zoom",
     "crop-zoom",
-    "view-zoom",
+    "zoom-view",
     "image-cropper",
     "typescript",
     "pinch-to-zoom",
@@ -57,14 +58,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Glazzes/react-native-zoomable.git"
+    "url": "git+https://github.com/Glazzes/react-native-zoom-toolkit.git"
   },
   "author": "Glazzes <santiagop1@protonmail.com> (https://github.com/Glazzes)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Glazzes/react-native-zoomable/issues"
+    "url": "https://github.com/Glazzes/react-native-zoom-toolkit/issues"
   },
-  "homepage": "https://glazzes.github.io/react-native-zoomable/",
+  "homepage": "https://glazzes.github.io/react-native-zoom-toolkit/",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
