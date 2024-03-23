@@ -19,7 +19,9 @@ import {
   type Vector,
   type PinchGestureEventCallback,
   type PinchGestureEvent,
+  PanMode,
 } from '../types';
+import { useState } from 'react';
 
 type PinchOptions = {
   detector: SizeVector<SharedValue<number>>;
@@ -35,6 +37,7 @@ type PinchOptions = {
   minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
+  panMode?: PanMode;
   panWithPinch?: boolean;
   userCallbacks?: Partial<{
     onPinchStart: PinchGestureEventCallback;
@@ -58,11 +61,19 @@ export const usePinchCommons = (options: PinchOptions) => {
     minScale,
     maxScale,
     scaleMode,
+    panMode,
     panWithPinch,
     origin,
     boundFn,
     userCallbacks,
   } = options;
+
+  const [gesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
+  const toggleGestures = () => {
+    if (scaleMode === ScaleMode.BOUNCE) {
+      setGesturesEnabled((prev) => !prev);
+    }
+  };
 
   const reset = (toX: number, toY: number, toScale: number) => {
     'worklet';
@@ -70,17 +81,19 @@ export const usePinchCommons = (options: PinchOptions) => {
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
     cancelAnimation(scale);
-    cancelAnimation(detectorTranslate.x);
-    cancelAnimation(detectorTranslate.y);
-    cancelAnimation(detectorScale);
 
+    detectorTranslate.x.value = translate.x.value;
+    detectorTranslate.y.value = translate.y.value;
+    detectorScale.value = scale.value;
+
+    detectorTranslate.x.value = withTiming(toX);
+    detectorTranslate.y.value = withTiming(toY);
+    detectorScale.value = withTiming(toScale);
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scale.value = withTiming(toScale);
-
-    detectorTranslate.x.value = toX;
-    detectorTranslate.y.value = toY;
-    detectorScale.value = toScale;
+    scale.value = withTiming(toScale, undefined, () => {
+      runOnJS(toggleGestures)();
+    });
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
@@ -88,6 +101,8 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
+    cancelAnimation(detectorTranslate.x);
+    cancelAnimation(detectorTranslate.y);
     cancelAnimation(scale);
     cancelAnimation(detectorScale);
 
@@ -105,6 +120,7 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
     'worklet';
+
     let toScale = e.scale * scaleOffset.value;
     if (scaleMode === ScaleMode.CLAMP) {
       toScale = clamp(toScale, minScale, maxScale.value);
@@ -124,7 +140,10 @@ export const usePinchCommons = (options: PinchOptions) => {
       },
     });
 
-    translate.x.value = toX;
+    const { x: boundX } = boundFn(toScale);
+    const clampedX = clamp(toX, -1 * boundX, boundX);
+
+    translate.x.value = panMode === PanMode.CLAMP ? clampedX : toX;
     translate.y.value = toY;
     scale.value = toScale;
   };
@@ -132,11 +151,13 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
+    runOnJS(toggleGestures)();
+
     if (userCallbacks?.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);
     }
 
-    if (scale.value <= minScale && scaleMode === ScaleMode.BOUNCE) {
+    if (scale.value < minScale && scaleMode === ScaleMode.BOUNCE) {
       reset(0, 0, minScale);
       return;
     }
@@ -169,8 +190,9 @@ export const usePinchCommons = (options: PinchOptions) => {
     const { x: boundX, y: boundY } = boundFn(scale.value);
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
+
     reset(toX, toY, scale.value);
   };
 
-  return { onPinchStart, onPinchUpdate, onPinchEnd };
+  return { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd };
 };

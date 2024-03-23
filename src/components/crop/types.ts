@@ -32,11 +32,6 @@ export type RotateTransitionCallback = (
   cb?: (value: number) => void
 ) => void;
 
-export type ResetTransitionCallback = (
-  animate?: boolean,
-  cb?: () => void
-) => void;
-
 export type CropZoomType = {
   /**
    * @description Rotates in steps of 90 degrees at a time in a range from 0 to 360 degrees
@@ -65,7 +60,7 @@ export type CropZoomType = {
    * @param cb callback to trigger at the end of the transition, its only called if animate parameter
    * is set to true.
    */
-  reset: ResetTransitionCallback;
+  reset: (animate?: boolean) => void;
 
   /**
    * @description Calculates the position and size of the pinch gesture transformations relative to

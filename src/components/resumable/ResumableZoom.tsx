@@ -116,26 +116,28 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     });
   }, [translate, detector, scale]);
 
-  const { onPinchStart, onPinchUpdate, onPinchEnd } = usePinchCommons({
-    detector,
-    detectorTranslate,
-    detectorScale,
-    translate,
-    offset,
-    origin,
-    scale,
-    scaleOffset,
-    minScale,
-    maxScale,
-    delta,
-    panWithPinch,
-    scaleMode,
-    boundFn: boundsFn,
-    userCallbacks: {
-      onPinchStart: onUserPinchStart,
-      onPinchEnd: onUserPinchEnd,
-    },
-  });
+  const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
+    usePinchCommons({
+      detector,
+      detectorTranslate,
+      detectorScale,
+      translate,
+      offset,
+      origin,
+      scale,
+      scaleOffset,
+      minScale,
+      maxScale,
+      delta,
+      panWithPinch,
+      scaleMode,
+      panMode,
+      boundFn: boundsFn,
+      userCallbacks: {
+        onPinchStart: onUserPinchStart,
+        onPinchEnd: onUserPinchEnd,
+      },
+    });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
     detector,
@@ -158,14 +160,14 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
-    .enabled(pinchEnabled)
+    .enabled(pinchEnabled && gesturesEnabled)
     .hitSlop(hitSlop)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
-    .enabled(panEnabled)
+    .enabled(panEnabled && gesturesEnabled)
     .hitSlop(hitSlop)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -173,7 +175,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
-    .enabled(tapsEnabled)
+    .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
     .hitSlop(hitSlop)
@@ -181,7 +183,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
-    .enabled(tapsEnabled)
+    .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
     .hitSlop(hitSlop)

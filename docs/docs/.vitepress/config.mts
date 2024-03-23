@@ -13,7 +13,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {text: '1.0.0', items: [
-        {text: 'Releases', link: 'https://www.youtube.com/'},
+        {text: 'Releases', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/releases'},
         {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/blob/main/CONTRIBUTING.md'},
       ]}
     ],

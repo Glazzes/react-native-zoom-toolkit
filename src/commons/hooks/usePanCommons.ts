@@ -92,10 +92,17 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
   const onPanChange = (e: PanGestureUpdadeEvent) => {
     'worklet';
+
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    /*
+     * In fucked up phones like mine its possible to trigger a pan gesture in the middle of a pinch
+     * gesture somehow, this resulting in the picture being displaced from the desired boundaries,
+     * therefore I've had to clamp the scale in order to prevent this behavior.
+     */
+    const toScale = clamp(scale.value, minScale, maxScale.value);
+    const { x: boundX, y: boundY } = boundFn(toScale);
     isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
     isWithinBoundY.value = toY >= -1 * boundY && toY <= boundY;
 
@@ -154,7 +161,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const canSwipe = scale.value === minScale && panMode === PanMode.CLAMP;
 
     const velocity = Math.abs(e.velocityX);
-    const deltaTime = Math.abs(performance.now() - time.value);
+    const deltaTime = performance.now() - time.value;
     const deltaX = Math.abs(x.value - e.absoluteX);
     const direction = Math.sign(e.absoluteX - x.value);
 
@@ -170,13 +177,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       }
     }
 
-    /*
-     * In fucked up phones like mine its possible to trigger a pan gesture in the middle of a pinch
-     * gesture somehow, this resulting in the picture being displaced from the desired boundaries,
-     * therefore I've had to clamp the final scale in order to prevent this behavior.
-     */
     const toScale = clamp(scale.value, minScale, maxScale.value);
-
     const { x: boundX, y: boundY } = boundFn(toScale);
     const clampX: [number, number] = [-1 * boundX, boundX];
     const clampY: [number, number] = [-1 * boundY, boundY];
