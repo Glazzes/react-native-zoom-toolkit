@@ -1,11 +1,9 @@
 {
   "git": {
     "requireBranch": "main",
+    "requireCleanWorkingDir": false,
     "commitMessage": "chore: release ${version}",
     "tagName": "v${version}"
-  },
-  "hooks": {
-    "before:init": ["yarn lint", "yarn test", "yarn prepare"]
   },
   "npm": {
     "publish": true
