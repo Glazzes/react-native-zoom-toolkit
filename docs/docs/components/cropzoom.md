@@ -87,7 +87,7 @@ For an overlay mode example, see Example App's [CropZoom Skia Example](https://g
 |------|---------|----------|-----------------|
 | `CropMode` | `CropMode.MANAGED` | `No`   | see [CropMode](#cropmode-enum) |
 
-Selects which mode to use.
+Select which one of the two available modes to use.
 
 ### cropSize
 | Type | Required |
@@ -101,14 +101,14 @@ Size of the cropping area.
 |------|----------|
 | `{ width: number; height: number; }` | `Yes`    |
 
-Resolution of your image/video or how big whatever you are trying to crop really is.
+Resolution of your image, video or how big whatever you are trying to crop really is.
 
 ### debug
 | Type | Default | Required |
 |------|---------|----------|
 | `boolean` | `false` | `No`    |
 
-Highlights the cropping area with a red-ish color as well as the gesture detection area with a light green color, this property is meant to be used when `mode` property is set to `CropMode.OVERLAY` so you can align your underlying component with it properly.
+Highlights the cropping area with a red-ish color as well as the gesture detection area with a light green color, use it to align your `OverlayComponent` with the crop area properly.
 
 ::: tip Note
 In case you're color blind and/or have any trouble differentiating colors, please consider opening an issue suggesting a suitable pair of colors.
@@ -133,14 +133,14 @@ Maximum scale value allowed by the pinch gesture, negative values instruct the c
 |------|---------|----------|-----------------|
 | `PanMode` | `PanMode.FREE` | `No`    | see [PanMode](#panmode-enum) |
 
-Which one of the three available pan modes to use.
+Select which one of the three available pan modes to use.
 
 ### scaleMode
 | Type | Default | Required | Additional Info |
 |------|---------|----------|-----------------|
 | `ScaleMode` | `ScaleMode.BOUNCE` | `No`    | see [ScaleMode](#scalemode-enum) |
 
-Which one of the two available scale modes to use.
+Select which one of the two available scale modes to use.
 
 ### panWithPinch
 | Type | Default | Required |
@@ -154,7 +154,7 @@ Lets the user drag the component around as they pinch, it also provides a more a
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a tap is made, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
 
 ### onPanStart
 | Type | Default | Additional Info |
@@ -189,7 +189,7 @@ Callback triggered as soon as the user lift their fingers off the screen after p
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
+Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
 Ideal if you need to mirror the internal state of the component to some other component as it updates.
 
@@ -218,7 +218,8 @@ ref.current?.crop(200);
 ```
 
 ### crop
-Map all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance [Expo Image Manipulator](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/).
+Map all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance Expo Image Manipulator, see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo)
+
 - Arguments
 
 | Name | Type | Default | Description |
@@ -228,7 +229,7 @@ Map all the transformations applied to your component into a simple and ready to
 - Returns [CropContextResult](#cropcontextresult)
 
 ::: warning Beware
-All crops resulting from this method may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+All crops resulting from this method may be subject to one pixel margin of error, if you used `fixedWidth` argument, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
 :::
 
 ### rotate

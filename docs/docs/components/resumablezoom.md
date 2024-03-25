@@ -86,21 +86,21 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 
 Maximum scale value allowed by the pinch gesture, expects values bigger than or equals one.
 
-Alternatively you can pass a resolution object, for instance an HD image resolution `{ width: 1920, height: 1080 }`; this will instruct the component to calculate `maxScale` in such a way it's a value just before images and videos start getting pixelated.
+Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`; this will instruct the component to calculate `maxScale`  in such a way it's a value just before images and videos start getting pixelated.
 
 ### panMode
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `PanMode` | `PanMode.CLAMP` | see [PanMode](#panmode-enum) |
 
-Which one of the three available pan modes to use.
+Select which one of the three available pan modes to use.
 
 ### scaleMode
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `ScaleMode` | `ScaleMode.BOUNCE` | see [ScaleMode](#scalemode-enum) |
 
-Which one of the two available scale modes to use.
+Select which one of the two available scale modes to use.
 
 ### decay
 | Type | Default | Additional Info |
@@ -142,17 +142,17 @@ Lets the user drag the component around as they pinch, it also provides a more a
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a tap is made, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
 
 ### onSwipeRight
 | Type | Default |
 |------|---------|
 | `function` | `undefined` |
 
-Callback triggered when a swipe to the right gesture has occurred.
+Callback triggered when the user swipes to the right.
 
 ::: tip Condition
-This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP`
+This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP` (default value).
 :::
 
 ### onSwipeLeft
@@ -160,10 +160,10 @@ This callback is only triggered when your component is at its minimum scale and 
 |------|---------|
 | `function` | `undefined` |
 
-Callback triggered when a swipe to the left gesture has occurred.
+Callback triggered when the user swipes to the left.
 
 ::: tip Condition
-This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP`
+This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP` (default value).
 :::
 
 ### onPanStart
@@ -199,7 +199,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 |------|---------|----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
+Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
 
 Ideal if you need to mirror the internal state of the component to some other component as it updates.
 
@@ -208,10 +208,10 @@ Ideal if you need to mirror the internal state of the component to some other co
 |------|---------|----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, ideal property to mimic scroll behavior.
+Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, ideal property to mimic scroll behavior.
 
 ::: tip Condition
-This callback is only triggered when the `panMode` property is set to `PanMode.CLAMP`.
+This callback is only triggered when the `panMode` property is set to `PanMode.CLAMP` (default value).
 :::
 
 ## Methods
