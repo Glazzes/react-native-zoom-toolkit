@@ -70,7 +70,7 @@ export type ResumableZoomProps = React.PropsWithChildren<{
 
   /**
    * @description Callback triggered when a swipe to the left gesture has occurred, this callback is
-   *  only triggered when your component is at its minimum scale and panMode property is set to
+   * only triggered when your component is at its minimum scale and panMode property is set to
    * PanMode.CLAMP.
    */
   onSwipeLeft?: () => void;
@@ -94,10 +94,12 @@ export type ResumableZoomProps = React.PropsWithChildren<{
 
   /**
    * @description Callback triggered when the component has been panned beyond the boundaries
-   * defined by its enclosing container, ideal property to mimic scroll behavior.
-   * This callback is only triggered when the panMode property is set to PanMode.CLAMP.
+   * defined by its enclosing container, ideal property to mimic scroll behavior. This callback is
+   * only triggered when the panMode property is set to PanMode.CLAMP.
+   * @param exceededBy How much the component has been panned beyond its enclosing container boundaries,
+   * receives positive values from the right and negative values from the left.
    */
-  onHorizontalBoundsExceeded?: (value: number) => void;
+  onHorizontalBoundsExceeded?: (exceededBy: number) => void;
 }> &
   PanGestureCallbacks &
   PinchGestureCallbacks &
