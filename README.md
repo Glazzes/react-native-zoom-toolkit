@@ -1,3 +1,6 @@
+>[!Note]
+> Are you watching from NPM website? NPM's markdown renderer is pretty bad, better watch it on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
+
 <div>
   <h1 align="center">React Native Zoom Toolkit</h1>
 </div>
@@ -6,7 +9,7 @@
   <h4 align="center">A set of utilities and components for common pinch to zoom feature requirements</h4>
 </div>
 
-| &nbsp;SnapbackZoom&nbsp; | ResumableZoom | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CropZoom&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
 |<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/f07a8916-e115-4af5-ae6d-932fa86a5e53" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
  
@@ -26,7 +29,7 @@ The idea behind this library is to provide a set of components and utilities for
 - **SnapBackZoom:** Zoom in and snap back, this component automatically snaps back to its original position once the gesture ends, making it ideal for previews.
 - **ResumableZoom**: Pick up where you left last time! This component remembers your previous interactions with it, just the same way it works in your Android/IOS OS integrated gallery application, making it ideal for detail screens and gallery screens.
 - **CropZoom:** An ideal, practical and unopinionated component for image and video cropping needs.
-- **Mirror:**: Mirror the current pinch gesture transformations to any other component you want.
+- **Mirror:** Mirror the current pinch gesture transformations to any other component you want.
 - **Expo Go Compatible**: This library has been written in typescript only with supported modules by the expo go app.
 
 ## Documentation
