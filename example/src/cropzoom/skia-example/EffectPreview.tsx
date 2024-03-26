@@ -22,6 +22,10 @@ type EffectPreviewProps = {
   matrix: number[];
 };
 
+/*
+ * Renders a preview image with the color matrix applied to it.
+ * On tap updates the color matrix of the full size image.
+ */
 const EffectPreview: React.FC<EffectPreviewProps> = ({
   index,
   activeIndex,

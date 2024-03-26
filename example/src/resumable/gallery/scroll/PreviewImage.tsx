@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
-import { PREVIEW_SIZE } from './constants';
-import { theme } from '../../constants';
+import { PREVIEW_SIZE } from '../utils/constants';
+import { theme } from '../../../constants';
 
 type PreviewImageProps = {
   uri: string;
@@ -10,6 +10,10 @@ type PreviewImageProps = {
   scrollTo: (index: number) => void;
 };
 
+/*
+ * Small image preview drawn at the bottom of the screen.
+ * On tapped scroll the position of its bigger counterpart.
+ */
 const PreviewImage: React.FC<PreviewImageProps> = ({
   uri,
   index,

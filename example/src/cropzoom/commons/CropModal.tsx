@@ -8,6 +8,9 @@ type CropModalProps = {
   setCrop: (uri: string | undefined) => void;
 };
 
+/*
+ * Just a modal that displays the crop result image.
+ */
 const CropModal: React.FC<CropModalProps> = ({ uri, setCrop }) => {
   const resetCrop = () => {
     setCrop(undefined);

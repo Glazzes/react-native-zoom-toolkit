@@ -17,9 +17,9 @@ import { StatusBar, setStatusBarHidden } from 'expo-status-bar';
 import ListImage from './ListImage';
 import Appbar from '../basic/Appbar';
 
-import { images } from './constants';
+import { images } from './utils/constants';
 import Constants from 'expo-constants';
-import ScrollPreview from './ScrollPreview';
+import ScrollPreview from './scroll/ScrollPreview';
 
 const barHeight = Constants.statusBarHeight;
 
