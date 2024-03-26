@@ -208,7 +208,9 @@ Ideal if you need to mirror the internal state of the component to some other co
 |------|---------|----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, ideal property to mimic scroll behavior.
+Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond its enclosing container boundaries, positive values from the right and negative values from the left.
+
+Ideal to mimic scroll behavior.
 
 ::: tip Condition
 This callback is only triggered when the `panMode` property is set to `PanMode.CLAMP` (default value).
