@@ -5,6 +5,10 @@
     "commitMessage": "chore: release ${version}",
     "tagName": "v${version}"
   },
+  "hooks": {
+    "before:init": ["yarn lint", "yarn test", "yarn prepare"],
+    "after:release": ["rm -rf lib"]
+  },
   "npm": {
     "publish": true
   },
