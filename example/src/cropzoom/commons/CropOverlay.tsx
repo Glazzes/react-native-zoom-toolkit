@@ -7,6 +7,10 @@ type CropOverlayProps = {
   cropSize: number;
 };
 
+/*
+ * Draws an SVG as big as the space cropzoom is ocuppying in the screen, this
+ * one also draws a "hole" in it as big as the crop size.
+ */
 const CropOverlay: React.FC<CropOverlayProps> = ({ cropSize }) => {
   const { width, height } = useWindowDimensions();
 

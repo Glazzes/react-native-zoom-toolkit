@@ -93,14 +93,14 @@ Enables or disable gestures, when gestures are disabled your component can detec
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a single tap is made, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
 
 ### onDoubleTap
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when a double tap is made, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component twice, receives a tap gesture event as its only argument.
 
 ### onPinchStart
 | Type | Default | Additional Info |
@@ -121,8 +121,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 |------|---------|-----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Callback triggered from the moment pinch gesture starts until the snap back animation finishes, 
-receives an object of type [SnapbackZoomState](#snapbackzoomstate) as its only argument.
+Worklet callback triggered from the moment pinch gesture starts until the snap back animation finishes, receives an object of type [SnapbackZoomState](#snapbackzoomstate) as its only argument.
 
 Ideal if you need to mirror the current state of the gesture to some other component.
 
@@ -169,7 +168,7 @@ At a scale of one your image is a tile of 200x200 pixel size, in other words a s
 | `width` | `number` | Inital width measurement of your component |
 | `height` | `number` | Inital height measurement of your component |
 | `resizedWidth` | `number \| undefined` | Current width measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
-| `resizedWidth` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
+| `resizedHeight` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
 | `translateX` | `number` | Current translateX transformation value |
 | `translateY` | `number` | Current translateY transformation value |
 | `scale` | `number` | Current scale transformation value |

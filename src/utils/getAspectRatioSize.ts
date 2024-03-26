@@ -7,10 +7,11 @@ type Options = {
 };
 
 /**
- *
+ * @description Gets width and height based on the aspect ratio.
  * @param options An object describing the aspect ratio of an image/video, and optional width and height
  * parameters, calculates height if this is undefined based on width and vice versa.
- * @returns An object containing the computed width and height by the aspect ratio
+ * @returns An object containing the computed width and height by the aspect ratio.
+ * @see https://glazzes.github.io/react-native-zoom-toolkit/utilities/getAspectRatioSize.html
  */
 export default function (options: Options): SizeVector<number> {
   'worklet';

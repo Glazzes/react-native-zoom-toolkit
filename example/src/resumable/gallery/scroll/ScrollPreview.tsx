@@ -8,10 +8,10 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
-import { emitIndexChangeEvent } from './utils';
+import { emitIndexChangeEvent } from '../utils/utils';
 import PreviewImage from './PreviewImage';
-import { theme } from '../../constants';
-import { PREVIEW_SIZE, TIMING_CONFIG, images } from './constants';
+import { theme } from '../../../constants';
+import { PREVIEW_SIZE, TIMING_CONFIG, images } from '../utils/constants';
 
 type ScrollPreviewProps = {
   translateY: SharedValue<number>;
@@ -19,6 +19,10 @@ type ScrollPreviewProps = {
   scrollOffset: SharedValue<number>;
 };
 
+/*
+ * Scroll preview rendered at the bottom of the screen.
+ * This component position is updated by what happens on ListImage component.
+ */
 const ScrollPreview: React.FC<ScrollPreviewProps> = ({
   translateY,
   scrollX,

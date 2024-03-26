@@ -13,8 +13,8 @@ import {
   type ResumableZoomType,
 } from 'react-native-zoom-toolkit';
 
-import { SCROLL_SIZE, TIMING_CONFIG, images } from './constants';
-import { snapPoint, subscribeToIndexChangeEvent } from './utils';
+import { SCROLL_SIZE, TIMING_CONFIG, images } from './utils/constants';
+import { snapPoint, subscribeToIndexChangeEvent } from './utils/utils';
 import type { PanGestureEvent } from '../../../../src/commons/types';
 
 type ListImageProps = {
@@ -77,7 +77,7 @@ const ListImage: React.FC<ListImageProps> = ({
     });
   };
 
-  // if no swipe gesture has been detected  determine whether to scroll to next or previous item.
+  // if no swipe gesture has been detected  determine whether to scroll to the next or previous item.
   // scrollOffset is updated at the end of every animation so next time we start "scrolling" again
   // it will start where we left.
   const onPanEnd = (e: PanGestureEvent) => {

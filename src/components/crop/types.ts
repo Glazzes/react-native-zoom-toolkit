@@ -8,7 +8,16 @@ import type {
 } from '../../commons/types';
 
 export enum CropMode {
+  /**
+   * @description Mode designed for common uses cases.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
+   */
   MANAGED = 'managed',
+
+  /**
+   * @description Mode designed for complex use cases, provides a barebones component.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
+   */
   OVERLAY = 'overlay',
 }
 
@@ -34,51 +43,44 @@ export type RotateTransitionCallback = (
 
 export type CropZoomType = {
   /**
-   * @description Rotates in steps of 90 degrees at a time in a range from 0 to 360 degrees
-   * @param {boolean} animate whether to animate the transition or not
-   * @param cb callback to trigger at beggining of the transition.
+   * @description Rotates in steps of 90 degrees at a time in a range from 0 to 360 degrees.
+   * @param animate Whether to animate the transition or not.
+   * @param cb Callback to trigger at the beginning of the transition, as its only argument receives
+   *  the angle your component will transition to, this angle ranges from 0 to 360 degrees (at 360 degrees it's clamped to 0).
    */
   rotate: RotateTransitionCallback;
 
   /**
    * @description Rotates the Y axis from 0 to 180 degrees and vice versa
-   * @param {boolean} animate whether to animate the transition or not.
-   * @param cb callback to trigger at beggining of the transition
+   * @param animate Whether to animate the transition or not.
+   * @param cb Callback to trigger at the beginning of the transition, as its only argument receives
+   * the angle your component will transition to, values are 0 or 180.
    */
   flipHorizontal: RotateTransitionCallback;
 
   /**
    * @description Rotates the X axis from 0 to 180 degrees and vice versa.
-   * @param {boolean} animate whether to animate the transition or not.
-   * @param cb callback to trigger at beggining of the transition
+   * @param animate Whether to animate the transition or not.
+   * @param cb Callback to trigger at the beginning of the transition, as its only argument receives
+   * the angle your component will transition to, values are 0 or 180.
    */
   flipVertical: RotateTransitionCallback;
 
   /**
    * @description Resets all transformations to their initail state.
-   * @param {boolean} animate whether to animate the transition or not.
-   * @param cb callback to trigger at the end of the transition, its only called if animate parameter
-   * is set to true.
+   * @param animate Whether to animate the transition or not.
    */
   reset: (animate?: boolean) => void;
 
   /**
-   * @description Calculates the position and size of the pinch gesture transformations relative to
-   * the resolution (image/video dimensios) of the component being pinched
-   *
-   * @param {number} fixedWidth By default all crops are dynamic based on the crop area and image/video
-   * dimensions, with this parameter you can enforce all of your crops to be of a fixed width, height
-   * is infered by the computed CroopZoom's cropSize property aspect ratio.
-   *
+   * @description Map all the transformations applied to your component into a simple and ready
+   * to use object specifying the context necessary for a crop operation, such object must be used
+   * along with a library capable of cropping images and/or videos, for instance Expo Image Manipulator.
+   * @param {number} fixedWidth Enforce all resulting crops to be of a fixed width, height is
+   * inferred by the computed aspect ratio of CropZoom's cropSize property.
    * @returns {object} An object representing the crop position and size, as well as  the necesary context to
-   * achieve the crop:
-   *
-   * crop property: Top left corner and size of the crop.
-   * context property: Fields specify if the image/video needs to flipped and to what angle must
-   * be rotated, the angle is measured in degrees.
-   * resize property: Fields specify the size your image/video must be resized to before cropping,
-   * if this property is undefined it means no resizing is necessary. This property is always
-   * undefined if you called this method without fixedWidth argument.
+   * achieve the desired crop.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
    */
   crop: (fixedWidth?: number) => CropContextResult;
 };
@@ -97,11 +99,40 @@ export type CropZoomState = {
 export type CropGestureEventCallBack = (event: CropZoomState) => void;
 
 export type CropZoomProps = React.PropsWithChildren<{
+  /** @description Size of the cropping area. */
   cropSize: SizeVector<number>;
+
+  /**
+   * @description Resolution of your image/video or how big whatever you are trying to crop really is.
+   */
   resolution: SizeVector<number>;
+
+  /**
+   * @description Highlights the cropping area with a red-ish color as well as the gesture detection
+   * area with a light green color.
+   * @default false
+   */
   debug?: boolean;
+
+  /**
+   * @description Select which one of the two available modes to use.
+   * @default CropMode.MANAGED
+   */
   mode?: CropMode;
+
+  /**
+   * @description Worklet callback triggered as the user interacts with the component, it also means
+   * interacting through its methods.
+   * @param e Internal state of the gesture.
+   * @see https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
+   */
   onGestureActive?: CropGestureEventCallBack;
+
+  /**
+   * @description A function that returns a React Component, such component will sit between your
+   * desired component to crop and the gesture detector.
+   */
   OverlayComponent?: () => React.ReactElement<any>;
 }> &
   PanGestureCallbacks &
