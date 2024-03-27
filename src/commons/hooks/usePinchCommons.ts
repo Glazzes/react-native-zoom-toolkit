@@ -4,9 +4,9 @@ import {
   runOnJS,
   type SharedValue,
 } from 'react-native-reanimated';
-import type {
-  GestureUpdateEvent,
-  PinchGestureHandlerEventPayload,
+import {
+  type GestureUpdateEvent,
+  type PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
 import { clamp } from '../utils/clamp';
@@ -69,9 +69,9 @@ export const usePinchCommons = (options: PinchOptions) => {
   } = options;
 
   const [gesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
-  const toggleGestures = () => {
+  const switchGesturesState = (value: boolean) => {
     if (scaleMode === ScaleMode.BOUNCE) {
-      setGesturesEnabled((prev) => !prev);
+      setGesturesEnabled(value);
     }
   };
 
@@ -92,12 +92,13 @@ export const usePinchCommons = (options: PinchOptions) => {
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
     scale.value = withTiming(toScale, undefined, () => {
-      runOnJS(toggleGestures)();
+      runOnJS(switchGesturesState)(true);
     });
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
     'worklet';
+    runOnJS(switchGesturesState)(false);
 
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
@@ -120,6 +121,9 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
     'worklet';
+    if (e.numberOfPointers !== 2) {
+      return;
+    }
 
     let toScale = e.scale * scaleOffset.value;
     if (scaleMode === ScaleMode.CLAMP) {
@@ -150,8 +154,6 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
-
-    runOnJS(toggleGestures)();
 
     if (userCallbacks?.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);

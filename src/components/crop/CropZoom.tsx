@@ -164,7 +164,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
-    .enabled(gesturesEnabled)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
