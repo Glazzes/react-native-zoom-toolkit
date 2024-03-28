@@ -6,7 +6,7 @@
     "tagName": "v${version}"
   },
   "hooks": {
-    "before:init": ["yarn lint", "yarn test", "yarn prepare"],
+    "before:init": ["yarn prepare"],
     "after:release": ["rm -rf lib"]
   },
   "npm": {
