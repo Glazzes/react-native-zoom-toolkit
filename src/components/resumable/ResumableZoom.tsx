@@ -1,5 +1,10 @@
 import React, { useImperativeHandle } from 'react';
-import { View, StyleSheet, type LayoutChangeEvent } from 'react-native';
+import {
+  Platform,
+  View,
+  StyleSheet,
+  type LayoutChangeEvent,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -41,7 +46,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = PanMode.CLAMP,
     scaleMode = ScaleMode.BOUNCE,
-    panWithPinch = true,
+    panWithPinch = Platform.OS !== 'ios',
     onTap,
     onGestureActive,
     onSwipeRight,
@@ -160,7 +165,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
-    .enabled(pinchEnabled && gesturesEnabled)
+    .enabled(pinchEnabled)
     .hitSlop(hitSlop)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)

@@ -1,5 +1,5 @@
 import React, { useImperativeHandle } from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import { Platform, StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -42,7 +42,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
-    panWithPinch = true,
+    panWithPinch = Platform.OS !== 'ios',
     mode = CropMode.MANAGED,
     onGestureActive = undefined,
     OverlayComponent = undefined,
@@ -164,7 +164,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
-    .enabled(gesturesEnabled)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
