@@ -7,7 +7,7 @@ outline: deep
 # SnapbackZoom
 
 ::: warning Beware iOS users
-Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature will be subject to some sttutering unless you install a version of React Native Gesture Handler greater than equals 2.16.0
+Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature will be subject to some sttutering unless you install a version of React Native Gesture Handler greater than equals `2.16.0`.
 :::
 
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
