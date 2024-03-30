@@ -35,20 +35,20 @@ export type BoundsFuction = (scale: number) => Vector<number>;
  */
 export enum PanMode {
   /** @description Prevents the user from dragging the component out of the specified boundaries. */
-  CLAMP = 'clamp',
+  CLAMP,
 
   /**
    * @description Lets the user drag the component around freely, when the pan gesture ends
    * the component will return to a position within the specified boundaries.
    */
-  FREE = 'free',
+  FREE,
 
   /**
    * @description Lets the user drag the component around freely applying friction to the pan gesture
    * up to a point where it's stopped completely, when the pan gesture ends the component will return
    * to a position within the specified boundaries.
    */
-  FRICTION = 'friction',
+  FRICTION,
 }
 
 /**
@@ -59,13 +59,13 @@ export enum ScaleMode {
   /**
    * @description Prevents the user from exceeding the scale boundaries.
    */
-  CLAMP = 'clamp',
+  CLAMP,
 
   /**
    * @description Lets the user scale above and below the scale boundary values, when the pinch
    * gesture ends the scale value returns to minScale or maxScale respectively.
    */
-  BOUNCE = 'bounce',
+  BOUNCE,
 }
 
 export type CommonZoomProps = Partial<{
