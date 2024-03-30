@@ -6,8 +6,9 @@ export const getMaxScale = (
 ): number => {
   'worklet';
 
-  const maxResolutionSide = Math.max(resolution.width, resolution.height);
-  const maxCropSide = Math.max(canvasSize.width, canvasSize.height);
+  if (resolution.width > resolution.height) {
+    return Math.max(1, resolution.width / canvasSize.width);
+  }
 
-  return Math.max(1, maxResolutionSide / maxCropSide);
+  return Math.max(1, resolution.height / canvasSize.height);
 };
