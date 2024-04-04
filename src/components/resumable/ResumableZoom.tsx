@@ -60,8 +60,8 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
-  const scaleOffset = useSharedValue<number>(1);
+  const scale = useSharedValue<number>(minScale);
+  const scaleOffset = useSharedValue<number>(minScale);
 
   const origin = useVector(0, 0);
   const delta = useVector(0, 0);
@@ -69,10 +69,10 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const rootContainer = useSizeVector(0, 0);
   const detector = useSizeVector(0, 0);
   const detectorTranslate = useVector(0, 0);
-  const detectorScale = useSharedValue(1);
+  const detectorScale = useSharedValue(minScale);
 
   const maxScale = useDerivedValue(() => {
-    if (userMaxScale !== undefined && typeof userMaxScale === 'object') {
+    if (typeof userMaxScale === 'object') {
       return getMaxScale(
         { width: detector.width.value, height: detector.height.value },
         userMaxScale
@@ -194,7 +194,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .hitSlop(hitSlop)
     .onEnd((e) => {
       if (scale.value >= maxScale.value * 0.8) {
-        reset(0, 0, 1, true);
+        reset(0, 0, minScale, true);
         return;
       }
 
@@ -248,7 +248,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
         { scale: detectorScale.value },
       ],
     }),
-    [detectorTranslate, detectorScale]
+    [detector, detectorTranslate, detectorScale]
   );
 
   const requestState = (): ResumableZoomState => {
