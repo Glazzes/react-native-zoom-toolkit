@@ -158,7 +158,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    const canSwipe = scale.value === minScale && panMode === PanMode.CLAMP;
+    const canSwipe = panMode === PanMode.CLAMP;
 
     const velocity = Math.abs(e.velocityX);
     const deltaTime = performance.now() - time.value;
@@ -166,12 +166,16 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const direction = Math.sign(e.absoluteX - x.value);
 
     if (velocity >= 500 && deltaX >= 20 && deltaTime < 175 && canSwipe) {
-      if (direction === -1 && userCallbacks?.onSwipeLeft) {
+      const { x: boundX } = boundFn(scale.value);
+
+      const inLeftEdge = translate.x.value === -1 * boundX;
+      if (direction === -1 && inLeftEdge && userCallbacks?.onSwipeLeft) {
         runOnJS(userCallbacks.onSwipeLeft)();
         return;
       }
 
-      if (direction === 1 && userCallbacks?.onSwipeRight) {
+      const inRightEdge = translate.x.value === boundX;
+      if (direction === 1 && inRightEdge && userCallbacks?.onSwipeRight) {
         runOnJS(userCallbacks.onSwipeRight)();
         return;
       }

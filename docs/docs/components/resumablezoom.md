@@ -158,7 +158,7 @@ Callback triggered when the user taps the wrapped component once, receives a tap
 Callback triggered when the user swipes to the right.
 
 ::: tip Condition
-This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP` (default value).
+This callback is only triggered when `panMode` property is set to `PanMode.CLAMP` (default value) and the right edge of your component is in contact with the right edge of its enclosing container.
 :::
 
 ### onSwipeLeft
@@ -169,7 +169,7 @@ This callback is only triggered when your component is at its minimum scale and 
 Callback triggered when the user swipes to the left.
 
 ::: tip Condition
-This callback is only triggered when your component is at its minimum scale and `panMode` property is set to `PanMode.CLAMP` (default value).
+This callback is only triggered when `panMode` property is set to `PanMode.CLAMP` (default value) and the left edge of your component is in contact with the left edge of its enclosing container.
 :::
 
 ### onPanStart
