@@ -150,6 +150,8 @@ Select which one of the two available scale modes to use.
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
 
+This feature has no relation with a pan gesture, therefore it won't trigger any pan gesture related callbacks.
+
 ::: warning Beware iOS users
 Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
 :::
@@ -280,25 +282,51 @@ Reset all transformations to their initial state.
 
 - Returns `void`
 
+### requestState
+Request internal transformation values of this component at the moment of the calling.
+
+- Takes no arguments
+- Returns [CropZoomState](#cropzoomstate)
+
+### assignState
+Assigns the internal transformation values for this component, if the state you have provided is considered to be not valid, it'll be approximated the closest to the values you provided.
+- Arguments
+
+| Name | Type |Description |
+|------|------|------------|
+| state   | [CropZoomAssignableState](#cropzoomassignablestate) | Object containg the transformation values to assign to `CropZoom` component. |
+| animate | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
+
+- Returns `void`
+
 ## Type Definitions
 
 ### CropZoomState
 | Name | Type    | Description |
 |------|---------|-------------|
-| `width` | `number` | Current width of the gesture detection area |
-| `height`| `number` | Current height of the gesture detection area |
-| `translateX` | `number` | Current translateX transformation value |
-| `translateY` | `number` | Current translateY transformation  value |
-| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
-| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
-| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+| `width` | `number` | Current width of the wrapped component. |
+| `height`| `number` | Current height of the wrapped component. |
+| `translateX` | `number` | Current translateX transformation value. |
+| `translateY` | `number` | Current translateY transformation value. |
+| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians. |
+| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians. |
+| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians. |
+
+### CropZoomAssignableState
+| Name | Type    | Description |
+|------|---------|-------------|
+| `translateX` | `number` | TranslateX transformation value. |
+| `translateY` | `number` | TranslateY transformation value. |
+| `rotate`     | `number` | Rotate transformation value, angle in radians. |
+| `rotateX`    | `number` | RotateX transformation value, angle in radians. |
+| `rotateY`    | `number` | RotateY transformation value, angle in radians. |
 
 ### CropMode Enum
 
 | Property |Description |
 |----------|------------|
-| `MANAGED`| Mode designed for common uses cases, see [How to use](#managed-mode) |
-| `OVERLAY`| Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode) |
+| `MANAGED`| Mode designed for common uses cases, see [How to use](#managed-mode). |
+| `OVERLAY`| Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode). |
 
 ### PanMode Enum
 Determines how your component must behave when it reaches the specified boundaries by the cropping area.

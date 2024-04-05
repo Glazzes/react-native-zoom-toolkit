@@ -36,12 +36,39 @@ export type CropContextResult = {
   resize?: SizeVector<number>;
 };
 
+export type CropZoomState = {
+  width: number;
+  height: number;
+  translateX: number;
+  translateY: number;
+  scale: number;
+  rotate: number;
+  rotateX: number;
+  rotateY: number;
+};
+
+export type CropZoomAssignableState = Omit<CropZoomState, 'width' | 'height'>;
+
 export type RotateTransitionCallback = (
   animate?: boolean,
   cb?: (value: number) => void
 ) => void;
 
 export type CropZoomType = {
+  /**
+   * @description Request internal transformation values of this component at the moment of the calling.
+   * @returns Internal state of the component.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropzoomstate
+   */
+  requestState: () => CropZoomState;
+
+  /**
+   * @description Assigns the internal transformation values of this component, if the state you have
+   * provided is considered to be not valid, it'll be approximated to the closest values you provided.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/resumablezoom.html#cropzoomassignablestate
+   */
+  assignState: (state: CropZoomAssignableState, animate?: boolean) => void;
+
   /**
    * @description Rotates in steps of 90 degrees at a time in a range from 0 to 360 degrees.
    * @param animate Whether to animate the transition or not.
@@ -83,17 +110,6 @@ export type CropZoomType = {
    * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
    */
   crop: (fixedWidth?: number) => CropContextResult;
-};
-
-export type CropZoomState = {
-  width: number;
-  height: number;
-  translateX: number;
-  translateY: number;
-  scale: number;
-  rotate: number;
-  rotateX: number;
-  rotateY: number;
 };
 
 export type CropGestureEventCallBack = (event: CropZoomState) => void;

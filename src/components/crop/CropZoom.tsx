@@ -1,6 +1,7 @@
 import React, { useImperativeHandle } from 'react';
 import { Platform, StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, {
+  clamp,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -21,6 +22,8 @@ import {
   type CropContextResult,
   type CropZoomType,
   type RotateTransitionCallback,
+  type CropZoomState,
+  type CropZoomAssignableState,
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 import { RAD2DEG } from '../../commons/constants';
@@ -44,8 +47,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panMode = PanMode.FREE,
     panWithPinch = Platform.OS !== 'ios',
     mode = CropMode.MANAGED,
-    onGestureActive = undefined,
-    OverlayComponent = undefined,
+    onGestureActive,
+    OverlayComponent,
     onPanStart: onUserPanStart,
     onPanEnd: onUserPanEnd,
     onPinchStart: onUserPinchStart,
@@ -61,8 +64,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   const rotate = useVector(0, 0);
 
   const delta = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
-  const scaleOffset = useSharedValue<number>(1);
+  const scale = useSharedValue<number>(minScale);
+  const scaleOffset = useSharedValue<number>(minScale);
 
   const container = useSizeVector(1, 1);
   const detector = useSizeVector(1, 1);
@@ -209,7 +212,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         { rotateY: `${rotate.y.value}rad` },
       ],
     };
-  }, [translate, scale, rotation, rotate]);
+  }, [container, translate, scale, rotation, rotate]);
 
   // Reference handling section
   const canRotate = useSharedValue<boolean>(true);
@@ -277,8 +280,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       rotation.value = withTiming(0);
       rotate.x.value = withTiming(0);
       rotate.y.value = withTiming(0);
-      scale.value = withTiming(1);
-
+      scale.value = withTiming(minScale);
       return;
     }
 
@@ -287,14 +289,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     rotation.value = 0;
     rotate.x.value = 0;
     rotate.y.value = 0;
-    scale.value = 1;
+    scale.value = minScale;
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
-    const angle = rotation.value * RAD2DEG;
-    const flipH = rotate.y.value === Math.PI;
-    const flipV = rotate.x.value === Math.PI;
-
     return canvasToSize({
       cropSize: cropSize,
       resolution: resolution,
@@ -302,12 +300,56 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       position: { x: translate.x.value, y: translate.y.value },
       scale: scale.value,
       context: {
-        rotationAngle: angle,
-        flipHorizontal: flipH,
-        flipVertical: flipV,
+        rotationAngle: rotation.value * RAD2DEG,
+        flipHorizontal: rotate.y.value === Math.PI,
+        flipVertical: rotate.x.value === Math.PI,
       },
       fixedWidth,
     });
+  };
+
+  const handleRequestState = (): CropZoomState => ({
+    width: container.width.value,
+    height: container.height.value,
+    translateX: translate.x.value,
+    translateY: translate.y.value,
+    scale: scale.value,
+    rotate: rotation.value,
+    rotateX: rotate.x.value,
+    rotateY: rotate.y.value,
+  });
+
+  const handleAssignState = (
+    state: CropZoomAssignableState,
+    animate: boolean = true
+  ) => {
+    const toScale = clamp(state.scale, minScale, maxScale.value);
+
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(state.translateX, -1 * boundX, boundX);
+    const toY = clamp(state.translateY, -1 * boundY, boundY);
+
+    const DEG90 = Math.PI / 2;
+    const toRotate = Math.floor((state.rotate % (Math.PI * 2)) / DEG90) * DEG90;
+    const toRotateX = Math.sign(state.rotateX - DEG90) === 1 ? Math.PI : 0;
+    const toRotateY = Math.sign(state.rotateY - DEG90) === 1 ? Math.PI : 0;
+
+    if (animate) {
+      translate.x.value = withTiming(toX);
+      translate.y.value = withTiming(toY);
+      scale.value = withTiming(toScale);
+      rotation.value = withTiming(toRotate);
+      rotate.x.value = withTiming(toRotateX);
+      rotate.y.value = withTiming(toRotateY);
+      return;
+    }
+
+    translate.x.value = toX;
+    translate.y.value = toY;
+    scale.value = toScale;
+    rotation.value = toRotate;
+    rotate.x.value = toRotateX;
+    rotate.y.value = toRotateY;
   };
 
   useImperativeHandle(ref, () => ({
@@ -316,6 +358,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     flipVertical: flipVertical,
     reset: handleReset,
     crop: handleCrop,
+    requestState: handleRequestState,
+    assignState: handleAssignState,
   }));
 
   const root: ViewStyle = {
