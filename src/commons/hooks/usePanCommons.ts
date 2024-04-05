@@ -36,6 +36,7 @@ type PanCommmonOptions = {
   decay?: boolean;
   boundFn: BoundsFuction;
   userCallbacks?: Partial<{
+    onGestureEnd: () => void;
     onSwipeLeft: () => void;
     onSwipeRight: () => void;
     onPanStart: PanGestureEventCallback;
@@ -96,11 +97,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    /*
-     * In fucked up phones like mine its possible to trigger a pan gesture in the middle of a pinch
-     * gesture somehow, this resulting in the picture being displaced from the desired boundaries,
-     * therefore I've had to clamp the scale in order to prevent this behavior.
-     */
     const toScale = clamp(scale.value, minScale, maxScale.value);
     const { x: boundX, y: boundY } = boundFn(toScale);
     isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
@@ -192,11 +188,18 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     if (decay && isWithinBoundX.value) {
       detectorTranslate.x.value = translate.x.value;
 
-      translate.x.value = withDecay({
-        velocity: e.velocityX,
-        clamp: clampX,
-        deceleration: DECELERATION,
-      });
+      translate.x.value = withDecay(
+        {
+          velocity: e.velocityX,
+          clamp: clampX,
+          deceleration: DECELERATION,
+        },
+        (finished) => {
+          if (finished && userCallbacks?.onGestureEnd) {
+            runOnJS(userCallbacks.onGestureEnd)();
+          }
+        }
+      );
 
       detectorTranslate.x.value = withDecay({
         velocity: e.velocityX,
@@ -204,7 +207,12 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         deceleration: DECELERATION,
       });
     } else {
-      translate.x.value = withTiming(toX);
+      translate.x.value = withTiming(toX, undefined, () => {
+        if (userCallbacks?.onGestureEnd) {
+          runOnJS(userCallbacks.onGestureEnd)();
+        }
+      });
+
       detectorTranslate.x.value = withTiming(toX);
     }
 
@@ -223,7 +231,12 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         deceleration: DECELERATION,
       });
     } else {
-      translate.y.value = withTiming(toY);
+      translate.y.value = withTiming(toY, undefined, () => {
+        if (isWithinBoundX.value && userCallbacks?.onGestureEnd) {
+          runOnJS(userCallbacks.onGestureEnd)();
+        }
+      });
+
       detectorTranslate.y.value = withTiming(toY);
     }
 

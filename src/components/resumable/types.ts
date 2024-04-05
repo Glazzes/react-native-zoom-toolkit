@@ -104,6 +104,8 @@ export type ResumableZoomProps = React.PropsWithChildren<{
    */
   onGestureActive?: (e: ResumableZoomState) => void;
 
+  onGestureEnd?: () => void;
+
   /**
    * @description Callback triggered when the component has been panned beyond the boundaries
    * defined by its enclosing container, ideal property to mimic scroll behavior. This callback is

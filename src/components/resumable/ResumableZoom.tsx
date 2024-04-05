@@ -50,6 +50,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     panWithPinch = Platform.OS !== 'ios',
     onTap,
     onGestureActive,
+    onGestureEnd,
     onSwipeRight,
     onSwipeLeft,
     onPinchStart: onUserPinchStart,
@@ -140,6 +141,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       panMode,
       boundFn: boundsFn,
       userCallbacks: {
+        onGestureEnd,
         onPinchStart: onUserPinchStart,
         onPinchEnd: onUserPinchEnd,
       },
@@ -159,6 +161,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     userCallbacks: {
       onSwipeRight,
       onSwipeLeft,
+      onGestureEnd,
       onPanStart: onUserPanStart,
       onPanEnd: onUserPanEnd,
       onHorizontalBoundsExceeded,

@@ -184,7 +184,7 @@ callback triggered when the pan gesture starts, receives a pan gesture event as 
 |------|---------|-----------------|
 | `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-Callback triggered when the pan gesture ends, receives a pan gesture event as its only argument.
+Callback triggered as soon as the user lifts their finger off the screen, receives a pan gesture event as its only argument.
 
 ### onPinchStart
 | Type | Default | Additional Info |
@@ -208,6 +208,15 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
 
 Ideal if you need to mirror the internal state of the component to some other component as it updates.
+
+### onGestureEnd
+| Type | Default | 
+|------|---------|
+| `worklet function` | `undefined` |
+
+Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped was not in bounds, this one will wait for the snapback animation to end.
+
+If the `decay` property is set to `true`, it will wait for the decay animation to end.
 
 ### onHorizontalBoundsExceeded
 | Type | Default | Additional Info |
