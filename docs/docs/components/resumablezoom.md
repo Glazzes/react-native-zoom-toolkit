@@ -137,6 +137,8 @@ Enables and disables both single and double tap gestures.
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
 
+Dragging with the pinch gesture will not trigger any of the following callbacks: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
+
 ::: warning Beware iOS users
 Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
 :::
@@ -252,6 +254,16 @@ Request internal transformation values of this component at the moment of the ca
 - Takes no arguments
 - Returns [ResumableZoomState](#resumablezoomstate)
 
+### assignState
+Assigns the internal transformation values for this component, if the state you have provided is considered to be not valid, it'll be approximated to the closest values you provided.
+- Arguments
+
+| Name | Type |Description |
+|------|------|------------|
+| state   | [ResumableZoomAssignableState](#resumablezoomassignablestate) | Object containg the transformation values to assign to `ResumableZoom` component. |
+| animate | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
+
+- Returns `void`
 
 ## Type Definitions
 ### ResumableZoomState
@@ -262,6 +274,13 @@ Request internal transformation values of this component at the moment of the ca
 | `translateX` | `number` | Current translateX transformation value. |
 | `translateY` | `number` | Current translateY transformation value. |
 | `scale`      | `number` | Current scale transformation value.      |
+
+### ResumableZoomAssignableState
+| Property     |  Type    | Description                      |
+|--------------|----------|----------------------------------|
+| `translateX` | `number` | TranslateX transformation value. |
+| `translateY` | `number` | TranslateY transformation value. |
+| `scale`      | `number` | Scale transformation value.      |
 
 ### PanMode Enum
 Determine how your component must behave when it reaches the specified boundaries by the container enclosing it.

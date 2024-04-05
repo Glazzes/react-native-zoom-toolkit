@@ -28,6 +28,7 @@ import type {
   ResumableZoomState,
   ResumableZoomProps,
   ResumableZoomType,
+  ResumableZoomAssignableState,
 } from './types';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
@@ -261,9 +262,27 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     };
   };
 
+  const assignState = (
+    state: ResumableZoomAssignableState,
+    animate: boolean = true
+  ) => {
+    const toScale = clamp(state.scale, minScale, maxScale.value);
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(state.translateX, -1 * boundX, boundX);
+    const toY = clamp(state.translateY, -1 * boundY, boundY);
+
+    if (animate) {
+      reset(toX, toY, toScale, animate);
+      return;
+    }
+
+    reset(toX, toY, toScale, animate);
+  };
+
   useImperativeHandle(ref, () => ({
-    reset: (animate) => reset(0, 0, 1, animate),
+    reset: (animate) => reset(0, 0, minScale, animate),
     requestState: requestState,
+    assignState: assignState,
   }));
 
   const composedTap = Gesture.Exclusive(doubleTap, tap);
