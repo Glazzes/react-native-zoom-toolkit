@@ -1,6 +1,6 @@
 name: Bug Report
 description: Create a report to help us improve.
-title: "[BUG]: "
+title: "[Bug]: "
 labels:
   - "bug"
 body:
@@ -10,24 +10,7 @@ body:
       required: true
     attributes:
       label: Summary
-      description: Please describe what happened.
-      placeholder: My component goes out of screen bounds when I pinch.
-
-  - type: textarea
-    id: actual-behaviour
-    validations:
-      required: true
-    attributes:
-      label: Actual Behavior
-      placeholder: My component goes out of screen bounds.
-
-  - type: textarea
-    id: expected-behavior
-    validations:
-      required: true
-    attributes:
-      label: Expected Behavior
-      placeholder: My component should not go out of the screen bounds.
+      description: Please describe your issue in detail, attach footage if appropriate.
 
   - type: textarea
     id: additional-context
@@ -45,16 +28,8 @@ body:
     attributes:
       label: Steps to Reproduce
       description: >-
-        If you can reproduce this bug consistently, please describe the steps,
-        a reproducible demo or an Expo Snack are welcome additions.
+        If you can reproduce this bug consistently, please describe the steps.
+        A reproducible demo or an Expo Snack are welcome additions.
       placeholder: |
         1. Go to file X
-        2. Add X property to component Y
-
-  - type: checkboxes
-    id: willingness
-    attributes:
-      label: Can you provide any help?
-      options:
-        - label: I may help fixing this issue.
-          required: false
+        2. Add X property to component

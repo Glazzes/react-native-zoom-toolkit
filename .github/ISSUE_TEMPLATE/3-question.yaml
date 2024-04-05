@@ -1,5 +1,6 @@
 name: Ask a question
 description: Make sure you've read the documentation carefully before asking a question.
+title: "[Question]: "
 labels:
   - "question"
 body:
@@ -7,6 +8,6 @@ body:
     validations:
       required: true
     attributes:
-      label: What Would You Like to Know?
-      description: All questions are valid questions!
+      label: Summary
+      description: You can ask many questions at once, however, make sure such questions are related to your issue's title.
       placeholder: Can i use this library for some random task?
