@@ -37,9 +37,9 @@ type PinchOptions = {
   minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
-  panMode?: PanMode;
-  panWithPinch?: boolean;
-  userCallbacks?: Partial<{
+  panMode: PanMode;
+  panWithPinch: boolean;
+  userCallbacks: Partial<{
     onGestureEnd: () => void;
     onPinchStart: PinchGestureEventCallback;
     onPinchEnd: PinchGestureEventCallback;
@@ -94,7 +94,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     offset.y.value = translate.y.value;
     scaleOffset.value = scale.value;
 
-    if (userCallbacks?.onPinchStart) {
+    if (userCallbacks.onPinchStart) {
       runOnJS(userCallbacks.onPinchStart)(e);
     }
   };
@@ -148,20 +148,20 @@ export const usePinchCommons = (options: PinchOptions) => {
     detectorScale.value = withTiming(toScale);
 
     translate.x.value = withTiming(toX, undefined, (finished) => {
-      if (finished && !inBoundX && userCallbacks?.onGestureEnd) {
+      if (finished && !inBoundX && userCallbacks.onGestureEnd) {
         runOnJS(userCallbacks.onGestureEnd)();
       }
     });
 
     translate.y.value = withTiming(toY, undefined, (finished) => {
-      if (finished && !inBoundY && inBoundX && userCallbacks?.onGestureEnd) {
+      if (finished && !inBoundY && inBoundX && userCallbacks.onGestureEnd) {
         runOnJS(userCallbacks.onGestureEnd)();
       }
     });
 
     scale.value = withTiming(toScale, undefined, (finished) => {
       runOnJS(switchGesturesState)(true);
-      if (finished && inBoundX && inBoundY && userCallbacks?.onGestureEnd) {
+      if (finished && inBoundX && inBoundY && userCallbacks.onGestureEnd) {
         runOnJS(userCallbacks.onGestureEnd)();
       }
     });
@@ -170,7 +170,7 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
-    if (userCallbacks?.onPinchEnd) {
+    if (userCallbacks.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);
     }
 
