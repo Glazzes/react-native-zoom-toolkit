@@ -1,6 +1,3 @@
->[!Note]
-> Are you watching from NPM website? NPM's markdown renderer is pretty bad, better watch it on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
-
 <div>
   <h1 align="center">React Native Zoom Toolkit</h1>
 </div>
@@ -9,19 +6,21 @@
   <h4 align="center">A set of utilities and components for common pinch to zoom feature requirements</h4>
 </div>
 
+The intention behind this library is to provide the most feature rich library for the most common use cases of the "pinch to zoom" interaction as this one can be found on wide variety of scenarios, including the following:
+- Zooming in the media contained a chat message.
+- Detail screens.
+- Cropping an image or video.
+- Image galleries.
+
+This one has also been designed to work with more complex use cases such as mirroring the gestures to some other components, for instance RN Skia's components.
+
+## Preview
+>[!Note]
+> Are you watching from NPM's website? NPM's markdown renderer wont render videos, better watch it on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
+
 | SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
 |<video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/19f73880-96ee-4eb4-b68f-53191faf4027" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoom-toolkit/assets/52082794/f07a8916-e115-4af5-ae6d-932fa86a5e53" width="100%" controls> | <video src="https://github.com/Glazzes/react-native-zoomable/assets/52082794/7253f7d5-42b0-4426-92ca-5b6772e10b5e" width="100%" controls> |
- 
-## Motivation
-Pinch to zoom is a must have feature for any application that displays images to the user, this one can be found in a wide variety of use cases:
-- Zooming in media contained a chat message
-- Detail screens
-- Cropping an image or video
-- Image galleries
-
-The idea behind this library is to provide a set of components and utilities for the most common use cases of the "pinch to zoom" interaction.
-
 
 ## Features
 - **Limitless**: Smoothly zoom in and out any component you want, you're not limited to images only.
@@ -30,13 +29,16 @@ The idea behind this library is to provide a set of components and utilities for
 - **ResumableZoom**: Pick up where you left last time! This component remembers your previous interactions with it, just the same way it works in your Android/IOS OS integrated gallery application, making it ideal for detail screens and gallery screens.
 - **CropZoom:** An ideal, practical and unopinionated component for image and video cropping needs.
 - **Mirror:** Mirror the current pinch gesture transformations to any other component you want.
-- **Expo Go Compatible**: This library has been written in typescript only with supported modules by the expo go app.
+- **Expo Compatible**: This library has been written in typescript only and supported modules by the expo SDK.
+
+Features scheduled for the next minor release `1.2.0`.
+- [ ] A simple and ready to use Image gallery component, which uses `ResumableZoom` component.
 
 ## Documentation
 To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
 
-## Examples
-To check out examples of this library, see the [Example app](./example/)
+## Demo
+The example app comes with five different examples from which you can learn from, see the [Example app](./example/).
 
 ## License
 [MIT](./LICENSE) License.
