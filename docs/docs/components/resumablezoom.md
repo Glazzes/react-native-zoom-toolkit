@@ -11,7 +11,7 @@ Among its more remarkable features you will find:
 - **Pan Gesture:** Drag and your components around in three different modes, optionally let your component slide with a decay animation.
 - **Pinch Gesture:** Accurate pinch gesture calculation, drag your component around as you pinch, scale your component in two different modes.
 - **Double Tap:** Tap twice in a point of interest to trigger a zoom animation.
-- **Swipe Gesture:** Implements swipe to the right and swipe to the left gestures, ideal for galleries.
+- **Swipe Gesture:** Implements swipe to the right and swipe to the left gestures, ideal for galleries, see [gallery example](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
 The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
@@ -109,6 +109,19 @@ Select which one of the two available scale modes to use.
 
 Whether to apply a decay animation when the pan gesture ends or not.
 
+### panWithPinch
+| Type | Default |
+|------|---------|
+| `boolean` | `true in Android` and `false in iOS` | 
+
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
+
+This feature has no relation with a pan gesture, therefore it won't trigger any pan gesture related callbacks.
+
+::: warning Beware iOS users
+Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+:::
+
 ### panEnabled
 | Type | Default |
 |------|---------|
@@ -129,19 +142,6 @@ Enables and disables the pinch gesture.
 | `boolean` | `true` |
 
 Enables and disables both single and double tap gestures.
-
-### panWithPinch
-| Type | Default |
-|------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
-
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
-
-This feature has no relation with a pan gesture, therefore it won't trigger any pan gesture related callbacks.
-
-::: warning Beware iOS users
-Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
-:::
 
 ### onTap
 | Type | Default | Additional Info |
@@ -205,16 +205,16 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 |------|---------|----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
 
-Ideal if you need to mirror the internal state of the component to some other component as it updates.
+Ideal if you need to mirror its current transformations values to some other component as it updates.
 
 ### onGestureEnd
 | Type | Default | 
 |------|---------|
-| `worklet function` | `undefined` |
+| `function` | `undefined` |
 
-Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped was not in bounds, this one will wait for the snapback animation to end.
+Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 
 If the `decay` property is set to `true`, it will wait for the decay animation to end.
 
@@ -223,12 +223,12 @@ If the `decay` property is set to `true`, it will wait for the decay animation t
 |------|---------|----------------|
 | `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond its enclosing container boundaries, positive values from the right and negative values from the left.
+Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries, positive values from the right and negative values from the left.
 
 Ideal to mimic scroll behavior.
 
 ::: tip Condition
-This callback is only triggered when the `panMode` property is set to `PanMode.CLAMP` (default value).
+Requires the `panMode` property to be set to `PanMode.CLAMP` (default value).
 :::
 
 ## Methods

@@ -144,9 +144,9 @@ Select which one of the three available pan modes to use.
 Select which one of the two available scale modes to use.
 
 ### panWithPinch
-| Type | Default |
-|------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
+| Type | Default | Required |
+|------|---------|----------|
+| `boolean` | `true in Android` and `false in iOS` | `No` | 
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
 
@@ -157,37 +157,37 @@ Due to the lack of decimal places for the focal point in iOS devices (see this [
 :::
 
 ### onTap
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
 Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
 
 ### onPanStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` |see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 callback triggered when the pan gesture starts, receives pan gesture event as its only argument.
 
 ### onPanEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 Callback triggered when the pan gestures ends, receives pan gesture event as its only argument.
 
 ### onPinchStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
 
 ### onPinchEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
@@ -196,8 +196,16 @@ Callback triggered as soon as the user lift their fingers off the screen after p
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument, ideal if you need to mirror the internal state of the component to some other component as it updates.
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
+Ideal if you need to mirror its current transformations values to some other component as it updates.
+
+### onGestureEnd
+| Type | Default | Required |
+|------|---------|----------|
+| `function` | `undefined` | `No` |
+
+Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 
 ### OverlayComponent
 | Type | Default | Required |
@@ -317,9 +325,9 @@ Assigns the internal transformation values for this component, if the state you 
 |------|---------|-------------|
 | `translateX` | `number` | TranslateX transformation value. |
 | `translateY` | `number` | TranslateY transformation value. |
-| `rotate`     | `number` | Rotate transformation value, angle in radians. |
-| `rotateX`    | `number` | RotateX transformation value, angle in radians. |
-| `rotateY`    | `number` | RotateY transformation value, angle in radians. |
+| `rotate`     | `number` | Rotate transformation value, angle measured in radians. |
+| `rotateX`    | `number` | RotateX transformation value, angle measured in radians. |
+| `rotateY`    | `number` | RotateY transformation value, angle measured in radians. |
 
 ### CropMode Enum
 
