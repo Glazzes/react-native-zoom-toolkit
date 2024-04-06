@@ -82,6 +82,8 @@ export type CommonZoomProps = Partial<{
    * @see https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-
    */
   timingConfig: TimingConfig;
+
+  onGestureEnd: () => void;
 }>;
 
 export type CommonResumableProps = Partial<{

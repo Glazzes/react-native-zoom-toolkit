@@ -1,6 +1,7 @@
 import type React from 'react';
 import type {
   CommonResumableProps,
+  CommonZoomProps,
   PanGestureCallbacks,
   PinchGestureCallbacks,
   SizeVector,
@@ -154,4 +155,5 @@ export type CropZoomProps = React.PropsWithChildren<{
   PanGestureCallbacks &
   PinchGestureCallbacks &
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
+  Omit<CommonZoomProps, 'hitSlop' | 'timingConfig'> &
   CommonResumableProps;

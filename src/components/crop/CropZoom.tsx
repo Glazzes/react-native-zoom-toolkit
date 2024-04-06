@@ -48,6 +48,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panWithPinch = Platform.OS !== 'ios',
     mode = CropMode.MANAGED,
     onGestureActive,
+    onGestureEnd,
     OverlayComponent,
     onPanStart: onUserPanStart,
     onPanEnd: onUserPanEnd,
@@ -143,8 +144,10 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       delta,
       panWithPinch,
       scaleMode,
+      panMode,
       boundFn: boundsFn,
       userCallbacks: {
+        onGestureEnd: onGestureEnd,
         onPinchStart: onUserPinchStart,
         onPinchEnd: onUserPinchEnd,
       },
@@ -161,6 +164,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panMode,
     boundFn: boundsFn,
     userCallbacks: {
+      onGestureEnd: onGestureEnd,
       onPanStart: onUserPanStart,
       onPanEnd: onUserPanEnd,
     },
