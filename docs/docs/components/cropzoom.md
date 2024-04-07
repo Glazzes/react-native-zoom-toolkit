@@ -150,7 +150,7 @@ Select which one of the two available scale modes to use.
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
 
-This feature has no relation with a pan gesture, therefore it won't trigger any pan gesture related callbacks.
+This feature is not associated with a pan gesture, therefore it won't trigger `onPanStart` and `onPanEnd` callbacks while you pinch.
 
 ::: warning Beware iOS users
 Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
@@ -297,7 +297,8 @@ Request internal transformation values of this component at the moment of the ca
 - Returns [CropZoomState](#cropzoomstate)
 
 ### assignState
-Assigns the internal transformation values for this component, if the state you have provided is considered to be not valid, it'll be approximated the closest to the values you provided.
+Assigns the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+
 - Arguments
 
 | Name | Type |Description |
