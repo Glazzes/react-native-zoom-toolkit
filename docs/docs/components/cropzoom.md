@@ -144,48 +144,50 @@ Select which one of the three available pan modes to use.
 Select which one of the two available scale modes to use.
 
 ### panWithPinch
-| Type | Default |
-|------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
+| Type | Default | Required |
+|------|---------|----------|
+| `boolean` | `true in Android` and `false in iOS` | `No` | 
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
+
+This feature is not associated with a pan gesture, therefore it won't trigger `onPanStart` and `onPanEnd` callbacks while you pinch.
 
 ::: warning Beware iOS users
 Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
 :::
 
 ### onTap
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
 Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
 
 ### onPanStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` |see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 callback triggered when the pan gesture starts, receives pan gesture event as its only argument.
 
 ### onPanEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 Callback triggered when the pan gestures ends, receives pan gesture event as its only argument.
 
 ### onPinchStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
 
 ### onPinchEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Required | Additional Info |
+|------|---------|----------|-----------------|
+| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
 
@@ -194,8 +196,16 @@ Callback triggered as soon as the user lift their fingers off the screen after p
 |------|---------|----------|----------------|
 | `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered as the user interacts with the component, it also means interacting through its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument, ideal if you need to mirror the internal state of the component to some other component as it updates.
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
+Ideal if you need to mirror its current transformations values to some other component as it updates.
+
+### onGestureEnd
+| Type | Default | Required |
+|------|---------|----------|
+| `function` | `undefined` | `No` |
+
+Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 
 ### OverlayComponent
 | Type | Default | Required |
@@ -280,25 +290,52 @@ Reset all transformations to their initial state.
 
 - Returns `void`
 
+### requestState
+Request internal transformation values of this component at the moment of the calling.
+
+- Takes no arguments
+- Returns [CropZoomState](#cropzoomstate)
+
+### assignState
+Assigns the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+
+- Arguments
+
+| Name | Type |Description |
+|------|------|------------|
+| state   | [CropZoomAssignableState](#cropzoomassignablestate) | Object containg the transformation values to assign to `CropZoom` component. |
+| animate | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
+
+- Returns `void`
+
 ## Type Definitions
 
 ### CropZoomState
 | Name | Type    | Description |
 |------|---------|-------------|
-| `width` | `number` | Current width of the gesture detection area |
-| `height`| `number` | Current height of the gesture detection area |
-| `translateX` | `number` | Current translateX transformation value |
-| `translateY` | `number` | Current translateY transformation  value |
-| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians |
-| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians |
-| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians |
+| `width` | `number` | Current width of the wrapped component. |
+| `height`| `number` | Current height of the wrapped component. |
+| `translateX` | `number` | Current translateX transformation value. |
+| `translateY` | `number` | Current translateY transformation value. |
+| `rotate`     | `number` | Current rotate transformation value, angle is measured in radians. |
+| `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians. |
+| `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians. |
+
+### CropZoomAssignableState
+| Name | Type    | Description |
+|------|---------|-------------|
+| `translateX` | `number` | TranslateX transformation value. |
+| `translateY` | `number` | TranslateY transformation value. |
+| `rotate`     | `number` | Rotate transformation value, angle measured in radians. |
+| `rotateX`    | `number` | RotateX transformation value, angle measured in radians. |
+| `rotateY`    | `number` | RotateY transformation value, angle measured in radians. |
 
 ### CropMode Enum
 
 | Property |Description |
 |----------|------------|
-| `MANAGED`| Mode designed for common uses cases, see [How to use](#managed-mode) |
-| `OVERLAY`| Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode) |
+| `MANAGED`| Mode designed for common uses cases, see [How to use](#managed-mode). |
+| `OVERLAY`| Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode). |
 
 ### PanMode Enum
 Determines how your component must behave when it reaches the specified boundaries by the cropping area.

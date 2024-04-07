@@ -28,6 +28,7 @@ import type {
   ResumableZoomState,
   ResumableZoomProps,
   ResumableZoomType,
+  ResumableZoomAssignableState,
 } from './types';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
@@ -49,6 +50,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     panWithPinch = Platform.OS !== 'ios',
     onTap,
     onGestureActive,
+    onGestureEnd,
     onSwipeRight,
     onSwipeLeft,
     onPinchStart: onUserPinchStart,
@@ -60,8 +62,8 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
-  const scaleOffset = useSharedValue<number>(1);
+  const scale = useSharedValue<number>(minScale);
+  const scaleOffset = useSharedValue<number>(minScale);
 
   const origin = useVector(0, 0);
   const delta = useVector(0, 0);
@@ -69,10 +71,10 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const rootContainer = useSizeVector(0, 0);
   const detector = useSizeVector(0, 0);
   const detectorTranslate = useVector(0, 0);
-  const detectorScale = useSharedValue(1);
+  const detectorScale = useSharedValue(minScale);
 
   const maxScale = useDerivedValue(() => {
-    if (userMaxScale !== undefined && typeof userMaxScale === 'object') {
+    if (typeof userMaxScale === 'object') {
       return getMaxScale(
         { width: detector.width.value, height: detector.height.value },
         userMaxScale
@@ -139,6 +141,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       panMode,
       boundFn: boundsFn,
       userCallbacks: {
+        onGestureEnd,
         onPinchStart: onUserPinchStart,
         onPinchEnd: onUserPinchEnd,
       },
@@ -158,6 +161,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     userCallbacks: {
       onSwipeRight,
       onSwipeLeft,
+      onGestureEnd,
       onPanStart: onUserPanStart,
       onPanEnd: onUserPanEnd,
       onHorizontalBoundsExceeded,
@@ -194,7 +198,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .hitSlop(hitSlop)
     .onEnd((e) => {
       if (scale.value >= maxScale.value * 0.8) {
-        reset(0, 0, 1, true);
+        reset(0, 0, minScale, true);
         return;
       }
 
@@ -248,7 +252,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
         { scale: detectorScale.value },
       ],
     }),
-    [detectorTranslate, detectorScale]
+    [detector, detectorTranslate, detectorScale]
   );
 
   const requestState = (): ResumableZoomState => {
@@ -261,9 +265,27 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     };
   };
 
+  const assignState = (
+    state: ResumableZoomAssignableState,
+    animate: boolean = true
+  ) => {
+    const toScale = clamp(state.scale, minScale, maxScale.value);
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(state.translateX, -1 * boundX, boundX);
+    const toY = clamp(state.translateY, -1 * boundY, boundY);
+
+    if (animate) {
+      reset(toX, toY, toScale, animate);
+      return;
+    }
+
+    reset(toX, toY, toScale, animate);
+  };
+
   useImperativeHandle(ref, () => ({
-    reset: (animate) => reset(0, 0, 1, animate),
+    reset: (animate) => reset(0, 0, minScale, animate),
     requestState: requestState,
+    assignState: assignState,
   }));
 
   const composedTap = Gesture.Exclusive(doubleTap, tap);

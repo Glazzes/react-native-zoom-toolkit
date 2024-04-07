@@ -16,6 +16,11 @@ export type ResumableZoomState = {
   scale: number;
 };
 
+export type ResumableZoomAssignableState = Omit<
+  ResumableZoomState,
+  'width' | 'height'
+>;
+
 export type ResumableZoomType = {
   /**
    * @description Reset all transformations to their initial state.
@@ -29,6 +34,13 @@ export type ResumableZoomType = {
    * @see https://glazzes.github.io/react-native-zoom-toolkit/components/resumablezoom.html#resumablezoomstate
    */
   requestState: () => ResumableZoomState;
+
+  /**
+   * @description Assigns the internal transformation values of this component, if the state you have
+   * provided is considered to be not valid, it'll be approximated to the closest values you provided.
+   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/resumablezoom.html#resumablezoomassignablestate
+   */
+  assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
 };
 
 export type ResumableZoomProps = React.PropsWithChildren<{

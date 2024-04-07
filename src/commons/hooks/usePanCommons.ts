@@ -14,7 +14,6 @@ import type {
 
 import { clamp } from '../utils/clamp';
 import { friction } from '../utils/friction';
-
 import {
   PanMode,
   type BoundsFuction,
@@ -35,7 +34,8 @@ type PanCommmonOptions = {
   maxScale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
-  userCallbacks?: Partial<{
+  userCallbacks: Partial<{
+    onGestureEnd: () => void;
     onSwipeLeft: () => void;
     onSwipeRight: () => void;
     onPanStart: PanGestureEventCallback;
@@ -48,7 +48,7 @@ type PanGestureUpdadeEvent = GestureUpdateEvent<
   PanGestureHandlerEventPayload & PanGestureChangeEventPayload
 >;
 
-const DECELERATION = 0.994;
+const DECELERATION = 0.9955;
 
 export const usePanCommons = (options: PanCommmonOptions) => {
   const {
@@ -85,7 +85,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     time.value = performance.now();
     x.value = e.absoluteX;
 
-    if (userCallbacks?.onPanStart) {
+    if (userCallbacks.onPanStart) {
       runOnJS(userCallbacks.onPanStart)(e);
     }
   };
@@ -96,11 +96,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    /*
-     * In fucked up phones like mine its possible to trigger a pan gesture in the middle of a pinch
-     * gesture somehow, this resulting in the picture being displaced from the desired boundaries,
-     * therefore I've had to clamp the scale in order to prevent this behavior.
-     */
     const toScale = clamp(scale.value, minScale, maxScale.value);
     const { x: boundX, y: boundY } = boundFn(toScale);
     isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
@@ -108,7 +103,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     if (
       !isWithinBoundX.value &&
-      userCallbacks?.onHorizontalBoundsExceeded &&
+      userCallbacks.onHorizontalBoundsExceeded &&
       panMode === PanMode.CLAMP
     ) {
       const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
@@ -150,31 +145,37 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         const frictionY = friction(clamp(fraction, 0, 1));
         translate.y.value += e.changeY * frictionY;
       }
-
-      return;
     }
   };
 
   const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    const canSwipe = scale.value === minScale && panMode === PanMode.CLAMP;
-
     const velocity = Math.abs(e.velocityX);
     const deltaTime = performance.now() - time.value;
     const deltaX = Math.abs(x.value - e.absoluteX);
-    const direction = Math.sign(e.absoluteX - x.value);
 
-    if (velocity >= 500 && deltaX >= 20 && deltaTime < 175 && canSwipe) {
-      if (direction === -1 && userCallbacks?.onSwipeLeft) {
+    const canSwipe = panMode === PanMode.CLAMP;
+    const didSwipe = velocity >= 500 && deltaX >= 20 && deltaTime < 175;
+    if (canSwipe && didSwipe) {
+      const { x: boundX } = boundFn(scale.value);
+      const direction = Math.sign(e.absoluteX - x.value);
+
+      const inLeftEdge = translate.x.value === -1 * boundX;
+      if (direction === -1 && inLeftEdge && userCallbacks.onSwipeLeft) {
         runOnJS(userCallbacks.onSwipeLeft)();
         return;
       }
 
-      if (direction === 1 && userCallbacks?.onSwipeRight) {
+      const inRightEdge = translate.x.value === boundX;
+      if (direction === 1 && inRightEdge && userCallbacks.onSwipeRight) {
         runOnJS(userCallbacks.onSwipeRight)();
         return;
       }
+    }
+
+    if (userCallbacks.onPanEnd) {
+      runOnJS(userCallbacks.onPanEnd)(e);
     }
 
     const toScale = clamp(scale.value, minScale, maxScale.value);
@@ -184,15 +185,23 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
+    const hasEndCB = userCallbacks.onGestureEnd !== undefined;
 
     if (decay && isWithinBoundX.value) {
       detectorTranslate.x.value = translate.x.value;
 
-      translate.x.value = withDecay({
-        velocity: e.velocityX,
-        clamp: clampX,
-        deceleration: DECELERATION,
-      });
+      translate.x.value = withDecay(
+        {
+          velocity: e.velocityX,
+          clamp: clampX,
+          deceleration: DECELERATION,
+        },
+        (finished) => {
+          if (finished && hasEndCB) {
+            runOnJS(userCallbacks.onGestureEnd!)();
+          }
+        }
+      );
 
       detectorTranslate.x.value = withDecay({
         velocity: e.velocityX,
@@ -200,7 +209,12 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         deceleration: DECELERATION,
       });
     } else {
-      translate.x.value = withTiming(toX);
+      translate.x.value = withTiming(toX, undefined, () => {
+        if (!isWithinBoundX.value && hasEndCB) {
+          runOnJS(userCallbacks.onGestureEnd!)();
+        }
+      });
+
       detectorTranslate.x.value = withTiming(toX);
     }
 
@@ -219,12 +233,13 @@ export const usePanCommons = (options: PanCommmonOptions) => {
         deceleration: DECELERATION,
       });
     } else {
-      translate.y.value = withTiming(toY);
-      detectorTranslate.y.value = withTiming(toY);
-    }
+      translate.y.value = withTiming(toY, undefined, () => {
+        if (isWithinBoundX.value && !isWithinBoundY.value && hasEndCB) {
+          runOnJS(userCallbacks.onGestureEnd!)();
+        }
+      });
 
-    if (userCallbacks?.onPanEnd) {
-      runOnJS(userCallbacks.onPanEnd)(e);
+      detectorTranslate.y.value = withTiming(toY);
     }
   };
 

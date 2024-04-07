@@ -66,6 +66,7 @@ const ListImage: React.FC<ListImageProps> = ({
     const to = clampScroll(SCROLL_SIZE * (index + 1));
     scrollX.value = withTiming(to, TIMING_CONFIG, () => {
       scrollOffset.value = scrollX.value;
+      runOnJS(reset)();
     });
   };
 
@@ -74,6 +75,7 @@ const ListImage: React.FC<ListImageProps> = ({
     const to = clampScroll(SCROLL_SIZE * (index - 1));
     scrollX.value = withTiming(to, TIMING_CONFIG, () => {
       scrollOffset.value = scrollX.value;
+      runOnJS(reset)();
     });
   };
 

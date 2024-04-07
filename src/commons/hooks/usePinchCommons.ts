@@ -37,9 +37,10 @@ type PinchOptions = {
   minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
-  panMode?: PanMode;
-  panWithPinch?: boolean;
-  userCallbacks?: Partial<{
+  panMode: PanMode;
+  panWithPinch: boolean;
+  userCallbacks: Partial<{
+    onGestureEnd: () => void;
     onPinchStart: PinchGestureEventCallback;
     onPinchEnd: PinchGestureEventCallback;
   }>;
@@ -75,27 +76,6 @@ export const usePinchCommons = (options: PinchOptions) => {
     }
   };
 
-  const reset = (toX: number, toY: number, toScale: number) => {
-    'worklet';
-
-    cancelAnimation(translate.x);
-    cancelAnimation(translate.y);
-    cancelAnimation(scale);
-
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.y.value = translate.y.value;
-    detectorScale.value = scale.value;
-
-    detectorTranslate.x.value = withTiming(toX);
-    detectorTranslate.y.value = withTiming(toY);
-    detectorScale.value = withTiming(toScale);
-    translate.x.value = withTiming(toX);
-    translate.y.value = withTiming(toY);
-    scale.value = withTiming(toScale, undefined, () => {
-      runOnJS(switchGesturesState)(true);
-    });
-  };
-
   const onPinchStart = (e: PinchGestureEvent) => {
     'worklet';
     runOnJS(switchGesturesState)(false);
@@ -114,16 +94,13 @@ export const usePinchCommons = (options: PinchOptions) => {
     offset.y.value = translate.y.value;
     scaleOffset.value = scale.value;
 
-    if (userCallbacks?.onPinchStart) {
+    if (userCallbacks.onPinchStart) {
       runOnJS(userCallbacks.onPinchStart)(e);
     }
   };
 
   const onPinchUpdate = (e: PinchGestueUpdateEvent) => {
     'worklet';
-    if (e.numberOfPointers !== 2) {
-      return;
-    }
 
     let toScale = e.scale * scaleOffset.value;
     if (scaleMode === ScaleMode.CLAMP) {
@@ -152,15 +129,57 @@ export const usePinchCommons = (options: PinchOptions) => {
     scale.value = toScale;
   };
 
+  const reset = (toX: number, toY: number, toScale: number) => {
+    'worklet';
+
+    cancelAnimation(translate.x);
+    cancelAnimation(translate.y);
+    cancelAnimation(scale);
+
+    const { x: bx, y: by } = boundFn(scale.value);
+    const inBoundX = translate.x.value >= -1 * bx && translate.x.value <= bx;
+    const inBoundY = translate.y.value >= -1 * by && translate.y.value <= by;
+
+    detectorTranslate.x.value = translate.x.value;
+    detectorTranslate.y.value = translate.y.value;
+    detectorScale.value = scale.value;
+    detectorTranslate.x.value = withTiming(toX);
+    detectorTranslate.y.value = withTiming(toY);
+    detectorScale.value = withTiming(toScale);
+
+    translate.x.value = withTiming(toX, undefined, (finished) => {
+      if (finished && !inBoundX && userCallbacks.onGestureEnd) {
+        runOnJS(userCallbacks.onGestureEnd)();
+      }
+    });
+
+    translate.y.value = withTiming(toY, undefined, (finished) => {
+      if (finished && !inBoundY && inBoundX && userCallbacks.onGestureEnd) {
+        runOnJS(userCallbacks.onGestureEnd)();
+      }
+    });
+
+    scale.value = withTiming(toScale, undefined, (finished) => {
+      runOnJS(switchGesturesState)(true);
+      if (finished && inBoundX && inBoundY && userCallbacks.onGestureEnd) {
+        runOnJS(userCallbacks.onGestureEnd)();
+      }
+    });
+  };
+
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
-    if (userCallbacks?.onPinchEnd) {
+    if (userCallbacks.onPinchEnd) {
       runOnJS(userCallbacks.onPinchEnd)(e);
     }
 
     if (scale.value < minScale && scaleMode === ScaleMode.BOUNCE) {
-      reset(0, 0, minScale);
+      const { x: boundX, y: boundY } = boundFn(minScale);
+      const toX = clamp(translate.x.value, -1 * boundX, boundX);
+      const toY = clamp(translate.y.value, -1 * boundY, boundY);
+
+      reset(toX, toY, minScale);
       return;
     }
 

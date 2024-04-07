@@ -46,11 +46,6 @@ export type SnapBackZoomProps = React.PropsWithChildren<{
    * @see https://glazzes.github.io/react-native-zoom-toolkit/components/snapbackzoom.html#snapbackzoomstate
    */
   onGestureActive?: (e: SnapbackZoomState) => void;
-
-  /**
-   * @description Callback triggered once the snap back animation has finished.
-   */
-  onGestureEnd?: () => void;
 }> &
   PinchGestureCallbacks &
   TapGestureCallbacks &
