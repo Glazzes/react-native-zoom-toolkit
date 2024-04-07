@@ -6,17 +6,18 @@
   <h4 align="center">A set of utilities and components for common pinch to zoom feature requirements</h4>
 </div>
 
-The intention behind this library is to provide the most feature rich library for the most common use cases of the "pinch to zoom" interaction as this one can be found on wide variety of scenarios, including the following:
-- Zooming in the media contained a chat message.
+The most feature rich React Native library to solve common use cases of the "pinch to zoom" interaction, as well as providing a barebones utility for complex use cases, for instance "pinch to zoom" React Native Skia's Components.
+
+You can build a solution to some of the following problems with this library:
+
+- Preview, zooming in the media contained in a chat message.
 - Detail screens.
 - Cropping an image or video.
-- Image galleries.
-
-This one has also been designed to work with more complex use cases such as mirroring the gestures to some other components, for instance RN Skia's components.
+- Build image galleries.
 
 ## Preview
 >[!Note]
-> Are you watching from NPM's website? NPM's markdown renderer wont render videos, better watch it on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
+> Are you watching from NPM's website? NPM's markdown renderer wont render videos, watch them on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
 
 | SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
@@ -32,7 +33,7 @@ This one has also been designed to work with more complex use cases such as mirr
 - **Expo Compatible**: This library has been written in typescript only and supported modules by the expo SDK.
 
 Features scheduled for the next minor release `1.2.0`.
-- [ ] A simple and ready to use Image gallery component, which uses `ResumableZoom` component.
+- [ ] A simple and ready to use Image gallery component, which uses the `ResumableZoom` component, see [Example app's](./example/) Resumable gallery example for a preview.
 
 ## Documentation
 To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
