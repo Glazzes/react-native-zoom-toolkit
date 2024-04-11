@@ -6,18 +6,10 @@
   <h4 align="center">A set of utilities and components for common pinch to zoom feature requirements</h4>
 </div>
 
-The most feature rich React Native library to solve common use cases of the "pinch to zoom" interaction, as well as providing a barebones utility for complex use cases, for instance "pinch to zoom" React Native Skia's Components.
+<p align="center">The most feature rich React Native library to solve common use cases of the pinch to zoom interaction, as well as providing barebones utilities for complex use cases, for instance pinch to zoom React Native Skia's components.</p>
 
-You can build a solution to some of the following problems with this library:
-
-- Preview, zooming in the media contained in a chat message.
-- Detail screens.
-- Cropping an image or video.
-- Build image galleries.
-
-## Preview
 >[!Note]
-> Are you watching from NPM's website? NPM's markdown renderer wont render videos, watch them on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
+> Are you watching from NPM's website? NPM's markdown renderer does not render videos, watch them on [github](https://github.com/Glazzes/react-native-zoom-toolkit).
 
 | SnapbackZoom | ResumableZoom | CropZoom |
 |--------------|---------------|----------|
@@ -33,7 +25,7 @@ You can build a solution to some of the following problems with this library:
 - **Expo Compatible**: This library has been written in typescript only and supported modules by the expo SDK.
 
 Features scheduled for the next minor release `1.2.0`.
-- [ ] A simple and ready to use Image gallery component, which uses the `ResumableZoom` component, see [Example app's](./example/) Resumable gallery example for a preview.
+- [ ] A simple and ready to use gallery component, which uses the `ResumableZoom` component, see [Example app's](./example/) Resumable gallery example for a quick reference.
 
 ## Documentation
 To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
@@ -42,4 +34,4 @@ To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit
 The example app comes with five different examples from which you can learn from, see the [Example app](./example/).
 
 ## License
-[MIT](./LICENSE) License.
+MIT License.
