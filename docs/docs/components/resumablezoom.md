@@ -52,7 +52,7 @@ const App = () => {
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <ResumableZoom>
+      <ResumableZoom maxScale={resolution}>
         <Image source={{uri}} style={imageSize} resizeMethod={'scale'} />
       </ResumableZoom>
     </View>
@@ -71,6 +71,13 @@ All properties for this component are optional.
 | `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
 
 Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
+
+### extendGestures
+| Type | Default | 
+|------|---------|
+| `boolean` | `false` |
+
+By default the gesture detection area is located around the wrapped component, by setting this property to `true`, the detection area is now increased to the whole space occupied by `ResuambleZoom`.
 
 ### minScale
 | Type | Default | 
@@ -114,13 +121,15 @@ Whether to apply a decay animation when the pan gesture ends or not.
 |------|---------|
 | `boolean` | `true in Android` and `false in iOS` | 
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
-
-This feature is not associated with a pan gesture, therefore it won't trigger the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
-
 ::: warning Beware iOS users
-Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+This feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+
+For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
+
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
+
+This feature is not a pan gesture, therefore it won't trigger any of the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
 
 ### panEnabled
 | Type | Default |
