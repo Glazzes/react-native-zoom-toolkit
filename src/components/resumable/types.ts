@@ -21,6 +21,24 @@ export type ResumableZoomAssignableState = Omit<
   'width' | 'height'
 >;
 
+export type ResumableZoomProps = React.PropsWithChildren<{
+  decay?: boolean;
+  extendGestures?: boolean;
+  tapsEnabled?: boolean;
+  panEnabled?: boolean;
+  pinchEnabled?: boolean;
+  maxScale?: SizeVector<number> | number;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  onGestureActive?: (e: ResumableZoomState) => void;
+  onHorizontalBoundsExceeded?: (exceededBy: number) => void;
+}> &
+  PanGestureCallbacks &
+  PinchGestureCallbacks &
+  Omit<TapGestureCallbacks, 'onDoubleTap'> &
+  Omit<CommonResumableProps, 'maxScale'> &
+  Omit<CommonZoomProps, 'timingConfig'>;
+
 export type ResumableZoomType = {
   /**
    * @description Reset all transformations to their initial state.
@@ -42,79 +60,3 @@ export type ResumableZoomType = {
    */
   assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
 };
-
-export type ResumableZoomProps = React.PropsWithChildren<{
-  /**
-   * @description Whether to apply a decay animation when the pan gesture ends or not.
-   * @default true
-   * @see https://docs.swmansion.com/react-native-reanimated/docs/animations/withDecay/
-   */
-  decay?: boolean;
-
-  /**
-   * @description Enables and disables both single and double tap gestures.
-   * @default true
-   */
-  tapsEnabled?: boolean;
-
-  /**
-   * @description Enables and disables both pan and swipe gestures.
-   * @default true
-   */
-  panEnabled?: boolean;
-
-  /**
-   * @description Enables and disables the pinch gesture.
-   * @default true
-   */
-  pinchEnabled?: boolean;
-
-  /**
-   * @description Maximum scale value allowed by the pinch gesture, expects values 
-   * bigger than or equals one.
-
-   * Alternatively you can pass the resolution of your image or video, for instance  {width: 1920, height: 1080}; 
-   * this will instruct the component to calculate maxScale  in such a way it's a value just before
-   * images and videos start getting pixelated.
-   * @default 6
-   */
-  maxScale?: SizeVector<number> | number;
-
-  /**
-   * @description Callback triggered when a swipe to the left gesture has occurred, this callback is
-   * only triggered when your component is at its minimum scale and panMode property is set to
-   * PanMode.CLAMP.
-   */
-  onSwipeLeft?: () => void;
-
-  /**
-   * @description Callback triggered when a swipe to the right gesture has occurred, this callback is
-   * only triggered when your component is at its minimum scale and panMode property is set to
-   * PanMode.CLAMP
-   */
-  onSwipeRight?: () => void;
-
-  /**
-   * @description Worklet Callback triggered as the user interacts with the component, it also means
-   * interacting through its methods, ideal if you need to mirror the internal state of the
-   * component to some other component as it updates.
-   * @param e Internal state of the gesture.
-   * @see https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/
-   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/resumablezoom.html#resumablezoomstate
-   */
-  onGestureActive?: (e: ResumableZoomState) => void;
-
-  /**
-   * @description Callback triggered when the component has been panned beyond the boundaries
-   * defined by its enclosing container, ideal property to mimic scroll behavior. This callback is
-   * only triggered when the panMode property is set to PanMode.CLAMP.
-   * @param exceededBy How much the component has been panned beyond its enclosing container boundaries,
-   * receives positive values from the right and negative values from the left.
-   */
-  onHorizontalBoundsExceeded?: (exceededBy: number) => void;
-}> &
-  PanGestureCallbacks &
-  PinchGestureCallbacks &
-  Omit<TapGestureCallbacks, 'onDoubleTap'> &
-  Omit<CommonResumableProps, 'maxScale'> &
-  Omit<CommonZoomProps, 'timingConfig'>;

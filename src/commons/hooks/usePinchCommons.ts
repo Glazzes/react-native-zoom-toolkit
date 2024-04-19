@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   withTiming,
   cancelAnimation,
@@ -11,20 +12,18 @@ import {
 
 import { clamp } from '../utils/clamp';
 import { pinchTransform } from '../utils/pinchTransform';
-
 import {
+  PanMode,
   ScaleMode,
   type BoundsFuction,
   type SizeVector,
   type Vector,
   type PinchGestureEventCallback,
   type PinchGestureEvent,
-  PanMode,
 } from '../types';
-import { useState } from 'react';
 
 type PinchOptions = {
-  detector: SizeVector<SharedValue<number>>;
+  container: SizeVector<SharedValue<number>>;
   detectorTranslate: Vector<SharedValue<number>>;
   detectorScale: SharedValue<number>;
   translate: Vector<SharedValue<number>>;
@@ -51,7 +50,7 @@ type PinchGestueUpdateEvent =
 
 export const usePinchCommons = (options: PinchOptions) => {
   const {
-    detector,
+    container,
     detectorTranslate,
     detectorScale,
     translate,
@@ -68,6 +67,9 @@ export const usePinchCommons = (options: PinchOptions) => {
     boundFn,
     userCallbacks,
   } = options;
+
+  const panClamp = panMode === PanMode.CLAMP;
+  const scaleClamp = scaleMode === ScaleMode.CLAMP;
 
   const [gesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
   const switchGesturesState = (value: boolean) => {
@@ -87,8 +89,8 @@ export const usePinchCommons = (options: PinchOptions) => {
     cancelAnimation(scale);
     cancelAnimation(detectorScale);
 
-    origin.x.value = e.focalX - detector.width.value / 2;
-    origin.y.value = e.focalY - detector.height.value / 2;
+    origin.x.value = e.focalX - container.width.value / 2;
+    origin.y.value = e.focalY - container.height.value / 2;
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
@@ -103,12 +105,10 @@ export const usePinchCommons = (options: PinchOptions) => {
     'worklet';
 
     let toScale = e.scale * scaleOffset.value;
-    if (scaleMode === ScaleMode.CLAMP) {
-      toScale = clamp(toScale, minScale, maxScale.value);
-    }
+    if (scaleClamp) toScale = clamp(toScale, minScale, maxScale.value);
 
-    delta.x.value = e.focalX - detector.width.value / 2 - origin.x.value;
-    delta.y.value = e.focalY - detector.height.value / 2 - origin.y.value;
+    delta.x.value = e.focalX - container.width.value / 2 - origin.x.value;
+    delta.y.value = e.focalY - container.height.value / 2 - origin.y.value;
 
     const { x: toX, y: toY } = pinchTransform({
       toScale: toScale,
@@ -121,11 +121,12 @@ export const usePinchCommons = (options: PinchOptions) => {
       },
     });
 
-    const { x: boundX } = boundFn(toScale);
+    const { x: boundX, y: boundY } = boundFn(toScale);
     const clampedX = clamp(toX, -1 * boundX, boundX);
+    const clampedY = clamp(toY, -1 * boundY, boundY);
 
-    translate.x.value = panMode === PanMode.CLAMP ? clampedX : toX;
-    translate.y.value = toY;
+    translate.x.value = panClamp ? clampedX : toX;
+    translate.y.value = panClamp ? clampedY : toY;
     scale.value = toScale;
   };
 
@@ -194,10 +195,7 @@ export const usePinchCommons = (options: PinchOptions) => {
         fromScale: scale.value,
         origin: { x: origin.x.value, y: origin.y.value },
         offset: { x: translate.x.value, y: translate.y.value },
-        delta: {
-          x: 0,
-          y: panWithPinch ? -1 * delta.y.value * scaleDiff : 0,
-        },
+        delta: { x: 0, y: panWithPinch ? -delta.y.value * scaleDiff : 0 },
       });
 
       const { x: boundX, y: boundY } = boundFn(maxScale.value);
