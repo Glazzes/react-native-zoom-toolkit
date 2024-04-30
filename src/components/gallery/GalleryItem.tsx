@@ -1,168 +1,138 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, type LayoutChangeEvent } from 'react-native';
-import ResumableZoom from '../resumable/ResumableZoom';
-import {
-  Easing,
-  clamp,
-  runOnJS,
+import React from 'react';
+import { StyleSheet, type LayoutChangeEvent } from 'react-native';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedReaction,
+  useAnimatedStyle,
   useDerivedValue,
-  withTiming,
+  useSharedValue,
   type SharedValue,
-  type WithTimingConfig,
 } from 'react-native-reanimated';
-import type { ResumableZoomState, ResumableZoomType } from '../resumable/types';
-import type {
-  PanGestureEvent,
-  SizeVector,
-  TapGestureEvent,
-} from '../../commons/types';
-import { snapPoint } from '../../commons/utils/snapPoint';
+
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { useVector } from '../../commons/hooks/useVector';
+import type { SizeVector, Vector } from '../../commons/types';
 
 type GalleryItemProps = React.PropsWithChildren<{
   index: number;
-  itemCount: number;
-  tapOnEdgeToItem: boolean;
-  activeIndex: SharedValue<number>;
-  resetIndex: SharedValue<number>;
-  stateIndex: SharedValue<number>;
-  stateCB: SharedValue<((state: ResumableZoomState) => void) | undefined>;
-  container: SizeVector<SharedValue<number>>;
+  count: number;
   scroll: SharedValue<number>;
-  scrollOffset: SharedValue<number>;
+  activeIndex: SharedValue<number>;
+  rootSize: SizeVector<SharedValue<number>>;
+  rootChild: SizeVector<SharedValue<number>>;
+  translate: Vector<SharedValue<number>>;
+  scale: SharedValue<number>;
 }>;
-
-const TIMING_CONFIG: WithTimingConfig = { easing: Easing.linear };
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
   children,
-  index,
-  itemCount,
-  activeIndex,
-  resetIndex,
-  stateIndex,
-  stateCB,
-  tapOnEdgeToItem,
-  container,
+  count,
   scroll,
-  scrollOffset,
+  index,
+  activeIndex,
+  rootChild,
+  rootSize,
+  translate,
+  scale,
 }) => {
-  const ref = useRef<ResumableZoomType>(null);
-  const reset = () => {
-    ref.current?.reset(false);
-  };
+  const childSize = useSizeVector(0, 0);
+  const innerTranslate = useVector(0, 0);
+  const innerScale = useSharedValue<number>(1);
 
-  const requestState = () => {
-    const state = ref.current?.requestState();
-    if (state && stateCB.value) {
-      stateCB.value(state);
-      stateCB.value = undefined;
+  const measureChild = (e: LayoutChangeEvent) => {
+    childSize.width.value = e.nativeEvent.layout.width;
+    childSize.height.value = e.nativeEvent.layout.height;
+
+    if (index === activeIndex.value) {
+      rootChild.width.value = e.nativeEvent.layout.width;
+      rootChild.height.value = e.nativeEvent.layout.height;
     }
   };
 
-  const child = useSizeVector(0, 0);
-  const onLayout = (e: LayoutChangeEvent) => {
-    child.width.value = e.nativeEvent.layout.width;
-    child.height.value = e.nativeEvent.layout.height;
-  };
+  const childStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: innerTranslate.x.value },
+        { translateY: innerTranslate.y.value },
+        { scale: innerScale.value },
+      ],
+    };
+  });
 
-  const clampScroll = (sc: number): number => {
-    const upperBound = container.width.value * (itemCount - 1);
-    return clamp(sc, 0, upperBound);
-  };
+  const animatedStyle = useAnimatedStyle(() => {
+    let translateX = index * rootSize.width.value - scroll.value;
+    let opacity = 1;
+    let sc = 1;
 
-  const updateIndex = (acc: 1 | -1) => {
-    activeIndex.value = index + acc;
-  };
-
-  const onBoundsExceeded = (exceededBy: number) => {
-    'worklet';
-    const to = scrollOffset.value + exceededBy;
-    scroll.value = clamp(to, 0, container.width.value * (itemCount - 1));
-  };
-
-  const onTap = (e: TapGestureEvent) => {
-    if (!tapOnEdgeToItem) return;
-    if (e.x <= child.width.value * 0.15 && index > 0) {
-      scroll.value = clampScroll(container.width.value * (index - 1));
-      runOnJS(updateIndex)(-1);
+    if (index < activeIndex.value - 1 || index > activeIndex.value + 1) {
+      return {
+        opacity: 0,
+        transform: [{ translateX: 0 }, { scale: 0 }],
+      };
     }
 
-    if (e.x >= child.width.value * 0.85 && index < itemCount - 1) {
-      scroll.value = clampScroll(container.width.value * (index + 1));
-      runOnJS(updateIndex)(1);
+    const isNext = index === activeIndex.value + 1;
+    const isCurrent = index === activeIndex.value;
+    if (isNext || (isCurrent && scroll.value < index * rootSize.width.value)) {
+      translateX = 0;
+      opacity = interpolate(
+        scroll.value,
+        [(index - 1) * rootSize.width.value, index * rootSize.width.value],
+        [0, 1],
+        Extrapolation.CLAMP
+      );
+
+      sc = 0.75 + 0.25 * opacity;
     }
-  };
 
-  const onPanStart = () => (scrollOffset.value = scroll.value);
-  const onPanEnd = (e: PanGestureEvent) => {
-    const scrollSize = container.width.value;
-    const prev = scrollSize * (index - 1);
-    const current = scrollSize * index;
-    const next = scrollSize * (index + 1);
-
-    const points = scroll.value >= current ? [current, next] : [prev, current];
-    const to = clampScroll(snapPoint(scroll.value, e.velocityX, points));
-
-    scroll.value = withTiming(to, TIMING_CONFIG, () => {
-      scrollOffset.value = scroll.value;
-      if (to !== current) {
-        runOnJS(reset)();
-        runOnJS(updateIndex)(to === next ? 1 : -1);
-      }
-    });
-  };
-
-  const onSwipe = (direction: 'right' | 'left') => {
-    const scrollSize = container.width.value;
-    const acc = direction === 'right' ? -1 : 1;
-    const to = clampScroll(scrollSize * (index + acc));
-
-    scroll.value = withTiming(to, TIMING_CONFIG, () => {
-      scrollOffset.value = scroll.value;
-      runOnJS(reset)();
-
-      if (direction === 'right' && index !== 0) runOnJS(updateIndex)(-1);
-      if (direction === 'left' && index !== itemCount - 1) {
-        runOnJS(updateIndex)(1);
-      }
-    });
-  };
+    return {
+      opacity,
+      transform: [{ translateX }, { scale: sc }],
+    };
+  });
 
   useDerivedValue(() => {
-    if (resetIndex.value === index) {
-      runOnJS(reset)();
+    if (index === activeIndex.value) {
+      innerTranslate.x.value = translate.x.value;
+      innerTranslate.y.value = translate.y.value;
+      innerScale.value = scale.value;
     }
-  }, [resetIndex, reset]);
+  }, [activeIndex, translate, scale]);
 
-  useDerivedValue(() => {
-    if (stateIndex.value === index) {
-      runOnJS(requestState)();
-    }
-  }, [stateIndex, stateCB, index]);
+  useAnimatedReaction(
+    () => activeIndex.value,
+    (value) => {
+      if (index === value) {
+        rootChild.width.value = childSize.width.value;
+        rootChild.height.value = childSize.height.value;
+      } else {
+        innerTranslate.x.value = 0;
+        innerTranslate.y.value = 0;
+        innerScale.value = 1;
+      }
+    },
+    [activeIndex]
+  );
 
   return (
-    <View style={styles.wrapper}>
-      <ResumableZoom
-        ref={ref}
-        onTap={onTap}
-        onPanStart={onPanStart}
-        onPanEnd={onPanEnd}
-        onSwipeRight={() => onSwipe('right')}
-        onSwipeLeft={() => onSwipe('left')}
-        onHorizontalBoundsExceeded={onBoundsExceeded}
-      >
-        <View collapsable={false} onLayout={onLayout}>
-          {children}
-        </View>
-      </ResumableZoom>
-    </View>
+    <Animated.View
+      style={[styles.root, { zIndex: count - index }, animatedStyle]}
+    >
+      <Animated.View style={childStyle} onLayout={measureChild}>
+        {children}
+      </Animated.View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
+  root: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
     overflow: 'hidden',
   },
 });

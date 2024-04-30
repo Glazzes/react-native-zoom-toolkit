@@ -11,7 +11,7 @@ import type {
   ReduceMotion,
 } from 'react-native-reanimated';
 
-type TimingConfig = Partial<{
+export type TimingConfig = Partial<{
   duration: number;
   easing: EasingFunction | EasingFunctionFactory;
   reduceMotion: ReduceMotion;
