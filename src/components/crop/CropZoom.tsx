@@ -7,7 +7,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { getCropRotatedSize } from '../../commons/utils/getCropRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
@@ -131,7 +135,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
     usePinchCommons({
-      detector,
+      container,
       detectorTranslate,
       detectorScale,
       translate,
@@ -382,7 +386,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   if (mode === CropMode.MANAGED) {
     return (
-      <View style={[root, styles.root]}>
+      <GestureHandlerRootView style={[root, styles.root]}>
         <View style={[cropStyle, styles.center]}>
           <Animated.View style={containerStyle}>{children}</Animated.View>
           <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
@@ -395,18 +399,18 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         <GestureDetector gesture={Gesture.Race(pinch, pan, tap)}>
           <Animated.View style={detectorStyle} />
         </GestureDetector>
-      </View>
+      </GestureHandlerRootView>
     );
   }
 
   return (
-    <View style={[cropStyle, styles.center]}>
+    <GestureHandlerRootView style={[cropStyle, styles.center]}>
       <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
 
       <GestureDetector gesture={Gesture.Race(pinch, pan)}>
         <Animated.View style={detectorStyle} />
       </GestureDetector>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 

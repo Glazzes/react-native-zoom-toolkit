@@ -1,17 +1,16 @@
 import React, { useImperativeHandle } from 'react';
-import {
-  Platform,
-  View,
-  StyleSheet,
-  type LayoutChangeEvent,
-} from 'react-native';
+import { Platform, StyleSheet, type LayoutChangeEvent } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 
 import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
@@ -287,7 +286,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const composedGesture = Gesture.Race(pinch, pan, composedTap);
 
   return (
-    <View style={styles.root} onLayout={measureRoot}>
+    <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
       <Animated.View style={childStyle} onLayout={measureChild}>
         {children}
       </Animated.View>
@@ -295,7 +294,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       <GestureDetector gesture={composedGesture}>
         <Animated.View style={detectorStyle} />
       </GestureDetector>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
