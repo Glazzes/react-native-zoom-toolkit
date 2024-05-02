@@ -1,27 +1,21 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { View, StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import {
   clamp,
-  Easing,
   runOnJS,
+  useAnimatedReaction,
   useDerivedValue,
   useSharedValue,
-  withTiming,
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { snapPoint } from '../../commons/utils/snapPoint';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import type { PanGestureEvent, TimingConfig } from '../../commons/types';
-import type { GalleryProps, GalleryType } from './types';
-import Reflection from './Reflection';
-import GalleryItem from './GalleryItem';
 import { useVector } from '../../commons/hooks/useVector';
 
-const config: TimingConfig = {
-  duration: 300,
-  easing: Easing.linear,
-};
+import Reflection from './Reflection';
+import GalleryItem from './GalleryItem';
+import type { GalleryProps, GalleryType } from './types';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
 
 const Gallery = <T extends unknown>(
   props: GalleryProps<T>,
@@ -29,27 +23,44 @@ const Gallery = <T extends unknown>(
 ) => {
   const {
     data,
-    initialIndex = 0,
-    numberToRender = 5,
     renderItem,
+    keyExtractor,
+    initialIndex = 0,
+    windowSize = 5,
+    maxScale: userMaxScale = 6,
     onIndexChange,
     onScroll,
+    onTap: onUserTap,
   } = props;
 
-  const nextItems = Math.floor(numberToRender / 2);
-
-  const rootChild = useSizeVector(0, 0);
-  const translate = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
+  const nextItems = Math.floor(windowSize / 2);
 
   const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);
   const activeIndex = useSharedValue<number>(initialIndex);
   const fetchIndex = useSharedValue<number>(initialIndex);
   const resetIndex = useSharedValue<number>(initialIndex);
 
+  const rootChild = useSizeVector(0, 0);
   const rootSize = useSizeVector(0, 0);
+
+  const translate = useVector(0, 0);
+  const scale = useSharedValue<number>(1);
+
   const scroll = useSharedValue<number>(0);
   const offset = useSharedValue<number>(0);
+
+  const isScrolling = useSharedValue<boolean>(false);
+
+  const maxScale = useDerivedValue(() => {
+    if (typeof userMaxScale === 'object') {
+      return getMaxScale(
+        { width: rootChild.width.value, height: rootChild.height.value },
+        userMaxScale[activeIndex.value]!
+      );
+    }
+
+    return userMaxScale;
+  }, [userMaxScale, activeIndex, rootChild]);
 
   useDerivedValue(() => {
     onScroll?.(
@@ -64,65 +75,38 @@ const Gallery = <T extends unknown>(
     scroll.value = activeIndex.value * e.nativeEvent.layout.width;
   };
 
-  const clampScroll = (value: number) => {
-    'worklet';
-    return clamp(value, 0, (data.length - 1) * rootSize.width.value);
+  useAnimatedReaction(
+    () => activeIndex.value,
+    (value) => {
+      if (onIndexChange) runOnJS(onIndexChange)(value);
+    },
+    [activeIndex]
+  );
+
+  useAnimatedReaction(
+    () => fetchIndex.value,
+    (value) => runOnJS(setScrollIndex)(value),
+    [fetchIndex]
+  );
+
+  const setIndex = (index: number) => {
+    const clamped = clamp(index, 0, data.length);
+    activeIndex.value = clamped;
+    scroll.value = index * rootSize.width.value;
   };
 
-  const onPanEnd = (e: PanGestureEvent) => {
-    'worklet';
-    const index = activeIndex.value;
-
-    const prev = rootSize.width.value * (index - 1);
-    const current = rootSize.width.value * index;
-    const next = rootSize.width.value * (index + 1);
-
-    const points = scroll.value >= current ? [current, next] : [prev, current];
-    const to = clampScroll(snapPoint(scroll.value, e.velocityX, points));
-
-    if (to !== current) {
-      fetchIndex.value = index + (to === next ? 1 : -1);
-    }
-
-    scroll.value = withTiming(to, config, () => {
-      if (to !== current) {
-        activeIndex.value = index + (to === next ? 1 : -1);
-        resetIndex.value = index;
-      }
-    });
-  };
-
-  const onSwipe = (direction: 'right' | 'left') => {
-    'worklet';
-    const index = activeIndex.value;
-
-    const toIndex = index + (direction === 'right' ? -1 : 1);
-    if (toIndex < 0 || toIndex > data.length - 1) return;
-
-    fetchIndex.value = toIndex;
-
-    const to = clampScroll(toIndex * rootSize.width.value);
-
-    scroll.value = withTiming(to, config, () => {
-      activeIndex.value = toIndex;
-      resetIndex.value = index;
-      offset.value = scroll.value;
-    });
-  };
-
-  useDerivedValue(() => {
-    if (onIndexChange) runOnJS(onIndexChange)(activeIndex.value);
-  }, [activeIndex]);
-
-  useDerivedValue(() => {
-    runOnJS(setScrollIndex)(fetchIndex.value);
-  }, [fetchIndex]);
+  const requestState = () => ({
+    width: rootChild.width.value,
+    height: rootChild.height.value,
+    translateX: translate.x.value,
+    translateY: translate.y.value,
+    scale: scale.value,
+  });
 
   useImperativeHandle(ref, () => ({
-    scrollToIndex: (index: number) => {
-      scroll.value = index * rootSize.width.value;
-    },
-    reset: () => (resetIndex.value = activeIndex.value),
+    setIndex,
+    reset: () => (resetIndex.value += 1),
+    requestState,
   }));
 
   return (
@@ -135,9 +119,11 @@ const Gallery = <T extends unknown>(
           return null;
         }
 
+        const key = keyExtractor?.(item, index) ?? `item-${index}`;
+
         return (
           <GalleryItem
-            key={`item-${index}`}
+            key={key}
             count={data.length}
             index={index}
             activeIndex={activeIndex}
@@ -146,6 +132,7 @@ const Gallery = <T extends unknown>(
             rootChild={rootChild}
             translate={translate}
             scale={scale}
+            isScrolling={isScrolling}
           >
             {renderItem(item, index)}
           </GalleryItem>
@@ -154,6 +141,8 @@ const Gallery = <T extends unknown>(
 
       <Reflection
         activeIndex={activeIndex}
+        resetIndex={resetIndex}
+        fetchIndex={fetchIndex}
         scroll={scroll}
         scrollOffset={offset}
         rootSize={rootSize}
@@ -161,8 +150,7 @@ const Gallery = <T extends unknown>(
         translate={translate}
         scale={scale}
         length={data.length}
-        onSwipe={onSwipe}
-        onPanEnd={onPanEnd}
+        isScrolling={isScrolling}
       />
     </GestureHandlerRootView>
   );

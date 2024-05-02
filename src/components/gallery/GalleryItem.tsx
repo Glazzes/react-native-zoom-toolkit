@@ -23,6 +23,7 @@ type GalleryItemProps = React.PropsWithChildren<{
   rootChild: SizeVector<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
+  isScrolling: SharedValue<boolean>;
 }>;
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
@@ -35,6 +36,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   rootSize,
   translate,
   scale,
+  isScrolling,
 }) => {
   const childSize = useSizeVector(0, 0);
   const innerTranslate = useVector(0, 0);
@@ -61,10 +63,6 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    let translateX = index * rootSize.width.value - scroll.value;
-    let opacity = 1;
-    let sc = 1;
-
     if (index < activeIndex.value - 1 || index > activeIndex.value + 1) {
       return {
         opacity: 0,
@@ -72,10 +70,14 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
       };
     }
 
-    const isNext = index === activeIndex.value + 1;
+    let translateX = index * rootSize.width.value - scroll.value;
+    let opacity = 1;
+    let sc = 1;
+    if (index !== activeIndex.value && !isScrolling.value) sc = 0;
+
     const isCurrent = index === activeIndex.value;
+    const isNext = index === activeIndex.value + 1;
     if (isNext || (isCurrent && scroll.value < index * rootSize.width.value)) {
-      translateX = 0;
       opacity = interpolate(
         scroll.value,
         [(index - 1) * rootSize.width.value, index * rootSize.width.value],
@@ -84,6 +86,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
       );
 
       sc = 0.75 + 0.25 * opacity;
+      translateX = 0;
     }
 
     return {
@@ -133,8 +136,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    overflow: 'hidden',
   },
 });
 
-export default GalleryItem;
+export default React.memo(GalleryItem);

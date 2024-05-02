@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Animated, {
+  Easing,
   cancelAnimation,
   runOnJS,
   useAnimatedReaction,
@@ -20,13 +21,15 @@ import type {
   SizeVector,
   Vector,
 } from '../../commons/types';
+import { snapPoint } from '../../commons/utils/snapPoint';
 
 const minScale = 1;
-const maxScale = 6;
-// const config = { duration: 200, easing: Easing.linear };
+const config = { duration: 300, easing: Easing.linear };
 
 type ReflectionProps = {
   activeIndex: SharedValue<number>;
+  resetIndex: SharedValue<number>;
+  fetchIndex: SharedValue<number>;
   length: number;
   rootSize: SizeVector<SharedValue<number>>;
   rootChild: SizeVector<SharedValue<number>>;
@@ -34,12 +37,14 @@ type ReflectionProps = {
   scrollOffset: SharedValue<number>;
   translate: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
-  onSwipe: (direction: 'right' | 'left') => void;
-  onPanEnd: (e: PanGestureEvent) => void;
+  maxScale: SharedValue<number>;
+  isScrolling: SharedValue<boolean>;
 };
 
 const Reflection = ({
   activeIndex,
+  resetIndex,
+  fetchIndex,
   length,
   rootSize,
   rootChild,
@@ -47,8 +52,8 @@ const Reflection = ({
   scrollOffset,
   translate,
   scale,
-  onSwipe,
-  onPanEnd,
+  maxScale,
+  isScrolling,
 }: ReflectionProps) => {
   const [enabled, setEnabled] = useState<boolean>(true);
   const toggleGestures = (value: boolean) => setEnabled(value);
@@ -99,10 +104,67 @@ const Reflection = ({
       : toScale;
   };
 
+  const clampScroll = (value: number) => {
+    'worklet';
+    return clamp(value, 0, (length - 1) * rootSize.width.value);
+  };
+
+  const onPanEnd = (e: PanGestureEvent) => {
+    'worklet';
+    const index = activeIndex.value;
+
+    const prev = rootSize.width.value * (index - 1);
+    const current = rootSize.width.value * index;
+    const next = rootSize.width.value * (index + 1);
+
+    const points = scroll.value >= current ? [current, next] : [prev, current];
+    const to = clampScroll(snapPoint(scroll.value, e.velocityX, points));
+
+    if (to !== current) {
+      fetchIndex.value = index + (to === next ? 1 : -1);
+    }
+
+    scroll.value = withTiming(to, config, () => {
+      if (to !== current) {
+        activeIndex.value = index + (to === next ? 1 : -1);
+        isScrolling.value = false;
+      }
+    });
+  };
+
+  const onSwipe = (direction: 'right' | 'left') => {
+    'worklet';
+    const index = activeIndex.value;
+
+    const toIndex = index + (direction === 'right' ? -1 : 1);
+    if (toIndex < 0 || toIndex > length - 1) return;
+
+    fetchIndex.value = toIndex;
+
+    const to = clampScroll(toIndex * rootSize.width.value);
+
+    scroll.value = withTiming(to, config, (finished) => {
+      activeIndex.value = toIndex;
+      if (finished) isScrolling.value = false;
+    });
+  };
+
+  useAnimatedReaction(
+    () => rootSize.width.value,
+    () => reset(0, 0, minScale, false),
+    [rootSize]
+  );
+
   useAnimatedReaction(
     () => activeIndex.value,
     () => reset(0, 0, minScale, false),
     [activeIndex]
+  );
+
+  useAnimatedReaction(
+    () => resetIndex.value,
+    () => reset(0, 0, minScale, false),
+    [resetIndex]
   );
 
   const pinch = Gesture.Pinch()
@@ -154,24 +216,24 @@ const Reflection = ({
         return;
       }
 
-      if (scale.value > maxScale) {
+      if (scale.value > maxScale.value) {
         const scaleDiff = Math.max(
           0,
           scaleOffset.value - (scale.value - scaleOffset.value) / 2
         );
 
         const { x, y } = pinchTransform({
-          toScale: maxScale,
+          toScale: maxScale.value,
           fromScale: scale.value,
           origin: { x: origin.x.value, y: origin.y.value },
           offset: { x: translate.x.value, y: translate.y.value },
           delta: { x: 0, y: -1 * delta.y.value * scaleDiff },
         });
 
-        const { x: boundX, y: boundY } = boundsFn(maxScale);
+        const { x: boundX, y: boundY } = boundsFn(maxScale.value);
         const toX = clamp(x, -1 * boundX, boundX);
         const toY = clamp(y, -1 * boundY, boundY);
-        reset(toX, toY, maxScale);
+        reset(toX, toY, maxScale.value);
 
         return;
       }
@@ -189,6 +251,7 @@ const Reflection = ({
     .maxPointers(1)
     .enabled(enabled)
     .onStart((e) => {
+      isScrolling.value = true;
       time.value = performance.now();
       absX.value = e.absoluteX;
       scrollOffset.value = scroll.value;
@@ -265,12 +328,28 @@ const Reflection = ({
       });
     });
 
-  const doubleTap = Gesture.Tap()
-    .numberOfTaps(2)
+  const tap = Gesture.Tap()
     .enabled(enabled)
+    .numberOfTaps(1)
+    .maxDuration(250)
+    .runOnJS(true)
+    .onEnd((e) => {
+      let toIndex = activeIndex.value;
+      if (e.x <= 44) toIndex = activeIndex.value - 1;
+      if (e.x >= rootSize.width.value - 44) toIndex = activeIndex.value + 1;
+
+      toIndex = clamp(toIndex, 0, length - 1);
+      scroll.value = toIndex * rootSize.width.value;
+      activeIndex.value = toIndex;
+      fetchIndex.value = toIndex;
+    });
+
+  const doubleTap = Gesture.Tap()
+    .enabled(enabled)
+    .numberOfTaps(2)
     .maxDuration(250)
     .onEnd((e) => {
-      if (scale.value >= maxScale * 0.8) {
+      if (scale.value >= maxScale.value * 0.8) {
         reset(0, 0, minScale);
         return;
       }
@@ -279,17 +358,17 @@ const Reflection = ({
       const originY = e.y - rootSize.height.value / 2;
 
       const { x, y } = pinchTransform({
-        toScale: maxScale,
+        toScale: maxScale.value,
         fromScale: scale.value,
         origin: { x: originX, y: originY },
         delta: { x: 0, y: 0 },
         offset: { x: translate.x.value, y: translate.y.value },
       });
 
-      const { x: boundX, y: boundY } = boundsFn(maxScale);
+      const { x: boundX, y: boundY } = boundsFn(maxScale.value);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
-      reset(toX, toY, maxScale);
+      reset(toX, toY, maxScale.value);
     });
 
   const detectorStyle = useAnimatedStyle(() => ({
@@ -305,7 +384,9 @@ const Reflection = ({
   }));
 
   return (
-    <GestureDetector gesture={Gesture.Race(pan, pinch, doubleTap)}>
+    <GestureDetector
+      gesture={Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap))}
+    >
       <Animated.View style={detectorStyle} />
     </GestureDetector>
   );

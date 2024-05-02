@@ -1,19 +1,20 @@
-import type React from 'react';
-
-type RenderInfo<T> = (item: T, index: number) => React.ReactElement;
-type KeyExtractor<T> = (item: T, index: number) => string;
+import type { SizeVector, TapGestureEvent } from '../../commons/types';
+import type { ResumableZoomState } from '../resumable/types';
 
 export type GalleryProps<T = unknown> = {
   data: T[];
-  renderItem: RenderInfo<T>;
-  keyExtractor?: KeyExtractor<T>;
+  renderItem: (item: T, index: number) => React.ReactElement;
+  keyExtractor?: (item: T, index: number) => string;
+  maxScale?: number | SizeVector<number>[];
   initialIndex?: number;
-  numberToRender?: number;
+  windowSize?: number;
+  onTap?: (e: TapGestureEvent) => void;
   onIndexChange?: (index: number) => void;
-  onScroll?: (scroll: number, offset: number) => void;
+  onScroll?: (scroll: number, contentOffset: number) => void;
 };
 
 export type GalleryType = {
-  scrollToIndex: (index: number) => void;
+  setIndex: (index: number) => void;
   reset: () => void;
+  requestState: () => ResumableZoomState;
 };
