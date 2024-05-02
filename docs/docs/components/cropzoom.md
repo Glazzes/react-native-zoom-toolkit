@@ -148,13 +148,15 @@ Select which one of the two available scale modes to use.
 |------|---------|----------|
 | `boolean` | `true in Android` and `false in iOS` | `No` | 
 
+::: warning Beware iOS users
+This feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+
+For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
+:::
+
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
 
 This feature is not associated with a pan gesture, therefore it won't trigger `onPanStart` and `onPanEnd` callbacks while you pinch.
-
-::: warning Beware iOS users
-Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
-:::
 
 ### onTap
 | Type | Default | Required | Additional Info |
