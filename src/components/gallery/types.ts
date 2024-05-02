@@ -8,7 +8,9 @@ export type GalleryProps<T = unknown> = {
   maxScale?: number | SizeVector<number>[];
   initialIndex?: number;
   windowSize?: number;
-  onTap?: (e: TapGestureEvent) => void;
+  tapOnEdgeToItem?: boolean;
+  allowPinchPanning?: boolean;
+  onTap?: (e: TapGestureEvent, index: number) => void;
   onIndexChange?: (index: number) => void;
   onScroll?: (scroll: number, contentOffset: number) => void;
 };

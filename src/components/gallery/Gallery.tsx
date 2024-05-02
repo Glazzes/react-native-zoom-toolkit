@@ -1,7 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { Platform, StyleSheet, type LayoutChangeEvent } from 'react-native';
 import {
-  clamp,
   runOnJS,
   useAnimatedReaction,
   useDerivedValue,
@@ -11,11 +10,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
+import { clamp } from '../../commons/utils/clamp';
 
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
 import type { GalleryProps, GalleryType } from './types';
-import { getMaxScale } from '../../commons/utils/getMaxScale';
 
 const Gallery = <T extends unknown>(
   props: GalleryProps<T>,
@@ -28,6 +28,8 @@ const Gallery = <T extends unknown>(
     initialIndex = 0,
     windowSize = 5,
     maxScale: userMaxScale = 6,
+    tapOnEdgeToItem = true,
+    allowPinchPanning = Platform.OS !== 'ios',
     onIndexChange,
     onScroll,
     onTap: onUserTap,
@@ -143,6 +145,7 @@ const Gallery = <T extends unknown>(
         activeIndex={activeIndex}
         resetIndex={resetIndex}
         fetchIndex={fetchIndex}
+        maxScale={maxScale}
         scroll={scroll}
         scrollOffset={offset}
         rootSize={rootSize}
@@ -151,6 +154,9 @@ const Gallery = <T extends unknown>(
         scale={scale}
         length={data.length}
         isScrolling={isScrolling}
+        allowPinchPanning={allowPinchPanning}
+        tapOnEdgeToItem={tapOnEdgeToItem}
+        onTap={onUserTap}
       />
     </GestureHandlerRootView>
   );

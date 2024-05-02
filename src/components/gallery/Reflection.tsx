@@ -19,6 +19,7 @@ import type {
   BoundsFuction,
   PanGestureEvent,
   SizeVector,
+  TapGestureEvent,
   Vector,
 } from '../../commons/types';
 import { snapPoint } from '../../commons/utils/snapPoint';
@@ -39,6 +40,9 @@ type ReflectionProps = {
   scale: SharedValue<number>;
   maxScale: SharedValue<number>;
   isScrolling: SharedValue<boolean>;
+  tapOnEdgeToItem: boolean;
+  allowPinchPanning: boolean;
+  onTap?: (e: TapGestureEvent, index: number) => void;
 };
 
 const Reflection = ({
@@ -54,6 +58,9 @@ const Reflection = ({
   scale,
   maxScale,
   isScrolling,
+  tapOnEdgeToItem,
+  allowPinchPanning,
+  onTap,
 }: ReflectionProps) => {
   const [enabled, setEnabled] = useState<boolean>(true);
   const toggleGestures = (value: boolean) => setEnabled(value);
@@ -196,8 +203,8 @@ const Reflection = ({
         origin: { x: origin.x.value, y: origin.y.value },
         offset: { x: offset.x.value, y: offset.y.value },
         delta: {
-          x: delta.x.value * scaleOffset.value,
-          y: delta.y.value * scaleOffset.value,
+          x: allowPinchPanning ? delta.x.value * scaleOffset.value : 0,
+          y: allowPinchPanning ? delta.y.value * scaleOffset.value : 0,
         },
       });
 
@@ -227,7 +234,10 @@ const Reflection = ({
           fromScale: scale.value,
           origin: { x: origin.x.value, y: origin.y.value },
           offset: { x: translate.x.value, y: translate.y.value },
-          delta: { x: 0, y: -1 * delta.y.value * scaleDiff },
+          delta: {
+            x: 0,
+            y: allowPinchPanning ? -1 * delta.y.value * scaleDiff : 0,
+          },
         });
 
         const { x: boundX, y: boundY } = boundsFn(maxScale.value);
@@ -335,8 +345,14 @@ const Reflection = ({
     .runOnJS(true)
     .onEnd((e) => {
       let toIndex = activeIndex.value;
-      if (e.x <= 44) toIndex = activeIndex.value - 1;
-      if (e.x >= rootSize.width.value - 44) toIndex = activeIndex.value + 1;
+      if (e.x <= 44 && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
+      if (e.x >= rootSize.width.value - 44 && tapOnEdgeToItem)
+        toIndex = activeIndex.value + 1;
+
+      if (toIndex === activeIndex.value) {
+        onTap?.(e, activeIndex.value);
+        return;
+      }
 
       toIndex = clamp(toIndex, 0, length - 1);
       scroll.value = toIndex * rootSize.width.value;
