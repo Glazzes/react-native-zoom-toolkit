@@ -30,7 +30,6 @@ Its usage is pretty straight forward, just wrap a component of your choice with 
 ```jsx
 import React from 'react';
 import { Image, View, useWindowDimensions } from 'react-native';
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { ResumableZoom, getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
 
 const uri = 'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg'
@@ -59,7 +58,7 @@ const App = () => {
   )
 }
 
-export default gestureHandlerRootHOC(App);
+export default App;
 ```
 
 ## Properties
@@ -119,10 +118,10 @@ Whether to apply a decay animation when the pan gesture ends or not.
 ### panWithPinch
 | Type | Default |
 |------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
+| `boolean` | `true` | 
 
 ::: warning Beware iOS users
-This feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
 
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::

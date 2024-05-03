@@ -146,10 +146,10 @@ Select which one of the two available scale modes to use.
 ### panWithPinch
 | Type | Default | Required |
 |------|---------|----------|
-| `boolean` | `true in Android` and `false in iOS` | `No` | 
+| `boolean` | `true` | `No` | 
 
 ::: warning Beware iOS users
-This feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
 
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::

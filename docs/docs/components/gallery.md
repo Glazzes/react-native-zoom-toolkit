@@ -163,10 +163,10 @@ Allow the user to go to the next or previous item by tapping the horizontal edge
 ### allowPinchPanning
 | Type | Default |
 |------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
+| `boolean` | `true` | 
 
 ::: warning Beware iOS users
-This feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
 
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
