@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Platform, StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import {
   runOnJS,
   useAnimatedReaction,
@@ -16,6 +16,7 @@ import { clamp } from '../../commons/utils/clamp';
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
 import type { GalleryProps, GalleryType } from './types';
+import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 
 const Gallery = <T extends unknown>(
   props: GalleryProps<T>,
@@ -29,12 +30,13 @@ const Gallery = <T extends unknown>(
     windowSize = 5,
     maxScale: userMaxScale = 6,
     tapOnEdgeToItem = true,
-    allowPinchPanning = Platform.OS !== 'ios',
+    allowPinchPanning: pinchPanning,
     onIndexChange,
     onScroll,
     onTap: onUserTap,
   } = props;
 
+  const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
   const nextItems = Math.floor(windowSize / 2);
 
   const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);

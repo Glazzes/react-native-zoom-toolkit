@@ -1,5 +1,5 @@
 import React, { useImperativeHandle } from 'react';
-import { Platform, StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
@@ -29,6 +29,7 @@ import type {
   ResumableZoomType,
   ResumableZoomAssignableState,
 } from './types';
+import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
 
@@ -47,7 +48,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = PanMode.CLAMP,
     scaleMode = ScaleMode.BOUNCE,
-    panWithPinch = Platform.OS !== 'ios',
+    panWithPinch: pinchPanning,
     onTap,
     onGestureActive,
     onGestureEnd,
@@ -59,6 +60,8 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onPanEnd: onUserPanEnd,
     onHorizontalBoundsExceeded,
   } = props;
+
+  const panWithPinch = pinchPanning ?? getPanWithPinchStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);

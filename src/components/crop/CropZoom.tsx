@@ -1,5 +1,5 @@
 import React, { useImperativeHandle } from 'react';
-import { Platform, StyleSheet, View, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, {
   clamp,
   useAnimatedStyle,
@@ -31,6 +31,7 @@ import {
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 import { RAD2DEG } from '../../commons/constants';
+import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';
@@ -49,7 +50,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
-    panWithPinch = Platform.OS !== 'ios',
+    panWithPinch: pinchPanning,
     mode = CropMode.MANAGED,
     onGestureActive,
     onGestureEnd,
@@ -60,6 +61,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onTap,
   } = props;
+
+  const panWithPinch = pinchPanning ?? getPanWithPinchStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
