@@ -1,11 +1,11 @@
 ---
 title: Resumable Zoom
-description: An ideal component for detail screens and galleries.
+description: An ideal component for detail screens.
 outline: deep
 ---
 
 # ResumableZoom
-An ideal and practical component for detail and gallery screens, all gestures are resumable and will pick up where you left in your last interaction with the component.
+An ideal and practical component for detail screens, all gestures are resumable and will pick up where you left in your last interaction with the component.
 
 Among its more remarkable features you will find:
 - **Pan Gesture:** Drag and your components around in three different modes, optionally let your component slide with a decay animation.
