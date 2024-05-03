@@ -96,7 +96,8 @@ const Gallery = <T extends unknown>(
   const setIndex = (index: number) => {
     const clamped = clamp(index, 0, data.length);
     activeIndex.value = clamped;
-    scroll.value = index * rootSize.width.value;
+    fetchIndex.value = clamped;
+    scroll.value = clamped * rootSize.width.value;
   };
 
   const requestState = () => ({
