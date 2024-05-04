@@ -64,19 +64,24 @@ export default App;
 ## Properties
 All properties for this component are optional.
 
-### hitslop
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
-
-Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
-
 ### extendGestures
 | Type | Default | 
 |------|---------|
 | `boolean` | `false` |
 
 By default the gesture detection area is located around the wrapped component, by setting this property to `true`, the detection area is now increased to the whole space occupied by `ResuambleZoom`.
+
+### hitslop
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
+
+::: warning Depreacted
+This property has been depreacted in favor of `extendGestures` property and will be removed in the
+next major release.
+:::
+
+Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
 ### minScale
 | Type | Default | 

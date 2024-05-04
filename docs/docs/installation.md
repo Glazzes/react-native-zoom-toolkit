@@ -22,7 +22,7 @@ yarn add react-native-zoom-toolkit
 This library relies on both Reanimated and Gesture Handler being part of your project, if you do not have them installed already please refer to [Reanimated](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/) and [Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation) installation guides.
 
 ::: warning Beware iOS users
-Dragging the components around as you pinch has been disabled by default for iOS users, and must enabled manually for the respective component you opt in to use, this will require a version of Gesture Handler greater than equals `2.16.0`.
+Dragging the components around as you pinch is disabled by default for iOS users unless you install a version of Gesture Handler greater than equals `2.16.0`.
 
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
