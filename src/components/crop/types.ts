@@ -9,16 +9,7 @@ import type {
 } from '../../commons/types';
 
 export enum CropMode {
-  /**
-   * @description Mode designed for common uses cases.
-   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
-   */
   MANAGED = 'managed',
-
-  /**
-   * @description Mode designed for complex use cases, provides a barebones component.
-   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
-   */
   OVERLAY = 'overlay',
 }
 
@@ -116,40 +107,11 @@ export type CropZoomType = {
 export type CropGestureEventCallBack = (event: CropZoomState) => void;
 
 export type CropZoomProps = React.PropsWithChildren<{
-  /** @description Size of the cropping area. */
   cropSize: SizeVector<number>;
-
-  /**
-   * @description Resolution of your image/video or how big whatever you are trying to crop really is.
-   */
   resolution: SizeVector<number>;
-
-  /**
-   * @description Highlights the cropping area with a red-ish color as well as the gesture detection
-   * area with a light green color.
-   * @default false
-   */
   debug?: boolean;
-
-  /**
-   * @description Select which one of the two available modes to use.
-   * @default CropMode.MANAGED
-   */
   mode?: CropMode;
-
-  /**
-   * @description Worklet callback triggered as the user interacts with the component, it also means
-   * interacting through its methods.
-   * @param e Internal state of the gesture.
-   * @see https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/
-   * @see https://glazzes.github.io/react-native-zoom-toolkit/components/cropzoom.html#cropcontextresult
-   */
   onGestureActive?: CropGestureEventCallBack;
-
-  /**
-   * @description A function that returns a React Component, such component will sit between your
-   * desired component to crop and the gesture detector.
-   */
   OverlayComponent?: () => React.ReactElement<any>;
 }> &
   PanGestureCallbacks &
