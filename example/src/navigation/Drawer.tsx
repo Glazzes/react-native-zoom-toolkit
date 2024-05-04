@@ -15,7 +15,7 @@ const barHeight = Constans.statusBarHeight;
 
 const screens = [
   { name: 'ResumableZoom Example', screen: 'index' },
-  { name: 'ResumableZoom Gallery Example', screen: 'resumablegallery' },
+  { name: 'Gallery Example', screen: 'resumablegallery' },
   { name: 'CropZoom Managed Example', screen: 'cropmanaged' },
   { name: 'CropZoom Skia Example', screen: 'cropoverlay' },
   { name: 'SnapbackZoom Example', screen: 'snapback' },

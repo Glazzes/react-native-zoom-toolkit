@@ -7,6 +7,9 @@ export type * from './components/resumable/types';
 export { default as CropZoom } from './components/crop/CropZoom';
 export * from './components/crop/types';
 
+export { default as Gallery } from './components/gallery/Gallery';
+export type * from './components/gallery/types';
+
 export { PanMode, ScaleMode } from './commons/types';
 export type {
   Vector,

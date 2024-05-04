@@ -12,7 +12,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      {text: '1.1.0', items: [
+      {text: '1.2.0', items: [
         {text: 'Releases', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/releases'},
         {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/blob/main/CONTRIBUTING.md'},
       ]}
@@ -30,7 +30,8 @@ export default defineConfig({
         items: [
           {text: 'SnapbackZoom', link: '/components/snapbackzoom'},
           {text: 'ResumableZoom', link: '/components/resumablezoom'},
-          {text: 'CropZoom', link: '/components/cropzoom'}
+          {text: 'CropZoom', link: '/components/cropzoom'},
+          {text: 'Gallery', link: '/components/gallery'}
         ]
       },
       {

@@ -1,11 +1,11 @@
 ---
 title: Resumable Zoom
-description: An ideal component for detail screens and galleries.
+description: An ideal component for detail screens.
 outline: deep
 ---
 
 # ResumableZoom
-An ideal and practical component for detail and gallery screens, all gestures are resumable and will pick up where you left in your last interaction with the component.
+An ideal and practical component for detail screens, all gestures are resumable and will pick up where you left in your last interaction with the component.
 
 Among its more remarkable features you will find:
 - **Pan Gesture:** Drag and your components around in three different modes, optionally let your component slide with a decay animation.
@@ -30,7 +30,6 @@ Its usage is pretty straight forward, just wrap a component of your choice with 
 ```jsx
 import React from 'react';
 import { Image, View, useWindowDimensions } from 'react-native';
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { ResumableZoom, getAspectRatioSize, useImageResolution } from 'react-native-zoom-toolkit';
 
 const uri = 'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg'
@@ -52,23 +51,35 @@ const App = () => {
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <ResumableZoom>
+      <ResumableZoom maxScale={resolution}>
         <Image source={{uri}} style={imageSize} resizeMethod={'scale'} />
       </ResumableZoom>
     </View>
   )
 }
 
-export default gestureHandlerRootHOC(App);
+export default App;
 ```
 
 ## Properties
 All properties for this component are optional.
 
+### extendGestures
+| Type | Default | 
+|------|---------|
+| `boolean` | `false` |
+
+By default the gesture detection area is located around the wrapped component, by setting this property to `true`, the detection area is now increased to the whole space occupied by `ResuambleZoom`.
+
 ### hitslop
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
+
+::: warning Depreacted
+This property has been depreacted in favor of `extendGestures` property and will be removed in the
+next major release.
+:::
 
 Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
@@ -112,15 +123,17 @@ Whether to apply a decay animation when the pan gesture ends or not.
 ### panWithPinch
 | Type | Default |
 |------|---------|
-| `boolean` | `true in Android` and `false in iOS` | 
-
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
-
-This feature is not associated with a pan gesture, therefore it won't trigger the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
+| `boolean` | `true` | 
 
 ::: warning Beware iOS users
-Due to the lack of decimal places for the focal point in iOS devices (see this [GH's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10)), this feature is disabled by default for iOS users, if you want to enable it, install a version of React Native Gesture Handler greater than equals `2.16.0`.
+This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
+
+For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
+
+Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
+
+This feature is not a pan gesture, therefore it won't trigger any of the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
 
 ### panEnabled
 | Type | Default |

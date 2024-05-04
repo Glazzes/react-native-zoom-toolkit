@@ -1,5 +1,5 @@
 import React, { useImperativeHandle } from 'react';
-import { Platform, StyleSheet, View, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, {
   clamp,
   useAnimatedStyle,
@@ -7,7 +7,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { getCropRotatedSize } from '../../commons/utils/getCropRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
@@ -27,6 +31,7 @@ import {
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 import { RAD2DEG } from '../../commons/constants';
+import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';
@@ -45,7 +50,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
-    panWithPinch = Platform.OS !== 'ios',
+    panWithPinch: pinchPanning,
     mode = CropMode.MANAGED,
     onGestureActive,
     onGestureEnd,
@@ -56,6 +61,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onTap,
   } = props;
+
+  const panWithPinch = pinchPanning ?? getPanWithPinchStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
@@ -131,7 +138,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
     usePinchCommons({
-      detector,
+      container,
       detectorTranslate,
       detectorScale,
       translate,
@@ -382,7 +389,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   if (mode === CropMode.MANAGED) {
     return (
-      <View style={[root, styles.root]}>
+      <GestureHandlerRootView style={[root, styles.root]}>
         <View style={[cropStyle, styles.center]}>
           <Animated.View style={containerStyle}>{children}</Animated.View>
           <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
@@ -395,18 +402,18 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
         <GestureDetector gesture={Gesture.Race(pinch, pan, tap)}>
           <Animated.View style={detectorStyle} />
         </GestureDetector>
-      </View>
+      </GestureHandlerRootView>
     );
   }
 
   return (
-    <View style={[cropStyle, styles.center]}>
+    <GestureHandlerRootView style={[cropStyle, styles.center]}>
       <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
 
       <GestureDetector gesture={Gesture.Race(pinch, pan)}>
         <Animated.View style={detectorStyle} />
       </GestureDetector>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 

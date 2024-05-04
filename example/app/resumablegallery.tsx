@@ -1,5 +1,5 @@
 import React from 'react';
-import ResumableGalleryExample from '../src/resumable/gallery/ResumableGalleryExample';
+import ResumableGalleryExample from '../src/gallery/GalleryExample';
 
 const resumablegallery = () => {
   return <ResumableGalleryExample />;

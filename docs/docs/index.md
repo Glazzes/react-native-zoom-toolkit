@@ -27,4 +27,8 @@ features:
   - title: CropZoom
     details: An ideal and unopinionated component for image and video cropping needs.
     link: /components/cropzoom
+
+  - title: Gallery
+    details: A practical gallery component which mimics Telegram's gallery behavior.
+    link: /components/gallery
 ---

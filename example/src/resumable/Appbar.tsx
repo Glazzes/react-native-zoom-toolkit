@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedStyle,
   type SharedValue,
 } from 'react-native-reanimated';
-import { theme } from '../../constants';
+import { theme } from '../constants';
 import { useRouter } from 'expo-router';
 
 type AppbarProps = {

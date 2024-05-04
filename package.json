@@ -52,6 +52,7 @@
     "crop-zoom",
     "zoom-view",
     "image-cropper",
+    "gallery",
     "pinch",
     "pan",
     "reanimated",
@@ -106,7 +107,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": ">= 2.x.x",
+    "react-native-reanimated": ">= 2.x.x"
   },
   "workspaces": [
     "example",
