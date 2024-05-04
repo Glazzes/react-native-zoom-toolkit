@@ -13,6 +13,15 @@ const iss = [
   'https://bestfriends.org/sites/default/files/styles/hero_mobile/public/hero-dash/Asana3808_Dashboard_Standard.jpg?h=ebad9ecf&itok=cWevo33k',
 ];
 
+const maxScale = [
+  { width: 1600, height: 900 },
+  { width: 480, height: 719 },
+  { width: 1920, height: 1080 },
+  { width: 1650, height: 1099 },
+  { width: 1200, height: 1200 },
+  { width: 660, height: 710 },
+];
+
 const GalleryExample = () => {
   const ref = useRef<GalleryType>(null);
   const activeIndex = useSharedValue<number>(0);
@@ -27,6 +36,7 @@ const GalleryExample = () => {
       data={iss}
       keyExtractor={(item, index) => `${item}-${index}`}
       renderItem={renderItem}
+      maxScale={maxScale}
       onIndexChange={(idx) => {
         activeIndex.value = idx;
       }}
