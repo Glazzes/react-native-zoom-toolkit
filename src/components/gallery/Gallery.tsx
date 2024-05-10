@@ -8,6 +8,7 @@ import {
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
@@ -16,7 +17,6 @@ import { clamp } from '../../commons/utils/clamp';
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
 import type { GalleryProps, GalleryType } from './types';
-import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
 
 const Gallery = <T extends unknown>(
   props: GalleryProps<T>,
@@ -33,7 +33,7 @@ const Gallery = <T extends unknown>(
     allowPinchPanning: pinchPanning,
     onIndexChange,
     onScroll,
-    onTap: onUserTap,
+    onTap,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
@@ -57,14 +57,22 @@ const Gallery = <T extends unknown>(
 
   const maxScale = useDerivedValue(() => {
     if (typeof userMaxScale === 'object') {
+      if (userMaxScale.length === 0) return 6;
+
       return getMaxScale(
         { width: rootChild.width.value, height: rootChild.height.value },
         userMaxScale[activeIndex.value]!
       );
     }
 
-    return userMaxScale;
+    return userMaxScale as number;
   }, [userMaxScale, activeIndex, rootChild]);
+
+  const measureRoot = (e: LayoutChangeEvent) => {
+    rootSize.width.value = e.nativeEvent.layout.width;
+    rootSize.height.value = e.nativeEvent.layout.height;
+    scroll.value = activeIndex.value * e.nativeEvent.layout.width;
+  };
 
   useDerivedValue(() => {
     onScroll?.(
@@ -72,12 +80,6 @@ const Gallery = <T extends unknown>(
       data.length * rootSize.width.value - rootSize.width.value
     );
   }, [scroll.value, rootSize, data.length]);
-
-  const measureRoot = (e: LayoutChangeEvent) => {
-    rootSize.width.value = e.nativeEvent.layout.width;
-    rootSize.height.value = e.nativeEvent.layout.height;
-    scroll.value = activeIndex.value * e.nativeEvent.layout.width;
-  };
 
   useAnimatedReaction(
     () => activeIndex.value,
@@ -131,6 +133,8 @@ const Gallery = <T extends unknown>(
             key={key}
             count={data.length}
             index={index}
+            item={item}
+            renderItem={renderItem}
             activeIndex={activeIndex}
             scroll={scroll}
             rootSize={rootSize}
@@ -138,9 +142,7 @@ const Gallery = <T extends unknown>(
             translate={translate}
             scale={scale}
             isScrolling={isScrolling}
-          >
-            {renderItem(item, index)}
-          </GalleryItem>
+          />
         );
       })}
 
@@ -159,7 +161,7 @@ const Gallery = <T extends unknown>(
         isScrolling={isScrolling}
         allowPinchPanning={allowPinchPanning}
         tapOnEdgeToItem={tapOnEdgeToItem}
-        onTap={onUserTap}
+        onTap={onTap}
       />
     </GestureHandlerRootView>
   );
@@ -168,8 +170,9 @@ const Gallery = <T extends unknown>(
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     overflow: 'hidden',
-    backgroundColor: '#131313',
   },
 });
 
