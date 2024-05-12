@@ -25,10 +25,14 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 ## How to use
 The following example is a full screen image gallery.
 
+::: tip Remember
+Follow React Native's [performance recommendations](https://reactnative.dev/docs/optimizing-flatlist-configuration#list-items) for list components.
+:::
+
 ::: code-group
 
 ```tsx [Gallery.tsx]
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
@@ -40,19 +44,29 @@ const images = [
   'https://i0.wp.com/bcc-newspack.s3.amazonaws.com/uploads/2023/05/052323-Foxes-in-Millennium-Park-Colin-Boyle-9124.jpg?fit=1650%2C1099&ssl=1',
 ];
 
-function renderItem(item: string, index: number) {
-  return <GalleryImage uri={item} index={index} />;
-};
-
 const GalleryExample = () => {
   const ref = useRef<GalleryType>(null);
+
+  // Remember to memoize your callbacks properly to keep a decent performance
+  const renderItem = useCallback((item: string, index: number) => {
+    return <GalleryImage uri={item} index={index} />;
+  }, []);
+
+  const keyExtractor = useCallback((item: string, index: number) => {
+    return `${item}-${index}`;
+  }, []);
+
+  const onTap = useCallback((_, index: number) => {
+    console.log(`Tapped on index ${index}`);
+  }, []);
 
   return (
     <Gallery
       ref={ref}
       data={images}
-      keyExtractor={(item, index) => `${item}-${index}`}
+      keyExtractor={keyExtractor}
       renderItem={renderItem}
+      onTap={onTap}
     />
   );
 };
