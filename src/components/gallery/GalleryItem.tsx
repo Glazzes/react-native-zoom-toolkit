@@ -14,8 +14,10 @@ import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
 import type { SizeVector, Vector } from '../../commons/types';
 
-type GalleryItemProps = React.PropsWithChildren<{
+type GalleryItemProps = {
   index: number;
+  item: any;
+  renderItem: (item: any, index: number) => React.ReactElement;
   count: number;
   scroll: SharedValue<number>;
   activeIndex: SharedValue<number>;
@@ -24,13 +26,14 @@ type GalleryItemProps = React.PropsWithChildren<{
   translate: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
   isScrolling: SharedValue<boolean>;
-}>;
+};
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
-  children,
   count,
   scroll,
   index,
+  item,
+  renderItem,
   activeIndex,
   rootChild,
   rootSize,
@@ -123,7 +126,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
       style={[styles.root, { zIndex: count - index }, animatedStyle]}
     >
       <Animated.View style={childStyle} onLayout={measureChild}>
-        {children}
+        {renderItem(item, index)}
       </Animated.View>
     </Animated.View>
   );
@@ -139,4 +142,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(GalleryItem);
+export default React.memo(GalleryItem, (prev, next) => {
+  return (
+    prev.count === next.count &&
+    prev.index === next.index &&
+    prev.renderItem === next.renderItem
+  );
+});

@@ -388,8 +388,8 @@ const Reflection = ({
     });
 
   const detectorStyle = useAnimatedStyle(() => ({
-    width: rootSize.width.value,
-    height: rootSize.height.value,
+    width: Math.max(rootSize.width.value, rootChild.width.value),
+    height: Math.max(rootSize.height.value, rootChild.height.value),
     position: 'absolute',
     zIndex: Number.MAX_SAFE_INTEGER,
     transform: [
@@ -399,13 +399,20 @@ const Reflection = ({
     ],
   }));
 
+  const composed = Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap));
+
   return (
-    <GestureDetector
-      gesture={Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap))}
-    >
+    <GestureDetector gesture={composed}>
       <Animated.View style={detectorStyle} />
     </GestureDetector>
   );
 };
 
-export default React.memo(Reflection);
+export default React.memo(Reflection, (prev, next) => {
+  return (
+    prev.onTap === next.onTap &&
+    prev.length === next.length &&
+    prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
+    prev.allowPinchPanning === next.allowPinchPanning
+  );
+});

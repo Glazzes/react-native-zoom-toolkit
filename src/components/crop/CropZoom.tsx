@@ -138,7 +138,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
     usePinchCommons({
-      container,
+      container: detector,
       detectorTranslate,
       detectorScale,
       translate,
