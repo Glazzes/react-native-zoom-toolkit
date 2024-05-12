@@ -1,57 +1,58 @@
 import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { getAspectRatioSize } from 'react-native-zoom-toolkit';
 import {
   runOnJS,
-  useDerivedValue,
+  useAnimatedReaction,
   type SharedValue,
 } from 'react-native-reanimated';
+import { type Asset } from 'expo-media-library';
+
+import { getAspectRatioSize } from 'react-native-zoom-toolkit';
 
 type GalleryImageProps = {
-  uri: string;
+  asset: Asset;
   index: number;
   activeIndex: SharedValue<number>;
 };
 
 const GalleryImage: React.FC<GalleryImageProps> = ({
-  uri,
+  asset,
   index,
   activeIndex,
 }) => {
-  const [allowD, setAllowD] = useState<boolean>(true);
+  const [downScale, setDownScale] = useState<boolean>(true);
   const { width, height } = useWindowDimensions();
-  const [resolution, setResolution] = useState<{
-    width: number;
-    height: number;
-  }>({
-    width: 1,
-    height: 1,
-  });
 
-  const size = getAspectRatioSize({
-    aspectRatio: (resolution?.width ?? 1) / (resolution?.height ?? 1),
+  const phoneRatio = width / height;
+  const pictureRatio = asset.width / asset.height;
+  let size = getAspectRatioSize({
+    aspectRatio: pictureRatio,
     width: height > width ? width : undefined,
     height: height > width ? undefined : height,
   });
 
-  useDerivedValue(() => {
-    runOnJS(setAllowD)(!(index === activeIndex.value));
-  }, [index, activeIndex]);
+  if (pictureRatio > phoneRatio && phoneRatio > 1) {
+    size = getAspectRatioSize({ aspectRatio: pictureRatio, width });
+  }
 
-  return (
-    <Image
-      source={{ uri }}
-      style={size}
-      allowDownscaling={allowD}
-      onLoad={(e) => {
-        setResolution({
-          width: e.source.width,
-          height: e.source.height,
-        });
-      }}
-    />
+  if (pictureRatio < phoneRatio && phoneRatio < 1) {
+    size = getAspectRatioSize({ aspectRatio: pictureRatio, height });
+  }
+
+  const wrapper = (active: number) => {
+    if (index === active) setDownScale(false);
+    if (index === active - 1 && !downScale) setDownScale(true);
+    if (index === active + 1 && !downScale) setDownScale(true);
+  };
+
+  useAnimatedReaction(
+    () => activeIndex.value,
+    (value) => runOnJS(wrapper)(value),
+    [activeIndex]
   );
+
+  return <Image source={asset.uri} style={size} allowDownscaling={downScale} />;
 };
 
 export default GalleryImage;
