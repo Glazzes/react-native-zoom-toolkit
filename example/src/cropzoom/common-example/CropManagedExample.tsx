@@ -42,7 +42,11 @@ const CropManagedExample = ({}) => {
         resolution={resolution}
         OverlayComponent={renderOverlay}
       >
-        <Image source={{ uri: IMAGE }} style={styles.image} />
+        <Image
+          source={{ uri: IMAGE }}
+          style={styles.image}
+          resizeMethod="scale"
+        />
       </CropZoom>
 
       {/*
@@ -70,7 +74,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   image: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
   },
 });
 

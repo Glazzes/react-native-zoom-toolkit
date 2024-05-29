@@ -4,12 +4,12 @@ import type { SizeVector } from '../types';
 type Options = {
   size: SizeVector<number>;
   angle: number;
-  aspectRatio?: number;
+  aspectRatio: number;
 };
 
 export const getCropRotatedSize = (options: Options): SizeVector<number> => {
   'worklet';
-  const { size, angle, aspectRatio = 1 } = options;
+  const { size, angle, aspectRatio } = options;
 
   const sinWidth = Math.abs(size.height * Math.sin(angle));
   const cosWidth = Math.abs(size.width * Math.cos(angle));
@@ -23,6 +23,6 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
   return getAspectRatioSize({
     aspectRatio: aspectRatio,
     width: aspectRatio >= 1 ? undefined : maxWidth,
-    height: aspectRatio > 1 ? maxHeight : undefined,
+    height: aspectRatio >= 1 ? maxHeight : undefined,
   });
 };

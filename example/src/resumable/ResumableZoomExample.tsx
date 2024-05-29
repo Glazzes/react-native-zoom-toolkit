@@ -71,6 +71,7 @@ const ResumableZoomExample: React.FC = ({}) => {
         ref={ref}
         hitSlop={{ vertical: 50 }}
         maxScale={resolution}
+        extendGestures={true}
         onTap={onTap}
       >
         <Image
