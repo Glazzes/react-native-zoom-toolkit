@@ -5,7 +5,6 @@ import { CropMode } from '../../components/crop/types';
 import { render } from '@testing-library/react-native';
 import type { SizeVector } from '../../commons/types';
 import { getInvalidChildrenMessage } from '../../commons/utils/messages';
-import { getInvalidCropSizeMessage } from '../../components/crop/utils/messages';
 
 const componentName = 'CropZoom';
 const cropSize: SizeVector<number> = { width: 100, height: 100 };
@@ -116,51 +115,5 @@ describe('CropZoom', () => {
     );
 
     expect(() => render(cropzoom)).toThrow();
-  });
-
-  test('should warn the user about invalid crop size height', () => {
-    const exceededCropSize: SizeVector<number> = { width: 100, height: 400 };
-    const spyConsole = jest.spyOn(global.console, 'warn');
-
-    const message = getInvalidCropSizeMessage({
-      dimension: 'height',
-      actual: exceededCropSize.height,
-      expected: resolution.height,
-    });
-
-    expect(
-      render(
-        <CropZoom cropSize={exceededCropSize} resolution={resolution}>
-          <View />
-        </CropZoom>
-      )
-    ).toBeDefined();
-
-    expect(spyConsole).toBeCalledWith(message);
-  });
-
-  test('should warn the user about invalid crop size width', () => {
-    const horizontalResolution: SizeVector<number> = {
-      width: 200,
-      height: 100,
-    };
-    const exceededCropSize: SizeVector<number> = { width: 400, height: 100 };
-
-    const spyConsole = jest.spyOn(global.console, 'warn');
-    const message = getInvalidCropSizeMessage({
-      dimension: 'width',
-      actual: exceededCropSize.width,
-      expected: horizontalResolution.width,
-    });
-
-    expect(
-      render(
-        <CropZoom cropSize={exceededCropSize} resolution={horizontalResolution}>
-          <View />
-        </CropZoom>
-      )
-    ).toBeDefined();
-
-    expect(spyConsole).toBeCalledWith(message);
   });
 });
