@@ -19,7 +19,7 @@ import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
 import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
-import { canvasToSize } from './utils/canvasToSize';
+import { crop } from '../../commons/utils/crop';
 import {
   CropMode,
   type CropZoomProps,
@@ -94,8 +94,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   useDerivedValue(() => {
     const size = getCropRotatedSize({
-      size: cropSize,
-      aspectRatio: resolution.width / resolution.height,
+      crop: cropSize,
+      resolution: resolution,
       angle: sizeAngle.value,
     });
 
@@ -304,7 +304,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
-    return canvasToSize({
+    return crop({
       cropSize: cropSize,
       resolution: resolution,
       canvas: { width: container.width.value, height: container.height.value },

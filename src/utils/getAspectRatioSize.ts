@@ -24,13 +24,13 @@ export default function (options: Options): SizeVector<number> {
 
   if (maxWidth !== undefined) {
     return {
-      width: maxWidth,
-      height: maxWidth / aspectRatio,
+      width: Math.floor(maxWidth),
+      height: Math.floor(maxWidth / aspectRatio),
     };
   }
 
   return {
-    width: Math.round(maxHeight! * aspectRatio),
-    height: Math.round(maxHeight!),
+    width: Math.floor(maxHeight! * aspectRatio),
+    height: Math.floor(maxHeight!),
   };
 }
