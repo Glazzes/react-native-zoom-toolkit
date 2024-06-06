@@ -26,7 +26,9 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 The following example is a full screen image gallery.
 
 ::: tip Remember
-Follow React Native's [performance recommendations](https://reactnative.dev/docs/optimizing-flatlist-configuration#list-items) for list components.
+- Follow React Native's [performance recommendations](https://reactnative.dev/docs/optimizing-flatlist-configuration#list-items) for list components.
+
+- Each cell is as big as the size of the `Gallery` component itself.
 :::
 
 ::: code-group

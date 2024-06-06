@@ -52,7 +52,13 @@ const GalleryImage: React.FC<GalleryImageProps> = ({
     [activeIndex]
   );
 
-  return <Image source={asset.uri} style={size} allowDownscaling={downScale} />;
+  return (
+    <Image
+      source={{ uri: asset.uri }}
+      style={size}
+      allowDownscaling={downScale}
+    />
+  );
 };
 
 export default GalleryImage;
