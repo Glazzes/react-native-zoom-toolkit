@@ -20,26 +20,26 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 </div>
 
 ## How to use
-Its usage is pretty straight forward, import SnapBackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
+Its usage is pretty straight forward, import SnapbackZoom component from `react-native-zoom-toolkit` and wrap a component of your choice with it.
 
 ::: tip Tip
-Do not use `position: "absolute"` in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapBackZoom` within a absolute positioned view if you need so.
+Do not use `position: "absolute"` in the wrapped component by `SnapbackZoom` as it messes up with pinch gesture's measurement, wrap `SnapbackZoom` within a absolute positioned view if you need so.
 :::
 
 ```jsx
-import { SnapBackZoom } from "react-native-zoom-toolkit"
+import { SnapbackZoom } from "react-native-zoom-toolkit"
 
 // Simple use case
-<SnapBackZoom>
+<SnapbackZoom>
   <Image // <= This could be an Expo image or a Video
     source={{ uri: IMAGE }}
     style={{ width: 200, height: 200 }}
     resizeMethod={"scale"} // <= Very important for images in Android do not forget it
     resizeMode={"cover"}/>
-</SnapBackZoom>
+</SnapbackZoom>
 
 // Complex use case
-<SnapBackZoom
+<SnapbackZoom
   hitSlop={{ vertical: 50, horizontal: 50 }}
   timingConfig={{ duration: 150, easing: Easing.linear }}
   onTap={(e) => console.log(e)}
@@ -56,7 +56,7 @@ import { SnapBackZoom } from "react-native-zoom-toolkit"
       style={{ width: 200, height: 200 }}
       resizeMethod={"scale"} // <= Very important for images in Android do not forget it
       resizeMode={"cover"}/>
-</SnapBackZoom>
+</SnapbackZoom>
 ```
 
 ## Properties
@@ -85,7 +85,7 @@ Be realistic with the timing configuration you use as you will not be able to re
 |------|---------|-----------------|
 | `ResizeConfig` | `undefined` | see [notes](#notes) |
 
-Dynamically recalculates `SnapBackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases.
+Dynamically recalculates `SnapbackZoom` component's `width` and `height` style properties to align with a given `aspect ratio` based on a `scale` value as the gesture scale increases.
 
 ### gesturesEnabled
 | Type | Default |
@@ -151,7 +151,7 @@ Imagine you've got a lot of images you want to display as tiles of 200x200 pixel
 ```
 
 ::: tip Important
-`SnapbackZoom` resizes its own dimensions not your component's ones, remember to use `{width: '100%', height: '100%'}` for images and videos so they cover the entire area of `SnapBackZoom` as it resizes.
+`SnapbackZoom` resizes its own dimensions not your component's ones, remember to use `{width: '100%', height: '100%'}` for images and videos so they cover the entire area of `SnapbackZoom` as it resizes.
 :::
 
 At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.
