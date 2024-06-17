@@ -47,7 +47,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     resolution,
     debug = false,
     minScale = 1,
-    maxScale: userMaxScale = -1,
+    maxScale: userMaxScale,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
     allowPinchPanning: pinchPanning,
@@ -89,7 +89,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       resolution
     );
 
-    return userMaxScale < 0 ? scaleValue : userMaxScale;
+    return userMaxScale ?? scaleValue;
   }, [container, userMaxScale, resolution]);
 
   useDerivedValue(() => {

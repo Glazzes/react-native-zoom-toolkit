@@ -30,13 +30,11 @@ export default function withCropValidation<T, P extends CropZoomProps>(
     }
 
     if (minScale !== undefined && minScale < 1) {
-      throw new Error('minScale must be greater than or equals one');
+      throw new Error('minScale property must be greater than or equals one');
     }
 
-    if (maxScale !== undefined && maxScale >= 0 && maxScale < 1) {
-      throw new Error(
-        'maxScale must be greater than one, or a negative number in order to infer the max scale'
-      );
+    if (maxScale !== undefined && maxScale < 1) {
+      throw new Error('maxScale property must be greater than or equals one');
     }
 
     if (
@@ -44,7 +42,7 @@ export default function withCropValidation<T, P extends CropZoomProps>(
       maxScale !== undefined &&
       minScale > maxScale
     ) {
-      throw new Error('minScale must not be greater than or equals maxScale');
+      throw new Error('minScale property must not be greater than maxScale');
     }
 
     return <WrappedComponent {...props} reference={ref} />;
