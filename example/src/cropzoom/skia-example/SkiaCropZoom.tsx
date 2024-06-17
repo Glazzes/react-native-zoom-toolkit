@@ -9,7 +9,7 @@ import {
   ColorMatrix,
   Lerp,
   useCanvasRef,
-  type Transforms2d,
+  type Transforms3d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
 
@@ -80,7 +80,7 @@ const SkiaCropZoom: React.FC = ({}) => {
     [height, screenHeight]
   );
 
-  const transform = useDerivedValue<Transforms2d>(() => {
+  const transform = useDerivedValue<Transforms3d>(() => {
     return [
       { translateX: translate.x.value },
       { translateY: translate.y.value },
