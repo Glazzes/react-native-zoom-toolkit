@@ -37,7 +37,7 @@ type PinchOptions = {
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
   panMode: PanMode;
-  panWithPinch: boolean;
+  allowPinchPanning: boolean;
   userCallbacks: Partial<{
     onGestureEnd: () => void;
     onPinchStart: PinchGestureEventCallback;
@@ -62,7 +62,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     maxScale,
     scaleMode,
     panMode,
-    panWithPinch,
+    allowPinchPanning,
     origin,
     boundFn,
     userCallbacks,
@@ -116,8 +116,8 @@ export const usePinchCommons = (options: PinchOptions) => {
       origin: { x: origin.x.value, y: origin.y.value },
       offset: { x: offset.x.value, y: offset.y.value },
       delta: {
-        x: panWithPinch ? delta.x.value * scaleOffset.value : 0,
-        y: panWithPinch ? delta.y.value * scaleOffset.value : 0,
+        x: allowPinchPanning ? delta.x.value * scaleOffset.value : 0,
+        y: allowPinchPanning ? delta.y.value * scaleOffset.value : 0,
       },
     });
 
@@ -195,7 +195,7 @@ export const usePinchCommons = (options: PinchOptions) => {
         fromScale: scale.value,
         origin: { x: origin.x.value, y: origin.y.value },
         offset: { x: translate.x.value, y: translate.y.value },
-        delta: { x: 0, y: panWithPinch ? -delta.y.value * scaleDiff : 0 },
+        delta: { x: 0, y: allowPinchPanning ? -delta.y.value * scaleDiff : 0 },
       });
 
       const { x: boundX, y: boundY } = boundFn(maxScale.value);

@@ -50,7 +50,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale = -1,
     scaleMode = ScaleMode.BOUNCE,
     panMode = PanMode.FREE,
-    panWithPinch: pinchPanning,
+    allowPinchPanning: pinchPanning,
     mode = CropMode.MANAGED,
     onGestureActive,
     onGestureEnd,
@@ -62,7 +62,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onTap,
   } = props;
 
-  const panWithPinch = pinchPanning ?? getPanWithPinchStatus();
+  const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
@@ -149,7 +149,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       minScale,
       maxScale,
       delta,
-      panWithPinch,
+      allowPinchPanning,
       scaleMode,
       panMode,
       boundFn: boundsFn,

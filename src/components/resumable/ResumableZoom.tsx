@@ -48,7 +48,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = PanMode.CLAMP,
     scaleMode = ScaleMode.BOUNCE,
-    panWithPinch: pinchPanning,
+    allowPinchPanning: pinchPanning,
     onTap,
     onGestureActive,
     onGestureEnd,
@@ -61,7 +61,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onHorizontalBoundsExceeded,
   } = props;
 
-  const panWithPinch = pinchPanning ?? getPanWithPinchStatus();
+  const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
@@ -139,7 +139,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       minScale,
       maxScale,
       delta,
-      panWithPinch,
+      allowPinchPanning,
       scaleMode,
       panMode,
       boundFn: boundsFn,
