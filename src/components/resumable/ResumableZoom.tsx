@@ -22,7 +22,6 @@ import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { PanMode, ScaleMode, type BoundsFuction } from '../../commons/types';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
-import { DEFAULT_HITSLOP } from '../../commons/constants';
 import type {
   ResumableZoomState,
   ResumableZoomProps,
@@ -39,7 +38,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const {
     children,
     extendGestures = false,
-    hitSlop = DEFAULT_HITSLOP,
     decay = true,
     tapsEnabled = true,
     panEnabled = true,
@@ -183,14 +181,12 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const pinch = Gesture.Pinch()
     .enabled(pinchEnabled)
-    .hitSlop(hitSlop)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
     .enabled(panEnabled && gesturesEnabled)
-    .hitSlop(hitSlop)
     .maxPointers(1)
     .onStart(onPanStart)
     .onChange(onPanChange)
@@ -200,7 +196,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
-    .hitSlop(hitSlop)
     .runOnJS(true)
     .onEnd((e) => onTap?.(e));
 
@@ -208,7 +203,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
-    .hitSlop(hitSlop)
     .onEnd((e) => {
       const originX = e.x - extendedSize.width.value / 2;
       const originY = e.y - extendedSize.height.value / 2;

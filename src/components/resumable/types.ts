@@ -1,7 +1,6 @@
 import type React from 'react';
 import type {
   CommonResumableProps,
-  CommonZoomProps,
   PanGestureCallbacks,
   PinchGestureCallbacks,
   SizeVector,
@@ -31,13 +30,13 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   maxScale?: SizeVector<number> | number;
   onSwipe?: (direction: SwipeDirection) => void;
   onGestureActive?: (e: ResumableZoomState) => void;
+  onGestureEnd?: (() => void) | undefined;
   onHorizontalBoundsExceeded?: (exceededBy: number) => void;
 }> &
   PanGestureCallbacks &
   PinchGestureCallbacks &
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
-  Omit<CommonResumableProps, 'maxScale'> &
-  Omit<CommonZoomProps, 'timingConfig'>;
+  Omit<CommonResumableProps, 'maxScale'>;
 
 export type ResumableZoomType = {
   /**
