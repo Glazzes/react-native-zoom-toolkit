@@ -55,7 +55,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onPanStart: onUserPanStart,
     onPanEnd: onUserPanEnd,
-    onHorizontalBoundsExceeded,
+    onOverPanning,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
@@ -175,7 +175,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       onGestureEnd,
       onPanStart: onUserPanStart,
       onPanEnd: onUserPanEnd,
-      onHorizontalBoundsExceeded,
+      onOverPanning,
     },
   });
 
@@ -265,7 +265,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       width: extendedSize.width.value,
       height: extendedSize.height.value,
       position: 'absolute',
-      backgroundColor: 'rgba(255, 0, 0, 0.5)',
       transform: [
         { translateX: detectorTranslate.x.value },
         { translateY: detectorTranslate.y.value },

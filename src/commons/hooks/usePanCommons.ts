@@ -42,7 +42,7 @@ type PanCommmonOptions = {
     onSwipe: (direction: SwipeDirection) => void;
     onPanStart: PanGestureEventCallback;
     onPanEnd: PanGestureEventCallback;
-    onHorizontalBoundsExceeded: (value: number) => void;
+    onOverPanning: (x: number, y: number) => void;
   }>;
 };
 
@@ -100,17 +100,19 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toY = e.translationY + offset.y.value;
 
     const toScale = clamp(scale.value, minScale, maxScale.value);
+
     const { x: boundX, y: boundY } = boundFn(toScale);
-    isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
-    isWithinBoundY.value = toY >= -1 * boundY && toY <= boundY;
+    const exceedX = Math.max(0, Math.abs(toX) - boundX);
+    const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
     if (
-      !isWithinBoundX.value &&
-      userCallbacks.onHorizontalBoundsExceeded &&
-      panMode === PanMode.CLAMP
+      (exceedX > 0 || exceedY > 0) &&
+      panMode === PanMode.CLAMP &&
+      userCallbacks.onOverPanning !== undefined
     ) {
-      const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
-      userCallbacks.onHorizontalBoundsExceeded(exceededBy);
+      const ex = Math.sign(toX) * exceedX;
+      const ey = Math.sign(toY) * exceedY;
+      userCallbacks.onOverPanning(ex, ey);
     }
 
     if (panMode === PanMode.FREE) {

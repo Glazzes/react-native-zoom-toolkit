@@ -31,7 +31,7 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   onSwipe?: (direction: SwipeDirection) => void;
   onGestureActive?: (e: ResumableZoomState) => void;
   onGestureEnd?: (() => void) | undefined;
-  onHorizontalBoundsExceeded?: (exceededBy: number) => void;
+  onOverPanning?: (x: number, y: number) => void;
 }> &
   PanGestureCallbacks &
   PinchGestureCallbacks &
