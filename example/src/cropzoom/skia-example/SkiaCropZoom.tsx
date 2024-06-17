@@ -137,7 +137,6 @@ const SkiaCropZoom: React.FC = ({}) => {
           onGestureActive={onGestureActive}
           scaleMode={ScaleMode.BOUNCE}
           panMode={PanMode.FREE}
-          panWithPinch={true}
         />
       </View>
 
