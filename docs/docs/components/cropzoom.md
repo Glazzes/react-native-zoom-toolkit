@@ -8,7 +8,7 @@ outline: deep
 An ideal, practical and unopinionated component for image and video cropping needs, among its features we can find the following:
 
 - **Custom UI:** Build your own custom UI on top of it.
-- **Resuamble:** Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
+- **Resumable:** Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
 - **Barebones:** For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
 - **Fixed size:** Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
 
@@ -68,7 +68,7 @@ if(resolution === undefined) {
 For a detailed managed mode example, see Example App's [CropZoom Managed Example](https://github.com/Glazzes/react-native-zoomable/blob/dev/example/src/cropzoom/common-example/CropManagedExample.tsx)
 
 ### Overlay mode
-In constrast to managed mode, overlay mode is designed to provide a barebones component with the very minimum necessary to work for complex use cases; it provides the crop and gesture detection areas only.
+In contrast to managed mode, overlay mode is designed to provide a barebones component with the very minimum necessary to work for complex use cases; it provides the crop and gesture detection areas only.
 
 There are some things to keep in mind
 
@@ -109,11 +109,11 @@ Resolution of your image, video or how big whatever you are trying to crop reall
 |------|---------|----------|
 | `boolean` | `false` | `No`    |
 
-Highlights the cropping area with a red-ish color as well as the gesture detection area with a light green color, use it to align your `OverlayComponent` with the crop area properly.
-
 ::: tip Note
 In case you're color blind and/or have any trouble differentiating colors, please consider opening an issue suggesting a suitable pair of colors.
 :::
+
+Highlight the cropping area with a red-ish color as well as the gesture detection area with a light green color, use it to align your `OverlayComponent` with the crop area properly.
 
 ### minScale
 | Type | Default | Required | 
@@ -125,9 +125,9 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 ### maxScale
 | Type | Default | Required |
 |------|---------|----------|
-| `number` | `-1` | `No`    |
+| `number` | `undefined` | `No`    |
 
-Maximum scale value allowed by the pinch gesture, negative values instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
+Maximum scale value allowed by the pinch gesture, leaving this property as `undefined` will instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
 
 ### panMode
 | Type | Default | Required | Additional Info |
@@ -143,7 +143,7 @@ Select which one of the three available pan modes to use.
 
 Select which one of the two available scale modes to use.
 
-### panWithPinch
+### allowPinchPanning
 | Type | Default | Required |
 |------|---------|----------|
 | `boolean` | `true` | `No` | 
@@ -159,39 +159,39 @@ Lets the user drag the component around as they pinch, it also provides a more a
 This feature is not associated with a pan gesture, therefore it won't trigger `onPanStart` and `onPanEnd` callbacks while you pinch.
 
 ### onTap
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `function` | `undefined` | `No` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once.
 
 ### onPanStart
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `function` | `undefined` | `No` |see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-callback triggered when the pan gesture starts, receives pan gesture event as its only argument.
+Callback triggered when the pan gesture starts.
 
 ### onPanEnd
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `function` | `undefined` | `No` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-Callback triggered when the pan gestures ends, receives pan gesture event as its only argument.
+Callback triggered as soon as the user lifts their finger off the screen.
 
 ### onPinchStart
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-callback triggered when the pinch gesture starts, receives pinch gesture event as its only argument.
+Callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `function` | `undefined` | `No` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-Callback triggered as soon as the user lift their fingers off the screen after pinching, receives tap gesture event as its only argument.
+Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
 ### onGestureActive
 | Type | Default | Required | Additional Info |
@@ -200,7 +200,7 @@ Callback triggered as soon as the user lift their fingers off the screen after p
 
 Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
 
-Ideal if you need to mirror its current transformations values to some other component as it updates.
+Ideal if you need to mirror its current transformation values to some other component as it updates.
 
 ### onGestureEnd
 | Type | Default | Required |
@@ -214,11 +214,11 @@ Callback triggered when a pan gesture or a pinch gesture ends, if the gesture fi
 |------|---------|----------|
 | `function` | `undefined` | `No`    |
 
-A function that returns a React Component, such component will sit between your desired component to crop and the gesture detector, for instance you can pass an svg component with a "hole" in it.
-
 ::: tip Condition
-`mode` property must be set to `CropMode.MANAGED` (default value).
+- Only visible if the `mode` property is set to `CropMode.MANAGED` (default value).
 :::
+
+A function that returns a React Component, such component will sit between your desired component to crop and the gesture detector, for instance you can pass an svg component with a hole in it.
 
 
 ## Methods
@@ -246,7 +246,7 @@ Map all the transformations applied to your component into a simple and ready to
 - Returns [CropContextResult](#cropcontextresult)
 
 ::: warning Beware
-If you called this method with the `fixedWidth` argument, resulting crops may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+If you call this method with the `fixedWidth` argument, resulting crops may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
 :::
 
 ### rotate
@@ -299,7 +299,7 @@ Request internal transformation values of this component at the moment of the ca
 - Returns [CropZoomState](#cropzoomstate)
 
 ### assignState
-Assigns the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+Assign the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
 
 - Arguments
 

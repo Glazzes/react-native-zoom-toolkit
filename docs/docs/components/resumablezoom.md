@@ -170,7 +170,7 @@ Callback triggered when the user swipes up, down, left or right.
 |------|---------|-----------------|
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-callback triggered when the pan gesture starts, receives a pan gesture event as its only argument.
+callback triggered when the pan gesture starts.
 
 ### onOverPanning
 | Type | Default | Additional Info |
@@ -183,14 +183,14 @@ callback triggered when the pan gesture starts, receives a pan gesture event as 
 
 Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries.
 
-For the `X` axis you will get negative values from left and positive values from the right, for the `Y` axis positive values going up and negative values going down.
+For the `X` axis you will get negative values from the left and positive values from the right, for the `Y` axis positive values going up and negative values going down.
 
 ### onPanEnd
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-Callback triggered as soon as the user lifts their finger off the screen, receives a pan gesture event as its only argument.
+Callback triggered as soon as the user lifts their finger off the screen.
 
 ### onPinchStart
 | Type | Default | Additional Info |
@@ -213,7 +213,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 
 Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
 
-Ideal if you need to mirror its current transformations values to some other component as it updates.
+Ideal if you need to mirror its current transformation values to some other component as it updates.
 
 ### onGestureEnd
 | Type | Default | 
