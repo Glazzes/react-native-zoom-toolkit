@@ -29,6 +29,13 @@ export type SizeVector<T> = {
 
 export type BoundsFuction = (scale: number) => Vector<number>;
 
+export enum SwipeDirection {
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+}
+
 /**
  * @description Determine how your component must behave when it reaches the specified boundaries
  * by its enclosing container.
@@ -87,39 +94,11 @@ export type CommonZoomProps = Partial<{
 }>;
 
 export type CommonResumableProps = Partial<{
-  /**
-   * @description Minimum scale value allowed by the pinch gesture, expects values greater than or
-   * equals one.
-   * @default 1
-   */
   minScale: number;
-
-  /**
-   * @description Maximum scale value allowed by the pinch gesture, negative values instruct
-   * the component to infer the maximum scale value based on cropSize and resolution properties
-   * in a such way maxScale is a value just before images and videos start getting pixelated.
-   * @default -1
-   */
   maxScale: number;
-
-  /**
-   * @description Select which one of the three available pan modes to use.
-   */
   panMode: PanMode;
-
-  /**
-   * @description Select which one of the two available scale modes to use.
-   * @default ScaleMode.BOUNCE
-   */
   scaleMode: ScaleMode;
-
-  /**
-   * @description Lets the user drag the component around as they pinch, it also provides a
-   * more accurate pinch gesture calculation at the cost of a subtle jittering, disable for a
-   * smoother but less accurate experience.
-   * @default true
-   */
-  panWithPinch: boolean;
+  allowPinchPanning: boolean;
 }>;
 
 export type TapGestureEvent =

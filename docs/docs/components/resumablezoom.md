@@ -69,19 +69,9 @@ All properties for this component are optional.
 |------|---------|
 | `boolean` | `false` |
 
-By default the gesture detection area is located around the wrapped component, by setting this property to `true`, the detection area is now increased to the whole space occupied by `ResuambleZoom`.
+By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true`, the detection area is increased to the size `ResuambleZoom` is taking on screen, in case the wrapped component is bigger than the space taken by `ResumableZoom` component it will nothing.
 
-### hitslop
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `object` | `undefined` | see [HitSlop](https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop) |
-
-::: warning Depreacted
-This property has been depreacted in favor of `extendGestures` property and will be removed in the
-next major release.
-:::
-
-Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
+To summarize this property improves the gesture detection for small components.
 
 ### minScale
 | Type | Default | 
@@ -120,7 +110,7 @@ Select which one of the two available scale modes to use.
 
 Whether to apply a decay animation when the pan gesture ends or not.
 
-### panWithPinch
+### allowPinchPanning
 | Type | Default |
 |------|---------|
 | `boolean` | `true` | 
@@ -133,7 +123,7 @@ For more information see this [Gesture Handler's issue](https://github.com/softw
 
 Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
-This feature is not a pan gesture, therefore it won't trigger any of the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onHorizontalBoundsExceeded`.
+This feature is not a pan gesture, therefore it won't trigger any of the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onOverPanning`.
 
 ### panEnabled
 | Type | Default |
@@ -159,59 +149,62 @@ Enables and disables both single and double tap gestures.
 ### onTap
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once.
 
-### onSwipeRight
+### onSwipe
 | Type | Default |
 |------|---------|
-| `function` | `undefined` |
+| `(direction: SwipeDirection) => void` | `undefined` |
 
-Callback triggered when the user swipes to the right.
-
-::: tip Condition
-This callback is only triggered when `panMode` property is set to `PanMode.CLAMP` (default value) and the right edge of your component is in contact with the right edge of its enclosing container.
+::: tip Trigger Conditions
+- `panMode` must be set to `PanMode.CLAMP` (default value).
+- Edges of the wrapped component must be in contact with the edges of `ResumableZoom`.
 :::
 
-### onSwipeLeft
-| Type | Default |
-|------|---------|
-| `function` | `undefined` |
-
-Callback triggered when the user swipes to the left.
-
-::: tip Condition
-This callback is only triggered when `panMode` property is set to `PanMode.CLAMP` (default value) and the left edge of your component is in contact with the left edge of its enclosing container.
-:::
+Callback triggered when the user swipes up, down, left or right.
 
 ### onPanStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-callback triggered when the pan gesture starts, receives a pan gesture event as its only argument.
+callback triggered when the pan gesture starts.
+
+### onOverPanning
+| Type | Default | Additional Info |
+|------|---------|----------------|
+| `(x: number, y: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+
+::: tip Trigger Condition
+- `panMode` property must be set to `PanMode.CLAMP` (default value).
+:::
+
+Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries.
+
+For the `X` axis you will get negative values from the left and positive values from the right, for the `Y` axis positive values going up and negative values going down.
 
 ### onPanEnd
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-Callback triggered as soon as the user lifts their finger off the screen, receives a pan gesture event as its only argument.
+Callback triggered as soon as the user lifts their finger off the screen.
 
 ### onPinchStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-callback triggered when the pinch gesture starts, receives a pinch gesture event as its only argument.
+Callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-Callback triggered as soon as the user lifts their fingers off the screen after pinching, receives a pinch gesture event as its only argument.
+Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
 ### onGestureActive
 | Type | Default | Additional Info |
@@ -220,7 +213,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 
 Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
 
-Ideal if you need to mirror its current transformations values to some other component as it updates.
+Ideal if you need to mirror its current transformation values to some other component as it updates.
 
 ### onGestureEnd
 | Type | Default | 
@@ -230,19 +223,6 @@ Ideal if you need to mirror its current transformations values to some other com
 Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 
 If the `decay` property is set to `true`, it will wait for the decay animation to end.
-
-### onHorizontalBoundsExceeded
-| Type | Default | Additional Info |
-|------|---------|----------------|
-| `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
-
-Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries, positive values from the right and negative values from the left.
-
-Ideal to mimic scroll behavior.
-
-::: tip Condition
-Requires the `panMode` property to be set to `PanMode.CLAMP` (default value).
-:::
 
 ## Methods
 All methods are accessible through a ref object.

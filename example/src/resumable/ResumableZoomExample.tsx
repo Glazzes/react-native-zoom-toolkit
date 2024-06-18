@@ -69,10 +69,10 @@ const ResumableZoomExample: React.FC = ({}) => {
 
       <ResumableZoom
         ref={ref}
-        hitSlop={{ vertical: 50 }}
         maxScale={resolution}
         extendGestures={true}
         onTap={onTap}
+        onSwipe={(direction) => console.log(direction)}
       >
         <Image
           source={{ uri: IMAGE }}
