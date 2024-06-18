@@ -15,14 +15,18 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { clamp } from '../../commons/utils/clamp';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
-import type {
-  BoundsFuction,
-  PanGestureEvent,
-  SizeVector,
-  TapGestureEvent,
-  Vector,
+import {
+  SwipeDirection,
+  type BoundsFuction,
+  type PanGestureEvent,
+  type PanGestureEventCallback,
+  type PinchGestureEventCallback,
+  type SizeVector,
+  type TapGestureEvent,
+  type Vector,
 } from '../../commons/types';
 import { snapPoint } from '../../commons/utils/snapPoint';
+import getSwipeDirection from '../../commons/utils/getSwipeDirection';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -43,8 +47,19 @@ type ReflectionProps = {
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
   onTap?: (e: TapGestureEvent, index: number) => void;
+  onPanStart?: PanGestureEventCallback;
+  onPanEnd?: PanGestureEventCallback;
+  onPinchStart?: PinchGestureEventCallback;
+  onPinchEnd?: PinchGestureEventCallback;
+  onSwipe?: (direction: SwipeDirection) => void;
 };
 
+/*
+ * Pinchable views are heavy components, real heavy ones, therefore in order to maximize
+ * performance only a single Pinchable view is shared among all the list items, by listening
+ * to this component updates the elements in the list get updated only if they're the current
+ * index.
+ */
 const Reflection = ({
   activeIndex,
   resetIndex,
@@ -61,6 +76,11 @@ const Reflection = ({
   tapOnEdgeToItem,
   allowPinchPanning,
   onTap,
+  onPanStart,
+  onPanEnd,
+  onPinchStart,
+  onPinchEnd,
+  onSwipe: onUserSwipe,
 }: ReflectionProps) => {
   const [enabled, setEnabled] = useState<boolean>(true);
   const toggleGestures = (value: boolean) => setEnabled(value);
@@ -74,7 +94,7 @@ const Reflection = ({
   const detectorScale = useSharedValue<number>(1);
 
   const time = useSharedValue<number>(0);
-  const absX = useSharedValue<number>(0);
+  const position = useVector(0, 0);
 
   const boundsFn: BoundsFuction = (scaleValue) => {
     'worklet';
@@ -116,7 +136,7 @@ const Reflection = ({
     return clamp(value, 0, (length - 1) * rootSize.width.value);
   };
 
-  const onPanEnd = (e: PanGestureEvent) => {
+  const onScrollEnd = (e: PanGestureEvent) => {
     'worklet';
     const index = activeIndex.value;
 
@@ -139,11 +159,19 @@ const Reflection = ({
     });
   };
 
-  const onSwipe = (direction: 'right' | 'left') => {
+  const onSwipe = (direction: SwipeDirection) => {
     'worklet';
-    const index = activeIndex.value;
 
-    const toIndex = index + (direction === 'right' ? -1 : 1);
+    const index = activeIndex.value;
+    let acc = 1;
+    if (
+      direction === SwipeDirection.RIGHT ||
+      direction === SwipeDirection.DOWN
+    ) {
+      acc = -1;
+    }
+
+    const toIndex = index + acc;
     if (toIndex < 0 || toIndex > length - 1) return;
 
     fetchIndex.value = toIndex;
@@ -177,6 +205,9 @@ const Reflection = ({
   const pinch = Gesture.Pinch()
     .onStart((e) => {
       runOnJS(toggleGestures)(false);
+      if (onPinchStart !== undefined) {
+        runOnJS(onPinchStart)(e);
+      }
 
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
@@ -213,7 +244,11 @@ const Reflection = ({
       translate.y.value = clamp(toY, -1 * boundY, boundY);
       scale.value = toScale;
     })
-    .onEnd(() => {
+    .onEnd((e) => {
+      if (onPinchEnd !== undefined) {
+        runOnJS(onPinchEnd)(e);
+      }
+
       if (scale.value < minScale) {
         const { x: boundX, y: boundY } = boundsFn(minScale);
         const toX = clamp(translate.x.value, -1 * boundX, boundX);
@@ -261,10 +296,16 @@ const Reflection = ({
     .maxPointers(1)
     .enabled(enabled)
     .onStart((e) => {
+      if (onPanStart !== undefined) {
+        runOnJS(onPanStart)(e);
+      }
+
       isScrolling.value = true;
-      time.value = performance.now();
-      absX.value = e.absoluteX;
       scrollOffset.value = scroll.value;
+
+      time.value = performance.now();
+      position.x.value = e.absoluteX;
+      position.y.value = e.absoluteY;
 
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
@@ -297,33 +338,29 @@ const Reflection = ({
       detectorTranslate.y.value = clamp(toY, -1 * boundY, boundY);
     })
     .onEnd((e) => {
-      const velocity = Math.abs(e.velocityX);
-      const deltaTime = performance.now() - time.value;
-      const deltaX = Math.abs(absX.value - e.absoluteX);
+      const boundaries = boundsFn(scale.value);
+      const direction = getSwipeDirection(e, {
+        boundaries,
+        time: time.value,
+        position: { x: position.x.value, y: position.y.value },
+        translate: { x: translate.x.value, y: translate.y.value },
+      });
 
-      const didSwipe = velocity >= 500 && deltaX >= 20 && deltaTime < 175;
-      if (didSwipe) {
-        const { x: boundX } = boundsFn(scale.value);
-        const direction = Math.sign(e.absoluteX - absX.value);
+      if (direction !== undefined) {
+        onSwipe(direction);
+        if (onUserSwipe !== undefined) runOnJS(onUserSwipe)(direction);
 
-        const inLeftEdge = translate.x.value === -1 * boundX;
-        if (direction === -1 && inLeftEdge) {
-          onSwipe('left');
-          return;
-        }
-
-        const inRightEdge = translate.x.value === boundX;
-        if (direction === 1 && inRightEdge) {
-          onSwipe('right');
-          return;
-        }
+        return;
       }
 
-      onPanEnd(e);
+      if (onPanEnd !== undefined) {
+        runOnJS(onPanEnd)(e);
+      }
 
-      const { x: boundX, y: boundY } = boundsFn(scale.value);
-      const clampX: [number, number] = [-1 * boundX, boundX];
-      const clampY: [number, number] = [-1 * boundY, boundY];
+      onScrollEnd(e);
+
+      const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];
+      const clampY: [number, number] = [-1 * boundaries.y, boundaries.y];
 
       translate.x.value = withDecay({ velocity: e.velocityX, clamp: clampX });
       detectorTranslate.x.value = withDecay({
@@ -411,6 +448,11 @@ const Reflection = ({
 export default React.memo(Reflection, (prev, next) => {
   return (
     prev.onTap === next.onTap &&
+    prev.onPanStart === next.onPanStart &&
+    prev.onPanEnd === next.onPanEnd &&
+    prev.onPinchStart === next.onPinchStart &&
+    prev.onPinchEnd === next.onPinchEnd &&
+    prev.onSwipe === next.onSwipe &&
     prev.length === next.length &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
     prev.allowPinchPanning === next.allowPinchPanning

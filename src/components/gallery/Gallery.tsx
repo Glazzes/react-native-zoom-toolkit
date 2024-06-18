@@ -34,6 +34,11 @@ const Gallery = <T extends unknown>(
     onIndexChange,
     onScroll,
     onTap,
+    onPanStart,
+    onPanEnd,
+    onPinchStart,
+    onPinchEnd,
+    onSwipe,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
@@ -162,6 +167,11 @@ const Gallery = <T extends unknown>(
         allowPinchPanning={allowPinchPanning}
         tapOnEdgeToItem={tapOnEdgeToItem}
         onTap={onTap}
+        onPanStart={onPanStart}
+        onPanEnd={onPanEnd}
+        onPinchStart={onPinchStart}
+        onPinchEnd={onPinchEnd}
+        onSwipe={onSwipe}
       />
     </GestureHandlerRootView>
   );
