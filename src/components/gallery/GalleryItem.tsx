@@ -1,46 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import Animated, {
-  Extrapolation,
-  interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  type SharedValue,
 } from 'react-native-reanimated';
 
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
-import type { SizeVector, Vector } from '../../commons/types';
+import { GalleryContext } from './context';
 
 type GalleryItemProps = {
   index: number;
   item: any;
   renderItem: (item: any, index: number) => React.ReactElement;
   count: number;
-  scroll: SharedValue<number>;
-  activeIndex: SharedValue<number>;
-  rootSize: SizeVector<SharedValue<number>>;
-  rootChild: SizeVector<SharedValue<number>>;
-  translate: Vector<SharedValue<number>>;
-  scale: SharedValue<number>;
-  isScrolling: SharedValue<boolean>;
 };
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
   count,
-  scroll,
   index,
   item,
   renderItem,
-  activeIndex,
-  rootChild,
-  rootSize,
-  translate,
-  scale,
-  isScrolling,
 }) => {
+  const { rootSize, activeIndex, rootChildSize, scroll, translate, scale } =
+    useContext(GalleryContext);
+
   const childSize = useSizeVector(0, 0);
   const innerTranslate = useVector(0, 0);
   const innerScale = useSharedValue<number>(1);
@@ -50,8 +36,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
     childSize.height.value = e.nativeEvent.layout.height;
 
     if (index === activeIndex.value) {
-      rootChild.width.value = e.nativeEvent.layout.width;
-      rootChild.height.value = e.nativeEvent.layout.height;
+      rootChildSize.width.value = e.nativeEvent.layout.width;
+      rootChildSize.height.value = e.nativeEvent.layout.height;
     }
   };
 
@@ -66,36 +52,10 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (index < activeIndex.value - 1 || index > activeIndex.value + 1) {
-      return {
-        opacity: 0,
-        transform: [{ translateX: 0 }, { scale: 0 }],
-      };
-    }
+    const translateX = index * rootSize.width.value - scroll.x.value;
+    const opacity = rootSize.width.value === 0 && index !== 0 ? 0 : 1;
 
-    let translateX = index * rootSize.width.value - scroll.value;
-    let opacity = 1;
-    let sc = 1;
-    if (index !== activeIndex.value && !isScrolling.value) sc = 0;
-
-    const isCurrent = index === activeIndex.value;
-    const isNext = index === activeIndex.value + 1;
-    if (isNext || (isCurrent && scroll.value < index * rootSize.width.value)) {
-      opacity = interpolate(
-        scroll.value,
-        [(index - 1) * rootSize.width.value, index * rootSize.width.value],
-        [0, 1],
-        Extrapolation.CLAMP
-      );
-
-      sc = 0.75 + 0.25 * opacity;
-      translateX = 0;
-    }
-
-    return {
-      opacity,
-      transform: [{ translateX }, { scale: sc }],
-    };
+    return { transform: [{ translateX }], opacity };
   });
 
   useDerivedValue(() => {
@@ -110,8 +70,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
     () => activeIndex.value,
     (value) => {
       if (index === value) {
-        rootChild.width.value = childSize.width.value;
-        rootChild.height.value = childSize.height.value;
+        rootChildSize.width.value = childSize.width.value;
+        rootChildSize.height.value = childSize.height.value;
       } else {
         innerTranslate.x.value = 0;
         innerTranslate.y.value = 0;

@@ -1,11 +1,26 @@
+import type { ViewStyle } from 'react-native';
 import type {
   PanGestureCallbacks,
   PinchGestureCallbacks,
   SizeVector,
   SwipeDirection,
   TapGestureEvent,
+  Vector,
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
+
+export type GalleryAnimationOptions = {
+  index: number;
+  activeIndex: number;
+  vertical: boolean;
+  isScrolling: boolean;
+  gallerySize: SizeVector<number>;
+  scroll: Vector<number>;
+};
+
+export type GalleryAnimationBuilder = (
+  options: GalleryAnimationOptions
+) => ViewStyle;
 
 export type GalleryProps<T = unknown> = {
   data: T[];

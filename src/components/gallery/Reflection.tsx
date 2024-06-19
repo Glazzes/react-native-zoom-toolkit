@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -21,29 +21,21 @@ import {
   type PanGestureEvent,
   type PanGestureEventCallback,
   type PinchGestureEventCallback,
-  type SizeVector,
   type TapGestureEvent,
-  type Vector,
 } from '../../commons/types';
 import { snapPoint } from '../../commons/utils/snapPoint';
 import getSwipeDirection from '../../commons/utils/getSwipeDirection';
+import { GalleryContext } from './context';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
 
 type ReflectionProps = {
-  activeIndex: SharedValue<number>;
   resetIndex: SharedValue<number>;
   fetchIndex: SharedValue<number>;
   length: number;
-  rootSize: SizeVector<SharedValue<number>>;
-  rootChild: SizeVector<SharedValue<number>>;
-  scroll: SharedValue<number>;
   scrollOffset: SharedValue<number>;
-  translate: Vector<SharedValue<number>>;
-  scale: SharedValue<number>;
   maxScale: SharedValue<number>;
-  isScrolling: SharedValue<boolean>;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
   onTap?: (e: TapGestureEvent, index: number) => void;
@@ -61,18 +53,11 @@ type ReflectionProps = {
  * index.
  */
 const Reflection = ({
-  activeIndex,
   resetIndex,
   fetchIndex,
   length,
-  rootSize,
-  rootChild,
-  scroll,
   scrollOffset,
-  translate,
-  scale,
   maxScale,
-  isScrolling,
   tapOnEdgeToItem,
   allowPinchPanning,
   onTap,
@@ -84,6 +69,16 @@ const Reflection = ({
 }: ReflectionProps) => {
   const [enabled, setEnabled] = useState<boolean>(true);
   const toggleGestures = (value: boolean) => setEnabled(value);
+
+  const {
+    activeIndex,
+    scroll,
+    isScrolling,
+    rootSize,
+    rootChildSize,
+    translate,
+    scale,
+  } = useContext(GalleryContext);
 
   const offset = useVector(0, 0);
   const origin = useVector(0, 0);
@@ -99,7 +94,7 @@ const Reflection = ({
   const boundsFn: BoundsFuction = (scaleValue) => {
     'worklet';
 
-    const { width: cWidth, height: cHeight } = rootChild;
+    const { width: cWidth, height: cHeight } = rootChildSize;
     const { width: rWidth, height: rHeight } = rootSize;
 
     const boundX = Math.max(0, cWidth.value * scaleValue - rWidth.value) / 2;
@@ -144,14 +139,15 @@ const Reflection = ({
     const current = rootSize.width.value * index;
     const next = rootSize.width.value * (index + 1);
 
-    const points = scroll.value >= current ? [current, next] : [prev, current];
-    const to = clampScroll(snapPoint(scroll.value, e.velocityX, points));
+    const points =
+      scroll.x.value >= current ? [current, next] : [prev, current];
+    const to = clampScroll(snapPoint(scroll.x.value, e.velocityX, points));
 
     if (to !== current) {
       fetchIndex.value = index + (to === next ? 1 : -1);
     }
 
-    scroll.value = withTiming(to, config, () => {
+    scroll.x.value = withTiming(to, config, () => {
       if (to !== current) {
         activeIndex.value = index + (to === next ? 1 : -1);
         isScrolling.value = false;
@@ -178,7 +174,7 @@ const Reflection = ({
 
     const to = clampScroll(toIndex * rootSize.width.value);
 
-    scroll.value = withTiming(to, config, (finished) => {
+    scroll.x.value = withTiming(to, config, (finished) => {
       activeIndex.value = toIndex;
       if (finished) isScrolling.value = false;
     });
@@ -301,7 +297,7 @@ const Reflection = ({
       }
 
       isScrolling.value = true;
-      scrollOffset.value = scroll.value;
+      scrollOffset.value = scroll.x.value;
 
       time.value = performance.now();
       position.x.value = e.absoluteX;
@@ -325,7 +321,7 @@ const Reflection = ({
 
       if (!isWithinBoundX.value) {
         const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
-        scroll.value = clamp(
+        scroll.x.value = clamp(
           scrollOffset.value + exceededBy,
           0,
           (length - 1) * rootSize.width.value
@@ -392,7 +388,7 @@ const Reflection = ({
       }
 
       toIndex = clamp(toIndex, 0, length - 1);
-      scroll.value = toIndex * rootSize.width.value;
+      scroll.x.value = toIndex * rootSize.width.value;
       activeIndex.value = toIndex;
       fetchIndex.value = toIndex;
     });
@@ -425,8 +421,8 @@ const Reflection = ({
     });
 
   const detectorStyle = useAnimatedStyle(() => ({
-    width: Math.max(rootSize.width.value, rootChild.width.value),
-    height: Math.max(rootSize.height.value, rootChild.height.value),
+    width: Math.max(rootSize.width.value, rootChildSize.width.value),
+    height: Math.max(rootSize.height.value, rootChildSize.height.value),
     position: 'absolute',
     zIndex: Number.MAX_SAFE_INTEGER,
     transform: [
