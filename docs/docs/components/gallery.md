@@ -228,9 +228,9 @@ Reset all transformations to their initial state.
 
 - Arguments
 
-| Name | Type | Default |Description |
-|------|------|---------|------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| Name | Type |Description |
+|------|------|------------|
+| animate | `boolean` | Whether to animate the transition or not. |
 
 - Returns `void`
 

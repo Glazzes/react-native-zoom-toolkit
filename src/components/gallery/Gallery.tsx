@@ -5,6 +5,7 @@ import {
   useAnimatedReaction,
   useDerivedValue,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -111,9 +112,15 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     scale: scale.value,
   });
 
+  const reset = (animate: boolean) => {
+    translate.x.value = animate ? withTiming(0) : 0;
+    translate.y.value = animate ? withTiming(0) : 0;
+    scale.value = animate ? withTiming(1) : 1;
+  };
+
   useImperativeHandle(reference, () => ({
     setIndex,
-    reset: () => (resetIndex.value += 1),
+    reset,
     requestState,
   }));
 

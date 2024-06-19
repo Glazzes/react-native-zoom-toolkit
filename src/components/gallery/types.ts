@@ -40,6 +40,6 @@ export type GalleryProps<T = unknown> = {
 
 export type GalleryType = {
   setIndex: (index: number) => void;
-  reset: () => void;
+  reset: (animate: boolean) => void;
   requestState: () => ResumableZoomState;
 };
