@@ -170,7 +170,7 @@ Callback triggered when the user swipes up, down, left or right.
 |------|---------|-----------------|
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-callback triggered when the pan gesture starts.
+Callback triggered when the pan gesture starts.
 
 ### onOverPanning
 | Type | Default | Additional Info |
