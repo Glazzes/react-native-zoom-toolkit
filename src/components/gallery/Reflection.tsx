@@ -31,11 +31,10 @@ const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
 
 type ReflectionProps = {
-  resetIndex: SharedValue<number>;
-  fetchIndex: SharedValue<number>;
   length: number;
-  scrollOffset: SharedValue<number>;
   maxScale: SharedValue<number>;
+  scrollDirection: Readonly<SharedValue<number>>;
+  vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
   onTap?: (e: TapGestureEvent, index: number) => void;
@@ -53,11 +52,10 @@ type ReflectionProps = {
  * index.
  */
 const Reflection = ({
-  resetIndex,
-  fetchIndex,
   length,
-  scrollOffset,
   maxScale,
+  scrollDirection,
+  vertical,
   tapOnEdgeToItem,
   allowPinchPanning,
   onTap,
@@ -72,7 +70,10 @@ const Reflection = ({
 
   const {
     activeIndex,
+    resetIndex,
+    fetchIndex,
     scroll,
+    scrollOffset,
     isScrolling,
     rootSize,
     rootChildSize,
@@ -128,26 +129,26 @@ const Reflection = ({
 
   const clampScroll = (value: number) => {
     'worklet';
-    return clamp(value, 0, (length - 1) * rootSize.width.value);
+    return clamp(value, 0, (length - 1) * scrollDirection.value);
   };
 
   const onScrollEnd = (e: PanGestureEvent) => {
     'worklet';
     const index = activeIndex.value;
 
-    const prev = rootSize.width.value * (index - 1);
-    const current = rootSize.width.value * index;
-    const next = rootSize.width.value * (index + 1);
+    const prev = scrollDirection.value * (index - 1);
+    const current = scrollDirection.value * index;
+    const next = scrollDirection.value * (index + 1);
 
-    const points =
-      scroll.x.value >= current ? [current, next] : [prev, current];
-    const to = clampScroll(snapPoint(scroll.x.value, e.velocityX, points));
+    const velocity = vertical ? e.velocityY : e.velocityX;
+    const points = scroll.value >= current ? [current, next] : [prev, current];
+    const to = clampScroll(snapPoint(scroll.value, velocity, points));
 
     if (to !== current) {
       fetchIndex.value = index + (to === next ? 1 : -1);
     }
 
-    scroll.x.value = withTiming(to, config, () => {
+    scroll.value = withTiming(to, config, () => {
       if (to !== current) {
         activeIndex.value = index + (to === next ? 1 : -1);
         isScrolling.value = false;
@@ -159,22 +160,20 @@ const Reflection = ({
     'worklet';
 
     const index = activeIndex.value;
-    let acc = 1;
-    if (
-      direction === SwipeDirection.RIGHT ||
-      direction === SwipeDirection.DOWN
-    ) {
-      acc = -1;
-    }
+    let acc = 0;
+    if (direction === SwipeDirection.UP && vertical) acc = 1;
+    if (direction === SwipeDirection.DOWN && vertical) acc = -1;
+    if (direction === SwipeDirection.LEFT && !vertical) acc = 1;
+    if (direction === SwipeDirection.RIGHT && !vertical) acc = -1;
 
     const toIndex = index + acc;
     if (toIndex < 0 || toIndex > length - 1) return;
 
     fetchIndex.value = toIndex;
 
-    const to = clampScroll(toIndex * rootSize.width.value);
+    const to = clampScroll(toIndex * scrollDirection.value);
 
-    scroll.x.value = withTiming(to, config, (finished) => {
+    scroll.value = withTiming(to, config, (finished) => {
       activeIndex.value = toIndex;
       if (finished) isScrolling.value = false;
     });
@@ -285,9 +284,6 @@ const Reflection = ({
       reset(toX, toY, scale.value);
     });
 
-  const isWithinBoundX = useSharedValue<boolean>(true);
-  const isWithinBoundY = useSharedValue<boolean>(true);
-
   const pan = Gesture.Pan()
     .maxPointers(1)
     .enabled(enabled)
@@ -297,7 +293,7 @@ const Reflection = ({
       }
 
       isScrolling.value = true;
-      scrollOffset.value = scroll.x.value;
+      scrollOffset.value = scroll.value;
 
       time.value = performance.now();
       position.x.value = e.absoluteX;
@@ -314,17 +310,26 @@ const Reflection = ({
     .onUpdate(({ translationX, translationY }) => {
       const toX = offset.x.value + translationX;
       const toY = offset.y.value + translationY;
+
       const { x: boundX, y: boundY } = boundsFn(scale.value);
+      const exceedX = Math.max(0, Math.abs(toX) - boundX);
+      const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
-      isWithinBoundX.value = toX >= -1 * boundX && toX <= boundX;
-      isWithinBoundY.value = toX >= -1 * boundY && toY <= boundY;
-
-      if (!isWithinBoundX.value) {
-        const exceededBy = -1 * (toX - Math.sign(toX) * boundX);
-        scroll.x.value = clamp(
-          scrollOffset.value + exceededBy,
+      if (exceedX > 0 && !vertical) {
+        const ex = -1 * Math.sign(toX) * exceedX;
+        scroll.value = clamp(
+          scrollOffset.value + ex,
           0,
           (length - 1) * rootSize.width.value
+        );
+      }
+
+      if (exceedY > 0 && vertical) {
+        const ey = -1 * Math.sign(toY) * exceedY;
+        scroll.value = clamp(
+          scrollOffset.value + ey,
+          0,
+          (length - 1) * rootSize.height.value
         );
       }
 
@@ -377,9 +382,11 @@ const Reflection = ({
     .maxDuration(250)
     .runOnJS(true)
     .onEnd((e) => {
+      const tapEdge = 44 / scale.value;
+
       let toIndex = activeIndex.value;
-      if (e.x <= 44 && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
-      if (e.x >= rootSize.width.value - 44 && tapOnEdgeToItem)
+      if (e.x <= tapEdge && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
+      if (e.x >= scrollDirection.value - tapEdge && tapOnEdgeToItem)
         toIndex = activeIndex.value + 1;
 
       if (toIndex === activeIndex.value) {
@@ -388,7 +395,7 @@ const Reflection = ({
       }
 
       toIndex = clamp(toIndex, 0, length - 1);
-      scroll.x.value = toIndex * rootSize.width.value;
+      scroll.value = toIndex * scrollDirection.value;
       activeIndex.value = toIndex;
       fetchIndex.value = toIndex;
     });
@@ -450,6 +457,7 @@ export default React.memo(Reflection, (prev, next) => {
     prev.onPinchEnd === next.onPinchEnd &&
     prev.onSwipe === next.onSwipe &&
     prev.length === next.length &&
+    prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
     prev.allowPinchPanning === next.allowPinchPanning
   );

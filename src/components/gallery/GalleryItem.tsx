@@ -10,22 +10,34 @@ import Animated, {
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
 import { GalleryContext } from './context';
+import type { GalleryAnimationBuilder } from './types';
 
 type GalleryItemProps = {
-  index: number;
   item: any;
-  renderItem: (item: any, index: number) => React.ReactElement;
+  index: number;
   count: number;
+  vertical: boolean;
+  renderItem: (item: any, index: number) => React.ReactElement;
+  customAnimation?: GalleryAnimationBuilder;
 };
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
   count,
   index,
   item,
+  vertical,
   renderItem,
+  customAnimation,
 }) => {
-  const { rootSize, activeIndex, rootChildSize, scroll, translate, scale } =
-    useContext(GalleryContext);
+  const {
+    rootSize,
+    activeIndex,
+    rootChildSize,
+    scroll,
+    isScrolling,
+    translate,
+    scale,
+  } = useContext(GalleryContext);
 
   const childSize = useSizeVector(0, 0);
   const innerTranslate = useVector(0, 0);
@@ -52,9 +64,27 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    const translateX = index * rootSize.width.value - scroll.x.value;
-    const opacity = rootSize.width.value === 0 && index !== 0 ? 0 : 1;
+    if (customAnimation !== undefined) {
+      return customAnimation({
+        index,
+        activeIndex: activeIndex.value,
+        isScrolling: isScrolling.value,
+        vertical,
+        scroll: scroll.value,
+        gallerySize: {
+          width: rootSize.width.value,
+          height: rootSize.height.value,
+        },
+      });
+    }
 
+    const opacity = rootSize.width.value === 0 && index !== 0 ? 0 : 1;
+    if (vertical) {
+      const translateY = index * rootSize.height.value - scroll.value;
+      return { transform: [{ translateY }], opacity };
+    }
+
+    const translateX = index * rootSize.width.value - scroll.value;
     return { transform: [{ translateX }], opacity };
   });
 
@@ -106,6 +136,8 @@ export default React.memo(GalleryItem, (prev, next) => {
   return (
     prev.count === next.count &&
     prev.index === next.index &&
+    prev.vertical === next.vertical &&
+    prev.customAnimation === next.customAnimation &&
     prev.renderItem === next.renderItem
   );
 });

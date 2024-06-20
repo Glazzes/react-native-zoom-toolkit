@@ -28,7 +28,7 @@ import type {
   ResumableZoomType,
   ResumableZoomAssignableState,
 } from './types';
-import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
+import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
 

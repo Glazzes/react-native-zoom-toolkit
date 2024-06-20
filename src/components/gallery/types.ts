@@ -5,7 +5,6 @@ import type {
   SizeVector,
   SwipeDirection,
   TapGestureEvent,
-  Vector,
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
 
@@ -14,8 +13,8 @@ export type GalleryAnimationOptions = {
   activeIndex: number;
   vertical: boolean;
   isScrolling: boolean;
+  scroll: number;
   gallerySize: SizeVector<number>;
-  scroll: Vector<number>;
 };
 
 export type GalleryAnimationBuilder = (
@@ -29,8 +28,10 @@ export type GalleryProps<T = unknown> = {
   maxScale?: number | SizeVector<number>[];
   initialIndex?: number;
   windowSize?: number;
+  vertical?: boolean;
   tapOnEdgeToItem?: boolean;
   allowPinchPanning?: boolean;
+  customAnimation?: GalleryAnimationBuilder;
   onTap?: (e: TapGestureEvent, index: number) => void;
   onSwipe?: (direction: SwipeDirection) => void;
   onIndexChange?: (index: number) => void;

@@ -4,14 +4,13 @@ import {
   runOnJS,
   useAnimatedReaction,
   useDerivedValue,
-  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
-import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { clamp } from '../../commons/utils/clamp';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
+import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
 
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
@@ -31,8 +30,10 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     initialIndex = 0,
     windowSize = 5,
     maxScale: userMaxScale = 6,
+    vertical = false,
     tapOnEdgeToItem = true,
     allowPinchPanning: pinchPanning,
+    customAnimation,
     onIndexChange,
     onScroll,
     onTap,
@@ -47,12 +48,19 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   const nextItems = Math.floor(windowSize / 2);
 
   const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);
-  const { activeIndex, rootSize, rootChildSize, scroll, translate, scale } =
-    useContext(GalleryContext);
+  const {
+    activeIndex,
+    fetchIndex,
+    rootSize,
+    rootChildSize,
+    scroll,
+    translate,
+    scale,
+  } = useContext(GalleryContext);
 
-  const fetchIndex = useSharedValue<number>(initialIndex);
-  const resetIndex = useSharedValue<number>(initialIndex);
-  const offset = useSharedValue<number>(0);
+  const scrollDirection = useDerivedValue(() => {
+    return vertical ? rootSize.height.value : rootSize.width.value;
+  }, [vertical, rootSize]);
 
   const maxScale = useDerivedValue(() => {
     if (typeof userMaxScale === 'object') {
@@ -67,21 +75,21 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
       );
     }
 
-    return userMaxScale as number;
+    return userMaxScale;
   }, [userMaxScale, activeIndex, rootChildSize]);
 
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;
     rootSize.height.value = e.nativeEvent.layout.height;
-    scroll.x.value = activeIndex.value * e.nativeEvent.layout.width;
+    scroll.value = activeIndex.value * e.nativeEvent.layout.width;
   };
 
   useDerivedValue(() => {
     onScroll?.(
-      scroll.x.value,
-      data.length * rootSize.width.value - rootSize.width.value
+      scroll.value,
+      data.length * scrollDirection.value - scrollDirection.value
     );
-  }, [scroll.x.value, rootSize, data.length]);
+  }, [scroll.value, data.length, scrollDirection]);
 
   useAnimatedReaction(
     () => activeIndex.value,
@@ -97,11 +105,20 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     [fetchIndex]
   );
 
+  useAnimatedReaction(
+    () => vertical,
+    (value) => {
+      const direction = value ? rootSize.height.value : rootSize.width.value;
+      scroll.value = activeIndex.value * direction;
+    },
+    [vertical, activeIndex, rootSize]
+  );
+
   const setIndex = (index: number) => {
     const clamped = clamp(index, 0, data.length);
     activeIndex.value = clamped;
     fetchIndex.value = clamped;
-    scroll.x.value = clamped * rootSize.width.value;
+    scroll.value = clamped * scrollDirection.value;
   };
 
   const requestState = () => ({
@@ -142,19 +159,20 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
             count={data.length}
             index={index}
             item={item}
+            vertical={vertical}
             renderItem={renderItem}
+            customAnimation={customAnimation}
           />
         );
       })}
 
       <Reflection
-        resetIndex={resetIndex}
-        fetchIndex={fetchIndex}
         maxScale={maxScale}
-        scrollOffset={offset}
+        scrollDirection={scrollDirection}
         length={data.length}
-        allowPinchPanning={allowPinchPanning}
+        vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
+        allowPinchPanning={allowPinchPanning}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}

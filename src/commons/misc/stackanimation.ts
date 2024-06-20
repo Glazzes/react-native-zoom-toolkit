@@ -4,7 +4,13 @@ import type { GalleryAnimationBuilder } from '../../components/gallery/types';
 export const galleryStackAnimation: GalleryAnimationBuilder = (options) => {
   'worklet';
 
-  const { index, activeIndex, gallerySize, scroll, isScrolling } = options;
+  const { index, activeIndex, vertical, gallerySize, scroll, isScrolling } =
+    options;
+
+  if (vertical) {
+    const translateY = index * gallerySize.height - scroll;
+    return { transform: [{ translateY }], opacity: 1 };
+  }
 
   if (index < activeIndex - 1 || index > activeIndex + 1) {
     return {
@@ -13,16 +19,16 @@ export const galleryStackAnimation: GalleryAnimationBuilder = (options) => {
     };
   }
 
-  let translateX = index * gallerySize.width - scroll.x;
+  let translateX = index * gallerySize.width - scroll;
   let opacity = 1;
   let scale = 1;
   if (index !== activeIndex && !isScrolling) scale = 0;
 
   const isCurrent = index === activeIndex;
   const isNext = index === activeIndex + 1;
-  if (isNext || (isCurrent && scroll.x < index * gallerySize.width)) {
+  if (isNext || (isCurrent && scroll < index * gallerySize.width)) {
     opacity = interpolate(
-      scroll.x,
+      scroll,
       [(index - 1) * gallerySize.width, index * gallerySize.width],
       [0, 1],
       Extrapolation.CLAMP

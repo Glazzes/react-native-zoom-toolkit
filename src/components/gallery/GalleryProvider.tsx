@@ -18,20 +18,27 @@ const GalleryProvider = <T extends unknown>(
 ) => {
   const rootSize = useSizeVector(0, 0);
   const rootChildSize = useSizeVector(0, 0);
-  const scroll = useVector(0, 0);
+
+  const scroll = useSharedValue<number>(0);
+  const scrollOffset = useSharedValue<number>(0);
+  const isScrolling = useSharedValue<boolean>(false);
 
   const translate = useVector(0, 0);
-
   const scale = useSharedValue<number>(1);
+
   const activeIndex = useSharedValue<number>(props.initialIndex ?? 0);
-  const isScrolling = useSharedValue<boolean>(false);
+  const resetIndex = useSharedValue<number>(props.initialIndex ?? 0);
+  const fetchIndex = useSharedValue<number>(props.initialIndex ?? 0);
 
   const context: GalleryContextType = {
     rootSize,
     rootChildSize,
     scroll,
+    scrollOffset,
     translate,
     activeIndex,
+    resetIndex,
+    fetchIndex,
     isScrolling,
     scale,
   };
