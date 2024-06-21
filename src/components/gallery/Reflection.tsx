@@ -26,6 +26,7 @@ import {
 import { snapPoint } from '../../commons/utils/snapPoint';
 import getSwipeDirection from '../../commons/utils/getSwipeDirection';
 import { GalleryContext } from './context';
+import { crop } from '../../commons/utils/crop';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -382,12 +383,33 @@ const Reflection = ({
     .maxDuration(250)
     .runOnJS(true)
     .onEnd((e) => {
+      const gallerySize = {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      };
+
+      const {
+        crop: { originX, width },
+      } = crop({
+        scale: scale.value,
+        context: {
+          flipHorizontal: false,
+          flipVertical: false,
+          rotationAngle: 0,
+        },
+        canvas: gallerySize,
+        cropSize: gallerySize,
+        resolution: gallerySize,
+        position: { x: translate.x.value, y: translate.y.value },
+      });
+
       const tapEdge = 44 / scale.value;
+      const left = originX + tapEdge;
+      const rightEdge = originX + width - tapEdge;
 
       let toIndex = activeIndex.value;
-      if (e.x <= tapEdge && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
-      if (e.x >= scrollDirection.value - tapEdge && tapOnEdgeToItem)
-        toIndex = activeIndex.value + 1;
+      if (e.x <= left && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
+      if (e.x >= rightEdge && tapOnEdgeToItem) toIndex = activeIndex.value + 1;
 
       if (toIndex === activeIndex.value) {
         onTap?.(e, activeIndex.value);
