@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -16,6 +16,8 @@ import { clamp } from '../../commons/utils/clamp';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
 import {
+  PanMode,
+  ScaleMode,
   SwipeDirection,
   type BoundsFuction,
   type PanGestureEvent,
@@ -27,6 +29,7 @@ import { snapPoint } from '../../commons/utils/snapPoint';
 import getSwipeDirection from '../../commons/utils/getSwipeDirection';
 import { GalleryContext } from './context';
 import { crop } from '../../commons/utils/crop';
+import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -62,13 +65,10 @@ const Reflection = ({
   onTap,
   onPanStart,
   onPanEnd,
-  onPinchStart,
-  onPinchEnd,
+  onPinchStart: onUserPinchStart,
+  onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
 }: ReflectionProps) => {
-  const [enabled, setEnabled] = useState<boolean>(true);
-  const toggleGestures = (value: boolean) => setEnabled(value);
-
   const {
     activeIndex,
     resetIndex,
@@ -121,11 +121,7 @@ const Reflection = ({
     scale.value = animate ? withTiming(toScale) : toScale;
     detectorTranslate.x.value = animate ? withTiming(toX) : toX;
     detectorTranslate.y.value = animate ? withTiming(toY) : toY;
-    detectorScale.value = animate
-      ? withTiming(toScale, undefined, () => {
-          runOnJS(toggleGestures)(true);
-        })
-      : toScale;
+    detectorScale.value = animate ? withTiming(toScale) : toScale;
   };
 
   const clampScroll = (value: number) => {
@@ -173,7 +169,6 @@ const Reflection = ({
     fetchIndex.value = toIndex;
 
     const to = clampScroll(toIndex * scrollDirection.value);
-
     scroll.value = withTiming(to, config, (finished) => {
       activeIndex.value = toIndex;
       if (finished) isScrolling.value = false;
@@ -198,96 +193,37 @@ const Reflection = ({
     [resetIndex]
   );
 
-  const pinch = Gesture.Pinch()
-    .onStart((e) => {
-      runOnJS(toggleGestures)(false);
-      if (onPinchStart !== undefined) {
-        runOnJS(onPinchStart)(e);
-      }
-
-      cancelAnimation(translate.x);
-      cancelAnimation(translate.y);
-      cancelAnimation(detectorTranslate.x);
-      cancelAnimation(detectorTranslate.y);
-      cancelAnimation(scale);
-      cancelAnimation(detectorScale);
-
-      origin.x.value = e.focalX - rootSize.width.value / 2;
-      origin.y.value = e.focalY - rootSize.height.value / 2;
-
-      offset.x.value = translate.x.value;
-      offset.y.value = translate.y.value;
-      scaleOffset.value = scale.value;
-    })
-    .onUpdate((e) => {
-      const toScale = e.scale * scaleOffset.value;
-      delta.x.value = e.focalX - rootSize.width.value / 2 - origin.x.value;
-      delta.y.value = e.focalY - rootSize.height.value / 2 - origin.y.value;
-
-      const { x: toX, y: toY } = pinchTransform({
-        toScale: toScale,
-        fromScale: scaleOffset.value,
-        origin: { x: origin.x.value, y: origin.y.value },
-        offset: { x: offset.x.value, y: offset.y.value },
-        delta: {
-          x: allowPinchPanning ? delta.x.value * scaleOffset.value : 0,
-          y: allowPinchPanning ? delta.y.value * scaleOffset.value : 0,
-        },
-      });
-
-      const { x: boundX, y: boundY } = boundsFn(toScale);
-      translate.x.value = clamp(toX, -1 * boundX, boundX);
-      translate.y.value = clamp(toY, -1 * boundY, boundY);
-      scale.value = toScale;
-    })
-    .onEnd((e) => {
-      if (onPinchEnd !== undefined) {
-        runOnJS(onPinchEnd)(e);
-      }
-
-      if (scale.value < minScale) {
-        const { x: boundX, y: boundY } = boundsFn(minScale);
-        const toX = clamp(translate.x.value, -1 * boundX, boundX);
-        const toY = clamp(translate.y.value, -1 * boundY, boundY);
-
-        reset(toX, toY, minScale);
-        return;
-      }
-
-      if (scale.value > maxScale.value) {
-        const scaleDiff = Math.max(
-          0,
-          scaleOffset.value - (scale.value - scaleOffset.value) / 2
-        );
-
-        const { x, y } = pinchTransform({
-          toScale: maxScale.value,
-          fromScale: scale.value,
-          origin: { x: origin.x.value, y: origin.y.value },
-          offset: { x: translate.x.value, y: translate.y.value },
-          delta: {
-            x: 0,
-            y: allowPinchPanning ? -1 * delta.y.value * scaleDiff : 0,
-          },
-        });
-
-        const { x: boundX, y: boundY } = boundsFn(maxScale.value);
-        const toX = clamp(x, -1 * boundX, boundX);
-        const toY = clamp(y, -1 * boundY, boundY);
-        reset(toX, toY, maxScale.value);
-
-        return;
-      }
-
-      const { x: boundX, y: boundY } = boundsFn(scale.value);
-      const toX = clamp(translate.x.value, -1 * boundX, boundX);
-      const toY = clamp(translate.y.value, -1 * boundY, boundY);
-      reset(toX, toY, scale.value);
+  const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
+    usePinchCommons({
+      container: rootSize,
+      detectorTranslate,
+      detectorScale,
+      translate,
+      offset,
+      origin,
+      scale,
+      scaleOffset,
+      minScale,
+      maxScale,
+      delta,
+      allowPinchPanning,
+      scaleMode: ScaleMode.BOUNCE,
+      panMode: PanMode.CLAMP,
+      boundFn: boundsFn,
+      userCallbacks: {
+        onPinchStart: onUserPinchStart,
+        onPinchEnd: onUserPinchEnd,
+      },
     });
+
+  const pinch = Gesture.Pinch()
+    .onStart(onPinchStart)
+    .onUpdate(onPinchUpdate)
+    .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
     .maxPointers(1)
-    .enabled(enabled)
+    .enabled(gesturesEnabled)
     .onStart((e) => {
       if (onPanStart !== undefined) {
         runOnJS(onPanStart)(e);
@@ -378,7 +314,7 @@ const Reflection = ({
     });
 
   const tap = Gesture.Tap()
-    .enabled(enabled)
+    .enabled(gesturesEnabled)
     .numberOfTaps(1)
     .maxDuration(250)
     .runOnJS(true)
@@ -423,7 +359,7 @@ const Reflection = ({
     });
 
   const doubleTap = Gesture.Tap()
-    .enabled(enabled)
+    .enabled(gesturesEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
     .onEnd((e) => {
