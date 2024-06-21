@@ -363,26 +363,23 @@ const Reflection = ({
     .numberOfTaps(2)
     .maxDuration(250)
     .onEnd((e) => {
-      if (scale.value >= maxScale.value * 0.8) {
-        reset(0, 0, minScale);
-        return;
-      }
-
       const originX = e.x - rootSize.width.value / 2;
       const originY = e.y - rootSize.height.value / 2;
+      const toScale =
+        scale.value >= maxScale.value * 0.8 ? minScale : maxScale.value;
 
       const { x, y } = pinchTransform({
-        toScale: maxScale.value,
+        toScale: toScale,
         fromScale: scale.value,
         origin: { x: originX, y: originY },
         delta: { x: 0, y: 0 },
         offset: { x: translate.x.value, y: translate.y.value },
       });
 
-      const { x: boundX, y: boundY } = boundsFn(maxScale.value);
+      const { x: boundX, y: boundY } = boundsFn(toScale);
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
-      reset(toX, toY, maxScale.value);
+      reset(toX, toY, toScale);
     });
 
   const detectorStyle = useAnimatedStyle(() => ({

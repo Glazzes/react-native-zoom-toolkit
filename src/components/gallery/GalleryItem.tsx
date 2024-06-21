@@ -63,7 +63,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
     };
   });
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const transitionStyle = useAnimatedStyle(() => {
     if (customAnimation !== undefined) {
       return customAnimation({
         index,
@@ -113,7 +113,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
 
   return (
     <Animated.View
-      style={[styles.root, { zIndex: count - index }, animatedStyle]}
+      style={[styles.root, { zIndex: count - index }, transitionStyle]}
     >
       <Animated.View style={childStyle} onLayout={measureChild}>
         {renderItem(item, index)}
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
+    overflow: 'hidden',
   },
 });
 
