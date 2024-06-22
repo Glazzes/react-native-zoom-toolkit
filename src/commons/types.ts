@@ -76,20 +76,8 @@ export enum ScaleMode {
 }
 
 export type CommonZoomProps = Partial<{
-  /**
-   * @description Increase (Android only) or decrease the gesture detection area around
-   * your component in all directions by a given amount in pixels, useful when dealing
-   * with small components.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gesture-handlers/common-gh/#hitslop
-   */
   hitSlop: HitSlop;
-
-  /**
-   * @description Custom React Native Reanimated's animation timing configuration.
-   * @see https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-
-   */
   timingConfig: TimingConfig;
-
   onGestureEnd: () => void;
 }>;
 
@@ -115,49 +103,16 @@ export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
 
 export type PanGestureCallbacks = Partial<{
-  /**
-   * @description Callback triggered when the pan gesture starts.
-   * @param e React native gesture handler's pan gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture/#event-data
-   */
   onPanStart: PanGestureEventCallback;
-
-  /**
-   * @description Callback triggered when the pan gesture ends.
-   * @param e React native gesture handler's pan gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture/#event-data
-   */
   onPanEnd: PanGestureEventCallback;
 }>;
 
 export type PinchGestureCallbacks = Partial<{
-  /**
-   * @description Callback triggered when the pinch gesture ends.
-   * @param e React native gesture handler's pinch gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture/#event-data
-   */
   onPinchStart: PinchGestureEventCallback;
-
-  /**
-   * @description Callback triggered when the pinch gesture ends.
-   * @param e React native gesture handler's pinch gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture/#event-data
-   */
   onPinchEnd: PinchGestureEventCallback;
 }>;
 
 export type TapGestureCallbacks = Partial<{
-  /**
-   * @description Callback triggered when a tap is made.
-   * @param e React native gesture handler's tap gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture/#event-data
-   */
   onTap: TapGestureEventCallback;
-
-  /**
-   * @description Callback triggered when a double tap is made.
-   * @param e React native gesture handler's tap gesture event data.
-   * @see https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture/#event-data
-   */
   onDoubleTap: TapGestureEventCallback;
 }>;

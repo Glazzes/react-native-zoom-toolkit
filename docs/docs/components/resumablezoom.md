@@ -170,20 +170,16 @@ Callback triggered when the user swipes up, down, left or right.
 |------|---------|-----------------|
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
-callback triggered when the pan gesture starts.
+Callback triggered when the pan gesture starts.
 
 ### onOverPanning
 | Type | Default | Additional Info |
 |------|---------|----------------|
 | `(x: number, y: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-::: tip Trigger Condition
-- `panMode` property must be set to `PanMode.CLAMP` (default value).
-:::
+Worklet callback triggered when the wrapped component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries in both `x` and `y` axis.
 
-Worklet callback triggered when the component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries.
-
-For the `X` axis you will get negative values from the left and positive values from the right, for the `Y` axis positive values going up and negative values going down.
+For the `x` axis you will get negative values from the left and positive values from the right, for the `y` axis positive values going up and negative values going down.
 
 ### onPanEnd
 | Type | Default | Additional Info |

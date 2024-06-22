@@ -31,7 +31,7 @@ import {
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 import { RAD2DEG } from '../../commons/constants';
-import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
+import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';

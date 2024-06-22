@@ -7,10 +7,6 @@ outline: deep
 # Gallery
 A practical gallery component which mimics Telegram's gallery behavior, among its more remarkable features you will find:
 
-::: warning Experimental Feature
-This component uses a highly customized version of `ResumableZoom` component to meet the performance expectations of gallery component, therefore in its current state it only uses a small subset of the properties offered by `ResuambleZoom`, this may change in the future.
-:::
-
 - **Flatlist API:** A simple API which resembles React Native Flatlist's API
 - **Pinch Gesture:** Accurate pinch gesture calculation, drag your component around as you pinch, scale your component in two different modes.
 - **Double Tap:** Tap twice in a point of interest to trigger a zoom animation.
@@ -203,6 +199,45 @@ Callback triggered when the list scrolls to the next or previous item.
 
 Callback triggered when the user taps the current item once, provides additional metadata like index if you need it.
 
+### onSwipe
+| Type | Default |
+|------|---------|
+| `(direction: SwipeDirection) => void` | `undefined` |
+
+::: tip Trigger Conditions
+- Edges of the current item must be in contact with the edges of `Gallery` component.
+:::
+
+Callback triggered when the user swipes up, down, left or right.
+
+### onPanStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+Callback triggered when the pan gesture starts.
+
+### onPanEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
+
+Callback triggered as soon as the user lifts their finger off the screen.
+
+### onPinchStart
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+Callback triggered when the pinch gesture starts.
+
+### onPinchEnd
+| Type | Default | Additional Info |
+|------|---------|-----------------|
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+
+Callback triggered as soon as the user lifts their fingers off the screen after pinching.
+
 ### onScroll
 | Type | Default | Additional Info |
 |------|---------|----------------|
@@ -228,9 +263,9 @@ Reset all transformations to their initial state.
 
 - Arguments
 
-| Name | Type | Default |Description |
-|------|------|---------|------------|
-| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| Name | Type |Description |
+|------|------|------------|
+| animate | `boolean` | Whether to animate the transition or not. |
 
 - Returns `void`
 

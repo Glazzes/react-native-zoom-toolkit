@@ -1,72 +1,82 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { useContext, useImperativeHandle, useState } from 'react';
 import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import {
   runOnJS,
   useAnimatedReaction,
   useDerivedValue,
-  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import getPanWithPinchStatus from '../../commons/utils/getPanWithPinchStatus';
-import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { useVector } from '../../commons/hooks/useVector';
-import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { clamp } from '../../commons/utils/clamp';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
+import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
 
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
+import { GalleryContext } from './context';
 import type { GalleryProps, GalleryType } from './types';
 
-const Gallery = <T extends unknown>(
-  props: GalleryProps<T>,
-  ref: React.ForwardedRef<GalleryType>
-) => {
+type GalleryPropsWithRef<T> = GalleryProps<T> & {
+  reference?: React.ForwardedRef<GalleryType>;
+};
+
+const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   const {
+    reference,
     data,
     renderItem,
     keyExtractor,
     initialIndex = 0,
     windowSize = 5,
     maxScale: userMaxScale = 6,
+    vertical = false,
     tapOnEdgeToItem = true,
     allowPinchPanning: pinchPanning,
+    customTransition,
     onIndexChange,
     onScroll,
     onTap,
+    onPanStart,
+    onPanEnd,
+    onPinchStart,
+    onPinchEnd,
+    onSwipe,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
   const nextItems = Math.floor(windowSize / 2);
 
   const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);
-  const activeIndex = useSharedValue<number>(initialIndex);
-  const fetchIndex = useSharedValue<number>(initialIndex);
-  const resetIndex = useSharedValue<number>(initialIndex);
+  const {
+    activeIndex,
+    fetchIndex,
+    rootSize,
+    rootChildSize,
+    scroll,
+    translate,
+    scale,
+  } = useContext(GalleryContext);
 
-  const rootChild = useSizeVector(0, 0);
-  const rootSize = useSizeVector(0, 0);
-
-  const translate = useVector(0, 0);
-  const scale = useSharedValue<number>(1);
-
-  const scroll = useSharedValue<number>(0);
-  const offset = useSharedValue<number>(0);
-
-  const isScrolling = useSharedValue<boolean>(false);
+  const scrollDirection = useDerivedValue(() => {
+    return vertical ? rootSize.height.value : rootSize.width.value;
+  }, [vertical, rootSize]);
 
   const maxScale = useDerivedValue(() => {
     if (typeof userMaxScale === 'object') {
       if (userMaxScale.length === 0) return 6;
 
       return getMaxScale(
-        { width: rootChild.width.value, height: rootChild.height.value },
+        {
+          width: rootChildSize.width.value,
+          height: rootChildSize.height.value,
+        },
         userMaxScale[activeIndex.value]!
       );
     }
 
-    return userMaxScale as number;
-  }, [userMaxScale, activeIndex, rootChild]);
+    return userMaxScale;
+  }, [userMaxScale, activeIndex, rootChildSize]);
 
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;
@@ -77,9 +87,9 @@ const Gallery = <T extends unknown>(
   useDerivedValue(() => {
     onScroll?.(
       scroll.value,
-      data.length * rootSize.width.value - rootSize.width.value
+      data.length * scrollDirection.value - scrollDirection.value
     );
-  }, [scroll.value, rootSize, data.length]);
+  }, [scroll.value, data.length, scrollDirection]);
 
   useAnimatedReaction(
     () => activeIndex.value,
@@ -95,24 +105,39 @@ const Gallery = <T extends unknown>(
     [fetchIndex]
   );
 
+  useAnimatedReaction(
+    () => vertical,
+    (value) => {
+      const direction = value ? rootSize.height.value : rootSize.width.value;
+      scroll.value = activeIndex.value * direction;
+    },
+    [vertical, activeIndex, rootSize]
+  );
+
   const setIndex = (index: number) => {
     const clamped = clamp(index, 0, data.length);
     activeIndex.value = clamped;
     fetchIndex.value = clamped;
-    scroll.value = clamped * rootSize.width.value;
+    scroll.value = clamped * scrollDirection.value;
   };
 
   const requestState = () => ({
-    width: rootChild.width.value,
-    height: rootChild.height.value,
+    width: rootChildSize.width.value,
+    height: rootChildSize.height.value,
     translateX: translate.x.value,
     translateY: translate.y.value,
     scale: scale.value,
   });
 
-  useImperativeHandle(ref, () => ({
+  const reset = (animate = true) => {
+    translate.x.value = animate ? withTiming(0) : 0;
+    translate.y.value = animate ? withTiming(0) : 0;
+    scale.value = animate ? withTiming(1) : 1;
+  };
+
+  useImperativeHandle(reference, () => ({
     setIndex,
-    reset: () => (resetIndex.value += 1),
+    reset,
     requestState,
   }));
 
@@ -134,34 +159,26 @@ const Gallery = <T extends unknown>(
             count={data.length}
             index={index}
             item={item}
+            vertical={vertical}
             renderItem={renderItem}
-            activeIndex={activeIndex}
-            scroll={scroll}
-            rootSize={rootSize}
-            rootChild={rootChild}
-            translate={translate}
-            scale={scale}
-            isScrolling={isScrolling}
+            customTransition={customTransition}
           />
         );
       })}
 
       <Reflection
-        activeIndex={activeIndex}
-        resetIndex={resetIndex}
-        fetchIndex={fetchIndex}
         maxScale={maxScale}
-        scroll={scroll}
-        scrollOffset={offset}
-        rootSize={rootSize}
-        rootChild={rootChild}
-        translate={translate}
-        scale={scale}
+        scrollDirection={scrollDirection}
         length={data.length}
-        isScrolling={isScrolling}
-        allowPinchPanning={allowPinchPanning}
+        vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
+        allowPinchPanning={allowPinchPanning}
         onTap={onTap}
+        onPanStart={onPanStart}
+        onPanEnd={onPanEnd}
+        onPinchStart={onPinchStart}
+        onPinchEnd={onPinchEnd}
+        onSwipe={onSwipe}
       />
     </GestureHandlerRootView>
   );
@@ -176,10 +193,4 @@ const styles = StyleSheet.create({
   },
 });
 
-type GalleryPropsWithRef<T> = GalleryProps<T> & {
-  ref?: React.ForwardedRef<GalleryType>;
-};
-
-export default forwardRef(Gallery) as <T>(
-  props: GalleryPropsWithRef<T>
-) => ReturnType<typeof Gallery>;
+export default Gallery;

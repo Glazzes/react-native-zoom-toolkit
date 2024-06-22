@@ -107,7 +107,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     if (
       (exceedX > 0 || exceedY > 0) &&
-      panMode === PanMode.CLAMP &&
       userCallbacks.onOverPanning !== undefined
     ) {
       const ex = Math.sign(toX) * exceedX;
