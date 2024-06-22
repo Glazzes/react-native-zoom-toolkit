@@ -10,7 +10,7 @@ import Animated, {
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
 import { GalleryContext } from './context';
-import type { GalleryAnimationBuilder } from './types';
+import type { GalleryTransitionCallback } from './types';
 
 type GalleryItemProps = {
   item: any;
@@ -18,7 +18,7 @@ type GalleryItemProps = {
   count: number;
   vertical: boolean;
   renderItem: (item: any, index: number) => React.ReactElement;
-  customAnimation?: GalleryAnimationBuilder;
+  customTransition?: GalleryTransitionCallback;
 };
 
 const GalleryItem: React.FC<GalleryItemProps> = ({
@@ -27,7 +27,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   item,
   vertical,
   renderItem,
-  customAnimation,
+  customTransition,
 }) => {
   const {
     rootSize,
@@ -64,8 +64,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
   });
 
   const transitionStyle = useAnimatedStyle(() => {
-    if (customAnimation !== undefined) {
-      return customAnimation({
+    if (customTransition !== undefined) {
+      return customTransition({
         index,
         activeIndex: activeIndex.value,
         isScrolling: isScrolling.value,
@@ -138,7 +138,7 @@ export default React.memo(GalleryItem, (prev, next) => {
     prev.count === next.count &&
     prev.index === next.index &&
     prev.vertical === next.vertical &&
-    prev.customAnimation === next.customAnimation &&
+    prev.customTransition === next.customTransition &&
     prev.renderItem === next.renderItem
   );
 });

@@ -1,7 +1,7 @@
 import { Extrapolation, interpolate } from 'react-native-reanimated';
-import type { GalleryAnimationBuilder } from '../../components/gallery/types';
+import type { GalleryTransitionCallback } from '../../components/gallery/types';
 
-export const galleryStackAnimation: GalleryAnimationBuilder = (options) => {
+export const stackTransition: GalleryTransitionCallback = (options) => {
   'worklet';
 
   const { index, activeIndex, vertical, gallerySize, scroll, isScrolling } =

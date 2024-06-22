@@ -8,7 +8,7 @@ import type {
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
 
-export type GalleryAnimationOptions = {
+export type GalleryTransitionState = {
   index: number;
   activeIndex: number;
   vertical: boolean;
@@ -17,8 +17,8 @@ export type GalleryAnimationOptions = {
   gallerySize: SizeVector<number>;
 };
 
-export type GalleryAnimationBuilder = (
-  options: GalleryAnimationOptions
+export type GalleryTransitionCallback = (
+  options: GalleryTransitionState
 ) => ViewStyle;
 
 export type GalleryProps<T = unknown> = {
@@ -31,7 +31,7 @@ export type GalleryProps<T = unknown> = {
   vertical?: boolean;
   tapOnEdgeToItem?: boolean;
   allowPinchPanning?: boolean;
-  customAnimation?: GalleryAnimationBuilder;
+  customTransition?: GalleryTransitionCallback;
   onTap?: (e: TapGestureEvent, index: number) => void;
   onSwipe?: (direction: SwipeDirection) => void;
   onIndexChange?: (index: number) => void;
@@ -41,6 +41,6 @@ export type GalleryProps<T = unknown> = {
 
 export type GalleryType = {
   setIndex: (index: number) => void;
-  reset: (animate: boolean) => void;
+  reset: (animate: boolean | undefined) => void;
   requestState: () => ResumableZoomState;
 };

@@ -33,7 +33,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     vertical = false,
     tapOnEdgeToItem = true,
     allowPinchPanning: pinchPanning,
-    customAnimation,
+    customTransition,
     onIndexChange,
     onScroll,
     onTap,
@@ -129,7 +129,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     scale: scale.value,
   });
 
-  const reset = (animate: boolean) => {
+  const reset = (animate = true) => {
     translate.x.value = animate ? withTiming(0) : 0;
     translate.y.value = animate ? withTiming(0) : 0;
     scale.value = animate ? withTiming(1) : 1;
@@ -161,7 +161,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
             item={item}
             vertical={vertical}
             renderItem={renderItem}
-            customAnimation={customAnimation}
+            customTransition={customTransition}
           />
         );
       })}

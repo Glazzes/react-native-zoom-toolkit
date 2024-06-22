@@ -29,4 +29,4 @@ export {
 } from './hooks/useImageResolution';
 
 export { default as getAspectRatioSize } from './utils/getAspectRatioSize';
-export { galleryStackAnimation } from './commons/misc/stackanimation';
+export { stackTransition } from './commons/misc/stacktransition';
