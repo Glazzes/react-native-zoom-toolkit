@@ -344,8 +344,11 @@ const Reflection = ({
       const rightEdge = originX + width - tapEdge;
 
       let toIndex = activeIndex.value;
-      if (e.x <= left && tapOnEdgeToItem) toIndex = activeIndex.value - 1;
-      if (e.x >= rightEdge && tapOnEdgeToItem) toIndex = activeIndex.value + 1;
+      if (e.x <= left && tapOnEdgeToItem && !vertical)
+        toIndex = activeIndex.value - 1;
+
+      if (e.x >= rightEdge && tapOnEdgeToItem && !vertical)
+        toIndex = activeIndex.value + 1;
 
       if (toIndex === activeIndex.value) {
         onTap?.(e, activeIndex.value);
