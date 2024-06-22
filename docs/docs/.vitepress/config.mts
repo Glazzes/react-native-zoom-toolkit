@@ -12,7 +12,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: '2.0.0', items: [
+      { text: '2.0.1', items: [
         {text: 'Releases', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/releases'},
         {text: 'Contributing', link: 'https://github.com/Glazzes/react-native-zoom-toolkit/blob/main/CONTRIBUTING.md'},
       ]}
