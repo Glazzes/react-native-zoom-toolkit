@@ -196,16 +196,14 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 ### onGestureActive
 | Type | Default | Required | Additional Info |
 |------|---------|----------|----------------|
-| `worklet function` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| `(state: CropZoomState) => void` | `undefined` | `No`    | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [CropZoomState](#cropzoomstate) as its only argument.
-
-Ideal if you need to mirror its current transformation values to some other component as it updates.
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), ideal if you need to mirror its current transformation values to some other component as it updates, see [CropZoomState](#cropzoomstate).
 
 ### onGestureEnd
 | Type | Default | Required |
 |------|---------|----------|
-| `function` | `undefined` | `No` |
+| `() => void` | `undefined` | `No` |
 
 Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 

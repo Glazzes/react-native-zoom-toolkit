@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
+import {
+  stackTransition,
+  Gallery,
+  type GalleryType,
+} from 'react-native-zoom-toolkit';
 import {
   getAssetsAsync,
   requestPermissionsAsync,
@@ -29,6 +33,8 @@ const GalleryExample = () => {
     },
     [activeIndex]
   );
+
+  const customTransition = useCallback(stackTransition, []);
 
   useEffect(() => {
     const requestAssets = async () => {
@@ -68,6 +74,7 @@ const GalleryExample = () => {
         onIndexChange={(idx) => {
           activeIndex.value = idx;
         }}
+        customTransition={customTransition}
       />
     </View>
   );
@@ -76,7 +83,7 @@ const GalleryExample = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#000',
   },
 });
 

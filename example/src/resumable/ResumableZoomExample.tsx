@@ -72,7 +72,6 @@ const ResumableZoomExample: React.FC = ({}) => {
         maxScale={resolution}
         extendGestures={true}
         onTap={onTap}
-        onSwipe={(direction) => console.log(direction)}
       >
         <Image
           source={{ uri: IMAGE }}

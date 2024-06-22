@@ -69,9 +69,9 @@ All properties for this component are optional.
 |------|---------|
 | `boolean` | `false` |
 
-By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true`, the detection area is increased to the size `ResuambleZoom` is taking on screen, in case the wrapped component is bigger than the space taken by `ResumableZoom` component it will nothing.
+By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true` the detection area is increased to the size `ResuambleZoom` is taking on screen, if the wrapped component is bigger than the space taken by `ResumableZoom` component, this property will do nothing.
 
-To summarize this property improves the gesture detection for small components.
+To summarize this property: It improves the gesture detection for small components.
 
 ### minScale
 | Type | Default | 
@@ -205,16 +205,14 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 ### onGestureActive
 | Type | Default | Additional Info |
 |------|---------|----------------|
-| `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| `(state: ResumableZoomState) = void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), receives an object of type [ResumableZoomState](#resumablezoomstate) as its only argument.
-
-Ideal if you need to mirror its current transformation values to some other component as it updates.
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), ideal if you need to mirror its current transformation values to some other component as it updates, see [ResumableZoomState](#resumablezoomstate).
 
 ### onGestureEnd
 | Type | Default | 
 |------|---------|
-| `function` | `undefined` |
+| `() => void` | `undefined` |
 
 Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
 
