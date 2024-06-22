@@ -34,6 +34,8 @@ const GalleryExample = () => {
     [activeIndex]
   );
 
+  const keyExtractor = useCallback((item, index) => `${item.uri}-${index}`, []);
+
   const customTransition = useCallback(stackTransition, []);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ const GalleryExample = () => {
       <Gallery
         ref={ref}
         data={assets}
-        keyExtractor={(item, index) => `${item.uri}-${index}`}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         maxScale={scales}
         onIndexChange={(idx) => {
