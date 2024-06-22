@@ -31,7 +31,7 @@ The following example is a full screen image gallery.
 
 ```tsx [Gallery.tsx]
 import React, { useCallback, useRef } from 'react';
-import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
+import { stackTransition, Gallery, type GalleryType } from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
 
@@ -58,6 +58,8 @@ const GalleryExample = () => {
     console.log(`Tapped on index ${index}`);
   }, []);
 
+  const transition = useCallback(stackTransition, []);
+
   return (
     <Gallery
       ref={ref}
@@ -65,6 +67,7 @@ const GalleryExample = () => {
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       onTap={onTap}
+      customTransition={transition}
     />
   );
 };
@@ -156,6 +159,13 @@ Maximum number of items to be rendered at once.
 
 Sets the initial position of the list.
 
+### vertical
+| Type | Default  | 
+|------|----------|
+| `boolean` | `false`  |
+
+Modifies the orientation of the component to vertical mode.
+
 ### maxScale
 | Type | Default  | 
 |------|----------|
@@ -169,6 +179,10 @@ Alternatively you can pass an array with the resolution of your images/videos, f
 | Type | Default  | 
 |------|----------|
 | `boolean` | `true`  |
+
+::: tip Condition
+- This property only works in horizontal mode.
+:::
 
 Allow the user to go to the next or previous item by tapping the horizontal edges of the gallery.
 
@@ -245,6 +259,34 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 
 Worklet callback triggered as the user scrolls the gallery.
 
+### customTransition
+
+| Type | Default | Additional Info |
+|------|---------|----------------|
+| `(state: GalleryTransitionState) => ViewStyle` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+
+Worklet callback used to modify the scroll animation used by the gallery, keep in mind the following when building a custom transition, see [GalleryTransitionState](#gallerytransitionstate).
+
+- All elements are absolute positioned one on top of another.
+- Use `translateX` and `translateY` style properties to position the items to your particular needs.
+
+The base behaviour would look this:
+
+```js
+const baseAnimation = (state) => {
+  'worklet';
+  const { index, vertical, scroll, gallerySize } = state;
+
+  if(vertical) {
+    const translateY = (index * gallerySize.height) - scroll;
+    return {transform: [{ translateY }]};
+  }
+
+  const translateX = (index * gallerySize.width) - scroll;
+  return {transform: [{ translateX }]};
+}
+```
+
 ## Methods
 All methods are accessible through a ref object.
 
@@ -263,9 +305,9 @@ Reset all transformations to their initial state.
 
 - Arguments
 
-| Name | Type |Description |
-|------|------|------------|
-| animate | `boolean` | Whether to animate the transition or not. |
+| Name | Type | Defaut | Description |
+|------|------|------------|---------|
+| animate | `boolean` | `true` | Whether to animate the transition or not. |
 
 - Returns `void`
 
@@ -295,3 +337,14 @@ Jump to the item at the given index.
 | `translateX` | `number` | Current translateX transformation value. |
 | `translateY` | `number` | Current translateY transformation value. |
 | `scale`      | `number` | Current scale transformation value.      |
+
+
+### GalleryTransitionState
+| Property      | Type                 | Description                                           |
+|---------------|----------------------|-------------------------------------------------------|
+| `index`       | `number`             | Index of an item rendered in the gallery.             |
+| `activeIndex` | `number`             | Index of the currently displayed item on the gallery. |
+| `vertical`    | `boolean`            | Whether the gallery is in vertical mode or not.       |
+| `isScrolling` | `boolean`            | Whether the gallery is being scrolled or not.         |
+| `scroll`      | `number`             | How much the gallery has been scrolled.               |
+| `gallerySize` | `SizeVector<number>` | Width and height of the gallery.                      |

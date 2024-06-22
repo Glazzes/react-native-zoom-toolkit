@@ -97,44 +97,42 @@ Enables or disable gestures, when gestures are disabled your component can detec
 ### onTap
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when the user taps the wrapped component once, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component once.
 
 ### onDoubleTap
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
-Callback triggered when the user taps the wrapped component twice, receives a tap gesture event as its only argument.
+Callback triggered when the user taps the wrapped component twice.
 
 ### onPinchStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-callback triggered when the pinch gesture starts, receives a pinch gesture event as its only argument.
+Callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `function` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
+| `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
-Callback triggered as soon as the user lifts their fingers off the screen after pinching, receives tap gesture event as its only argument.
+Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
 ### onGestureActive
 | Type | Default | Additional Info |
 |------|---------|-----------------|
-| `worklet function` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| `(state: SnapbackZoomState) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered from the moment pinch gesture starts until the snap back animation finishes, receives an object of type [SnapbackZoomState](#snapbackzoomstate) as its only argument.
-
-Ideal if you need to mirror the current state of the gesture to some other component.
+Worklet callback triggered from the moment pinch gesture starts until the snap back animation finishes, ideal if you need to mirror the current state of the gesture to some other component, see [SnapbackZoomState](#snapbackzoomstate).
 
 ### onGestureEnd
 | Type | Default |
 |------|---------|
-| `function` | `undefined` |
+| `() => void` | `undefined` |
 
 Callback triggered once the snap back animation has finished.
 
