@@ -258,6 +258,18 @@ Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.
 
 - Returns `void`
 
+### rotateWithDirection
+Rotate the component 90 degrees (or -90 degrees) clockwise or counterclockwise in a range from 0 to 360 degrees (or 0 to -360 degrees).
+- Arguments
+
+| Name | Type | Default |Description |
+|------|------|-----|--------------|
+| animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
+| clockwise | `boolean \| undefined` | `true` | Whether to rotate clockwise (90 degrees) or counterclockwise (-90 degrees) |
+| cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (or -360 degrees) (at 360 or -360 degrees it's clamped to 0). |
+
+- Returns `void`
+
 ### flipHorizontal
 Flip the component horizontally.
 - Arguments
