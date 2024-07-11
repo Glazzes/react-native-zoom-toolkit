@@ -26,6 +26,7 @@ import {
   type CropContextResult,
   type CropZoomType,
   type RotateTransitionCallback,
+  type DirectionRotationCallback,
   type CropZoomState,
   type CropZoomAssignableState,
 } from './types';
@@ -227,10 +228,16 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   // Reference handling section
   const canRotate = useSharedValue<boolean>(true);
-  const handleRotate: RotateTransitionCallback = (animate = true, cb) => {
+  const handleRotate: DirectionRotationCallback = (
+    animate = true,
+    clockwise = true,
+    cb
+  ) => {
     if (!canRotate.value) return;
 
-    const toAngle = rotation.value + Math.PI / 2;
+    // Determine the direction multiplier based on clockwise or counterclockwise rotation
+    const direction = clockwise ? 1 : -1;
+    const toAngle = rotation.value + (Math.PI / 2) * direction;
     sizeAngle.value = toAngle;
     if (cb !== undefined) cb(toAngle % (Math.PI * 2));
 
@@ -246,7 +253,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
       rotation.value = withTiming(toAngle, undefined, (_) => {
         canRotate.value = true;
-        if (rotation.value === Math.PI * 2) rotation.value = 0;
+        if (Math.abs(rotation.value) === Math.PI * 2) rotation.value = 0;
       });
 
       return;
@@ -364,7 +371,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   };
 
   useImperativeHandle(ref, () => ({
-    rotate: handleRotate,
+    rotate: (animate, cb) => handleRotate(animate, true, cb),
+    rotateWithDirection: handleRotate,
     flipHorizontal: flipHorizontal,
     flipVertical: flipVertical,
     reset: handleReset,

@@ -46,6 +46,12 @@ export type RotateTransitionCallback = (
   cb?: (value: number) => void
 ) => void;
 
+export type DirectionRotationCallback = (
+  animate?: boolean,
+  clockwise?: boolean,
+  cb?: (value: number) => void
+) => void;
+
 export type CropZoomType = {
   /**
    * @description Request internal transformation values of this component at the moment of the calling.
@@ -68,6 +74,15 @@ export type CropZoomType = {
    *  the angle your component will transition to, this angle ranges from 0 to 360 degrees (at 360 degrees it's clamped to 0).
    */
   rotate: RotateTransitionCallback;
+
+  /**
+   * @description Rotates in steps of 90 degrees at a time, either in the positive or negative direction, within a range from 0 to 360 degrees (or 0 to -360 degrees).
+   * @param animate Whether to animate the transition or not.
+   * @param clockwise Whether to rotate clockwise (90 degrees) or counterclockwise (-90 degrees).
+   * @param cb Callback to trigger at the beginning of the transition, as its only argument receives
+   *  the angle your component will transition to, this angle ranges from 0 to 360 degrees (or 0 to -360 degrees) and at 360 degrees (or -360 degrees) it is clamped back to 0.
+   */
+  rotateWithDirection: DirectionRotationCallback;
 
   /**
    * @description Rotates the Y axis from 0 to 180 degrees and vice versa
