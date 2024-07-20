@@ -261,14 +261,14 @@ Worklet callback triggered as the user scrolls the gallery.
 
 ### onZoomBegin
 | Type | Default |
-|------|---------|----------------|
+|------|---------|
 | `(index: number) => void` | `undefined` |
 
 Callback triggered when component is zoomed.
 
 ### onZoomEnd
 | Type | Default |
-|------|---------|----------------|
+|------|---------|
 | `(index: number) => void` | `undefined` |
 
 Callback triggered when component returns back to original state.
