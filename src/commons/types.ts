@@ -116,3 +116,8 @@ export type TapGestureCallbacks = Partial<{
   onTap: TapGestureEventCallback;
   onDoubleTap: TapGestureEventCallback;
 }>;
+
+export type ZoomEventCallbacks = Partial<{
+  onZoomBegin: (index: number) => void;
+  onZoomEnd: (index: number) => void;
+}>;

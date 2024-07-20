@@ -42,6 +42,8 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     onPinchStart,
     onPinchEnd,
     onSwipe,
+    onZoomBegin,
+    onZoomEnd,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
@@ -56,6 +58,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     scroll,
     translate,
     scale,
+    hasZoomed,
   } = useContext(GalleryContext);
 
   const scrollDirection = useDerivedValue(() => {
@@ -112,6 +115,20 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
       scroll.value = activeIndex.value * direction;
     },
     [vertical, activeIndex, rootSize]
+  );
+
+  useAnimatedReaction(
+    () => scale.value,
+    (value, previousValue) => {
+      if (value !== 1 && !hasZoomed.value) {
+        hasZoomed.value = true;
+        onZoomBegin && runOnJS(onZoomBegin)(activeIndex.value);
+      } else if (value === 1 && previousValue !== 1 && hasZoomed.value) {
+        hasZoomed.value = false;
+        onZoomEnd && runOnJS(onZoomEnd)(activeIndex.value);
+      }
+    },
+    [scale]
   );
 
   const setIndex = (index: number) => {
