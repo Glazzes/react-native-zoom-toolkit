@@ -104,6 +104,7 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
         keyExtractor={keyExtractor}
         stickyHeaderIndices={[0]}
         contentContainerStyle={styles.content}
+        automaticallyAdjustKeyboardInsets={true}
         showsVerticalScrollIndicator={true}
         ItemSeparatorComponent={seperator}
         ListHeaderComponent={renderAppbar}
