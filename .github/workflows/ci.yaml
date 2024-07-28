@@ -12,13 +12,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup
+      - name: setup
         uses: ./.github/actions/setup
 
-      - name: Lint files
+      - name: lint
         run: yarn lint
 
       - name: Typecheck files
@@ -27,10 +27,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup
+      - name: setup
         uses: ./.github/actions/setup
 
       - name: Run unit tests
@@ -39,11 +39,24 @@ jobs:
   build-library:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup
+      - name: setup
         uses: ./.github/actions/setup
 
-      - name: Build package
+      - name: build package
         run: yarn prepare
+
+  build-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: build documentation
+        run: yarn docs docs:build
