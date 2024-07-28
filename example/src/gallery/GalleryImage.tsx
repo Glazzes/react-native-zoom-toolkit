@@ -8,7 +8,7 @@ import {
 } from 'react-native-reanimated';
 import { type Asset } from 'expo-media-library';
 
-import { getAspectRatioSize } from 'react-native-zoom-toolkit';
+import { calculateItemSize } from './utils/utils';
 
 type GalleryImageProps = {
   asset: Asset;
@@ -24,21 +24,11 @@ const GalleryImage: React.FC<GalleryImageProps> = ({
   const [downScale, setDownScale] = useState<boolean>(true);
   const { width, height } = useWindowDimensions();
 
-  const phoneRatio = width / height;
-  const pictureRatio = asset.width / asset.height;
-  let size = getAspectRatioSize({
-    aspectRatio: pictureRatio,
-    width: height > width ? width : undefined,
-    height: height > width ? undefined : height,
-  });
-
-  if (pictureRatio > phoneRatio && phoneRatio > 1) {
-    size = getAspectRatioSize({ aspectRatio: pictureRatio, width });
-  }
-
-  if (pictureRatio < phoneRatio && phoneRatio < 1) {
-    size = getAspectRatioSize({ aspectRatio: pictureRatio, height });
-  }
+  const size = calculateItemSize(
+    { width: asset.width, height: asset.height },
+    { width, height },
+    width / height
+  );
 
   const wrapper = (active: number) => {
     if (index === active) setDownScale(false);
