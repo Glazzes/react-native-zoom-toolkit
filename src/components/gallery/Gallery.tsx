@@ -42,6 +42,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     onPinchStart,
     onPinchEnd,
     onSwipe,
+    onVerticalPull,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
@@ -93,9 +94,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
 
   useAnimatedReaction(
     () => activeIndex.value,
-    (value) => {
-      if (onIndexChange) runOnJS(onIndexChange)(value);
-    },
+    (value) => onIndexChange && runOnJS(onIndexChange)(value),
     [activeIndex]
   );
 
@@ -114,6 +113,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     [vertical, activeIndex, rootSize]
   );
 
+  // Reference handling
   const setIndex = (index: number) => {
     const clamped = clamp(index, 0, data.length);
     activeIndex.value = clamped;
@@ -179,6 +179,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
         onPinchStart={onPinchStart}
         onPinchEnd={onPinchEnd}
         onSwipe={onSwipe}
+        onVerticalPull={onVerticalPull}
       />
     </GestureHandlerRootView>
   );

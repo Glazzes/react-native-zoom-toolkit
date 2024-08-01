@@ -36,6 +36,7 @@ export type GalleryProps<T = unknown> = {
   onSwipe?: (direction: SwipeDirection) => void;
   onIndexChange?: (index: number) => void;
   onScroll?: (scroll: number, contentOffset: number) => void;
+  onVerticalPull?: (translateY: number, released: boolean) => void;
 } & PinchGestureCallbacks &
   PanGestureCallbacks;
 
