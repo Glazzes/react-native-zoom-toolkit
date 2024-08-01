@@ -5,6 +5,7 @@ import type {
   SizeVector,
   SwipeDirection,
   TapGestureEvent,
+  ZoomEventCallbacks,
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
 
@@ -44,7 +45,8 @@ export type GalleryProps<T = unknown> = {
   onScroll?: (scroll: number, contentOffset: number) => void;
   onVerticalPull?: (translateY: number, released: boolean) => void;
 } & PinchGestureCallbacks &
-  PanGestureCallbacks;
+  PanGestureCallbacks &
+  ZoomEventCallbacks;
 
 export type GalleryType = {
   setIndex: (index: number) => void;

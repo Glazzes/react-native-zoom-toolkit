@@ -34,6 +34,8 @@ const GalleryProvider = <T extends unknown>(
   const resetIndex = useSharedValue<number>(startIndex);
   const fetchIndex = useSharedValue<number>(startIndex);
 
+  const hasZoomed = useSharedValue<boolean>(false);
+
   const context: GalleryContextType = {
     rootSize,
     rootChildSize,
@@ -45,6 +47,7 @@ const GalleryProvider = <T extends unknown>(
     fetchIndex,
     isScrolling,
     scale,
+    hasZoomed,
   };
 
   return (
