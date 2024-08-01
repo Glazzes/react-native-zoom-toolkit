@@ -15,21 +15,20 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { clamp } from '../../commons/utils/clamp';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
+import { snapPoint } from '../../commons/utils/snapPoint';
+import getSwipeDirection from '../../commons/utils/getSwipeDirection';
+import { GalleryContext } from './context';
+import { crop } from '../../commons/utils/crop';
+import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
+
+import { type GalleryProps, PinchCenteringMode } from './types';
 import {
   PanMode,
   ScaleMode,
   SwipeDirection,
   type BoundsFuction,
   type PanGestureEvent,
-  type PanGestureEventCallback,
-  type PinchGestureEventCallback,
-  type TapGestureEvent,
 } from '../../commons/types';
-import { snapPoint } from '../../commons/utils/snapPoint';
-import getSwipeDirection from '../../commons/utils/getSwipeDirection';
-import { GalleryContext } from './context';
-import { crop } from '../../commons/utils/crop';
-import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -41,12 +40,14 @@ type ReflectionProps = {
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
-  onTap?: (e: TapGestureEvent, index: number) => void;
-  onPanStart?: PanGestureEventCallback;
-  onPanEnd?: PanGestureEventCallback;
-  onPinchStart?: PinchGestureEventCallback;
-  onPinchEnd?: PinchGestureEventCallback;
-  onSwipe?: (direction: SwipeDirection) => void;
+  pinchCenteringMode: PinchCenteringMode;
+  onTap?: GalleryProps['onTap'];
+  onPanStart?: GalleryProps['onPanStart'];
+  onPanEnd?: GalleryProps['onPanEnd'];
+  onPinchStart?: GalleryProps['onPinchStart'];
+  onPinchEnd?: GalleryProps['onPinchEnd'];
+  onSwipe?: GalleryProps['onSwipe'];
+  onVerticalPull?: GalleryProps['onVerticalPull'];
 };
 
 /*
@@ -62,12 +63,14 @@ const Reflection = ({
   vertical,
   tapOnEdgeToItem,
   allowPinchPanning,
+  pinchCenteringMode: pinchMode,
   onTap,
   onPanStart,
   onPanEnd,
   onPinchStart: onUserPinchStart,
   onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
+  onVerticalPull,
 }: ReflectionProps) => {
   const {
     activeIndex,
@@ -92,6 +95,9 @@ const Reflection = ({
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
+
+  const isPullingVertical = useSharedValue<boolean>(false);
+  const pullReleased = useSharedValue<boolean>(false);
 
   const boundsFn: BoundsFuction = (scaleValue) => {
     'worklet';
@@ -176,21 +182,28 @@ const Reflection = ({
   };
 
   useAnimatedReaction(
-    () => rootSize.width.value,
-    () => reset(0, 0, minScale, false),
-    [rootSize]
+    () => ({
+      translate: translate.y.value,
+      scale: scale.value,
+      isPulling: isPullingVertical.value,
+      released: pullReleased.value,
+    }),
+    (val) => {
+      if (!vertical && val.scale === 1 && val.isPulling) {
+        onVerticalPull?.(val.translate, pullReleased.value);
+      }
+    },
+    [translate, scale, isPullingVertical, pullReleased]
   );
 
   useAnimatedReaction(
-    () => activeIndex.value,
+    () => ({
+      root: rootSize.width.value,
+      active: activeIndex.value,
+      reset: resetIndex.value,
+    }),
     () => reset(0, 0, minScale, false),
-    [activeIndex]
-  );
-
-  useAnimatedReaction(
-    () => resetIndex.value,
-    () => reset(0, 0, minScale, false),
-    [resetIndex]
+    [rootSize, activeIndex, resetIndex]
   );
 
   const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
@@ -208,7 +221,8 @@ const Reflection = ({
       delta,
       allowPinchPanning,
       scaleMode: ScaleMode.BOUNCE,
-      panMode: PanMode.CLAMP,
+      panMode:
+        pinchMode === PinchCenteringMode.CLAMP ? PanMode.CLAMP : PanMode.FREE,
       boundFn: boundsFn,
       userCallbacks: {
         onPinchStart: onUserPinchStart,
@@ -236,6 +250,11 @@ const Reflection = ({
       position.x.value = e.absoluteX;
       position.y.value = e.absoluteY;
 
+      const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
+      if (isVerticalPan && scale.value === 1 && !vertical) {
+        isPullingVertical.value = true;
+      }
+
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
       cancelAnimation(detectorTranslate.x);
@@ -245,6 +264,11 @@ const Reflection = ({
       offset.y.value = translate.y.value;
     })
     .onUpdate(({ translationX, translationY }) => {
+      if (isPullingVertical.value) {
+        translate.y.value = translationY;
+        return;
+      }
+
       const toX = offset.x.value + translationX;
       const toY = offset.y.value + translationY;
 
@@ -276,6 +300,17 @@ const Reflection = ({
       detectorTranslate.y.value = clamp(toY, -1 * boundY, boundY);
     })
     .onEnd((e) => {
+      if (isPullingVertical.value) {
+        pullReleased.value = true;
+        translate.y.value = withTiming(0, undefined, (finished) => {
+          if (finished) {
+            isPullingVertical.value = false;
+            pullReleased.value = false;
+          }
+        });
+        return;
+      }
+
       const boundaries = boundsFn(scale.value);
       const direction = getSwipeDirection(e, {
         boundaries,
@@ -286,16 +321,12 @@ const Reflection = ({
 
       if (direction !== undefined) {
         onSwipe(direction);
-        if (onUserSwipe !== undefined) runOnJS(onUserSwipe)(direction);
-
+        onUserSwipe && runOnJS(onUserSwipe)(direction);
         return;
       }
 
-      if (onPanEnd !== undefined) {
-        runOnJS(onPanEnd)(e);
-      }
-
       onScrollEnd(e);
+      onPanEnd && runOnJS(onPanEnd)(e);
 
       const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];
       const clampY: [number, number] = [-1 * boundaries.y, boundaries.y];
@@ -417,6 +448,8 @@ export default React.memo(Reflection, (prev, next) => {
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
-    prev.allowPinchPanning === next.allowPinchPanning
+    prev.allowPinchPanning === next.allowPinchPanning &&
+    prev.pinchCenteringMode === next.pinchCenteringMode &&
+    prev.onVerticalPull === next.onVerticalPull
   );
 });

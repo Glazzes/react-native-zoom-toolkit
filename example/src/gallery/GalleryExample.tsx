@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 import {
   stackTransition,
   Gallery,
@@ -8,12 +8,15 @@ import {
 } from 'react-native-zoom-toolkit';
 import {
   getAssetsAsync,
+  MediaType,
   requestPermissionsAsync,
   type Asset,
 } from 'expo-media-library';
 
 import GalleryImage from './GalleryImage';
 import { StyleSheet } from 'react-native';
+import VideoControls from './controls/VideoControls';
+import GalleryVideo from './GalleryVideo';
 
 type SizeVector = { width: number; height: number };
 
@@ -23,20 +26,46 @@ const GalleryExample = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [scales, setScales] = useState<SizeVector[]>([]);
 
+  const progress = useSharedValue<number>(0);
+  const opacityControls = useSharedValue<number>(0);
   const activeIndex = useSharedValue<number>(0);
+
+  // This value is used to prevent the timer to keep updating the current position
+  // when the user is dragging the bar to a position of their desire
+  const isSeeking = useSharedValue<boolean>(false);
 
   const renderItem = useCallback(
     (item: Asset, index: number) => {
+      if (item.mediaType === MediaType.video) {
+        return (
+          <GalleryVideo
+            asset={item}
+            index={index}
+            isLooping={true}
+            progress={progress}
+            isSeeking={isSeeking}
+          />
+        );
+      }
+
       return (
         <GalleryImage asset={item} index={index} activeIndex={activeIndex} />
       );
     },
-    [activeIndex]
+    [activeIndex, progress, isSeeking]
   );
 
   const keyExtractor = useCallback((item, index) => `${item.uri}-${index}`, []);
-
   const customTransition = useCallback(stackTransition, []);
+
+  // Toogle video controls opacity if the current item is a video
+  const onTap = useCallback(() => {
+    const isVideo = assets[activeIndex.value]?.mediaType === MediaType.video;
+    if (!isVideo) return;
+
+    const toValue = opacityControls.value > 0 ? 0 : 1;
+    opacityControls.value = withTiming(toValue);
+  }, [assets, activeIndex, opacityControls]);
 
   useEffect(() => {
     const requestAssets = async () => {
@@ -44,7 +73,7 @@ const GalleryExample = () => {
       if (granted) {
         const page = await getAssetsAsync({
           first: 100,
-          mediaType: 'photo',
+          mediaType: ['photo', 'video'],
           sortBy: 'creationTime',
         });
 
@@ -76,7 +105,16 @@ const GalleryExample = () => {
         onIndexChange={(idx) => {
           activeIndex.value = idx;
         }}
+        onTap={onTap}
         customTransition={customTransition}
+      />
+
+      <VideoControls
+        assets={assets}
+        activeIndex={activeIndex}
+        progress={progress}
+        isSeeking={isSeeking}
+        opacity={opacityControls}
       />
     </View>
   );
