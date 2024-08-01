@@ -213,6 +213,20 @@ Callback triggered when the list scrolls to the next or previous item.
 
 Callback triggered when the user taps the current item once, provides additional metadata like index if you need it.
 
+### onVerticalPull
+| Type | Default  | Additional Info |
+|------|----------|-----------------|
+| `(translateY: number, released: boolean) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+
+::: tip Conditions
+- Gallery must be on horizontal mode
+- The current item must be at a scale of one.
+:::
+
+Worklet callback triggered as the user drags the component vertically when this one is at a scale of one, it includes metadata like `released` parameter which indicates whether the user stopped pulling.
+
+This property is useful for instance to animate the background color based on the translateY parameter.
+
 ### onSwipe
 | Type | Default |
 |------|---------|
