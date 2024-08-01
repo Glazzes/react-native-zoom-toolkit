@@ -8,6 +8,11 @@ import type {
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
 
+export enum PinchCenteringMode {
+  CLAMP,
+  INTERACTION,
+}
+
 export type GalleryTransitionState = {
   index: number;
   activeIndex: number;
@@ -31,6 +36,7 @@ export type GalleryProps<T = unknown> = {
   vertical?: boolean;
   tapOnEdgeToItem?: boolean;
   allowPinchPanning?: boolean;
+  pinchCenteringMode?: PinchCenteringMode;
   customTransition?: GalleryTransitionCallback;
   onTap?: (e: TapGestureEvent, index: number) => void;
   onSwipe?: (direction: SwipeDirection) => void;

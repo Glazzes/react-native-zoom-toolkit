@@ -15,7 +15,11 @@ import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
 import { GalleryContext } from './context';
-import type { GalleryProps, GalleryType } from './types';
+import {
+  PinchCenteringMode,
+  type GalleryProps,
+  type GalleryType,
+} from './types';
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
   reference?: React.ForwardedRef<GalleryType>;
@@ -32,6 +36,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     maxScale: userMaxScale = 6,
     vertical = false,
     tapOnEdgeToItem = true,
+    pinchCenteringMode = PinchCenteringMode.CLAMP,
     allowPinchPanning: pinchPanning,
     customTransition,
     onIndexChange,
@@ -173,6 +178,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
         vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
         allowPinchPanning={allowPinchPanning}
+        pinchCenteringMode={pinchCenteringMode}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}

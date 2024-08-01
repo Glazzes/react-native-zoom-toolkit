@@ -21,7 +21,7 @@ import { GalleryContext } from './context';
 import { crop } from '../../commons/utils/crop';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 
-import type { GalleryProps } from './types';
+import { type GalleryProps, PinchCenteringMode } from './types';
 import {
   PanMode,
   ScaleMode,
@@ -40,6 +40,7 @@ type ReflectionProps = {
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
+  pinchCenteringMode: PinchCenteringMode;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
   onPanEnd?: GalleryProps['onPanEnd'];
@@ -62,6 +63,7 @@ const Reflection = ({
   vertical,
   tapOnEdgeToItem,
   allowPinchPanning,
+  pinchCenteringMode: pinchMode,
   onTap,
   onPanStart,
   onPanEnd,
@@ -219,7 +221,8 @@ const Reflection = ({
       delta,
       allowPinchPanning,
       scaleMode: ScaleMode.BOUNCE,
-      panMode: PanMode.CLAMP,
+      panMode:
+        pinchMode === PinchCenteringMode.CLAMP ? PanMode.CLAMP : PanMode.FREE,
       boundFn: boundsFn,
       userCallbacks: {
         onPinchStart: onUserPinchStart,
@@ -446,6 +449,7 @@ export default React.memo(Reflection, (prev, next) => {
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
     prev.allowPinchPanning === next.allowPinchPanning &&
+    prev.pinchCenteringMode === next.pinchCenteringMode &&
     prev.onVerticalPull === next.onVerticalPull
   );
 });
