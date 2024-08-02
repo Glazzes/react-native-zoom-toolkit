@@ -12,13 +12,19 @@ import {
   GestureDetector,
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
+
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { getCropRotatedSize } from '../../commons/utils/getCropRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
-import { PanMode, type BoundsFuction, ScaleMode } from '../../commons/types';
+import {
+  PanMode,
+  type BoundsFuction,
+  ScaleMode,
+  PinchCenteringMode,
+} from '../../commons/types';
 import { crop } from '../../commons/utils/crop';
 import {
   CropMode,
@@ -152,7 +158,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       delta,
       allowPinchPanning,
       scaleMode,
-      panMode,
+      pinchCenteringMode: PinchCenteringMode.INTERACTION,
       boundFn: boundsFn,
       userCallbacks: {
         onGestureEnd: onGestureEnd,
@@ -162,12 +168,12 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
+    container: detector,
     translate,
     offset,
     scale,
     minScale,
     maxScale,
-    detector,
     detectorTranslate,
     panMode,
     boundFn: boundsFn,
@@ -234,80 +240,47 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     cb
   ) => {
     if (!canRotate.value) return;
+    if (animate) canRotate.value = false;
 
     // Determine the direction multiplier based on clockwise or counterclockwise rotation
     const direction = clockwise ? 1 : -1;
     const toAngle = rotation.value + (Math.PI / 2) * direction;
     sizeAngle.value = toAngle;
-    if (cb !== undefined) cb(toAngle % (Math.PI * 2));
+    cb?.(toAngle % (Math.PI * 2));
 
-    if (animate) {
-      canRotate.value = false;
-
-      translate.x.value = withTiming(0);
-      translate.y.value = withTiming(0);
-      detectorTranslate.x.value = withTiming(0);
-      detectorTranslate.y.value = withTiming(0);
-      scale.value = withTiming(1);
-      detectorScale.value = withTiming(1);
-
-      rotation.value = withTiming(toAngle, undefined, (_) => {
-        canRotate.value = true;
-        if (Math.abs(rotation.value) === Math.PI * 2) rotation.value = 0;
-      });
-
-      return;
-    }
-
-    translate.x.value = 0;
-    translate.y.value = 0;
-    detectorTranslate.x.value = 0;
-    detectorTranslate.y.value = 0;
-    scale.value = 1;
-    detectorScale.value = 1;
+    translate.x.value = animate ? withTiming(0) : 0;
+    translate.y.value = animate ? withTiming(0) : 0;
+    detectorTranslate.x.value = animate ? withTiming(0) : 0;
+    detectorTranslate.y.value = animate ? withTiming(0) : 0;
+    scale.value = animate ? withTiming(1) : 1;
+    detectorScale.value = animate ? withTiming(1) : 1;
+    rotation.value = animate
+      ? withTiming(toAngle, undefined, (_) => {
+          canRotate.value = true;
+          if (rotation.value === Math.PI * 2) rotation.value = 0;
+        })
+      : toAngle;
   };
 
   const flipHorizontal: RotateTransitionCallback = (animate = true, cb) => {
     const toAngle = rotate.y.value !== Math.PI ? Math.PI : 0;
-    if (cb !== undefined) cb(toAngle * RAD2DEG);
-
-    if (animate) {
-      rotate.y.value = withTiming(toAngle);
-      return;
-    }
-
-    rotate.y.value = toAngle;
+    cb?.(toAngle * RAD2DEG);
+    rotate.y.value = animate ? withTiming(toAngle) : toAngle;
   };
 
   const flipVertical: RotateTransitionCallback = (animate = true, cb) => {
     const toAngle = rotate.x.value !== Math.PI ? Math.PI : 0;
-    if (cb !== undefined) cb(toAngle * RAD2DEG);
-
-    if (animate) {
-      rotate.x.value = withTiming(toAngle);
-      return;
-    }
-
-    rotate.x.value = toAngle;
+    cb?.(toAngle * RAD2DEG);
+    rotate.x.value = animate ? withTiming(toAngle) : toAngle;
   };
 
   const handleReset = (animate: boolean = true) => {
-    if (animate) {
-      translate.x.value = withTiming(0);
-      translate.y.value = withTiming(0);
-      rotation.value = withTiming(0);
-      rotate.x.value = withTiming(0);
-      rotate.y.value = withTiming(0);
-      scale.value = withTiming(minScale);
-      return;
-    }
-
-    translate.x.value = 0;
-    translate.y.value = 0;
-    rotation.value = 0;
-    rotate.x.value = 0;
-    rotate.y.value = 0;
-    scale.value = minScale;
+    translate.x.value = animate ? withTiming(0) : 0;
+    translate.y.value = animate ? withTiming(0) : 0;
+    rotation.value = animate ? withTiming(0) : 0;
+    rotate.x.value = animate ? withTiming(0) : 0;
+    rotate.y.value = animate ? withTiming(0) : 0;
+    scale.value = animate ? withTiming(minScale) : minScale;
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
@@ -352,22 +325,12 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     const toRotateX = Math.sign(state.rotateX - DEG90) === 1 ? Math.PI : 0;
     const toRotateY = Math.sign(state.rotateY - DEG90) === 1 ? Math.PI : 0;
 
-    if (animate) {
-      translate.x.value = withTiming(toX);
-      translate.y.value = withTiming(toY);
-      scale.value = withTiming(toScale);
-      rotation.value = withTiming(toRotate);
-      rotate.x.value = withTiming(toRotateX);
-      rotate.y.value = withTiming(toRotateY);
-      return;
-    }
-
-    translate.x.value = toX;
-    translate.y.value = toY;
-    scale.value = toScale;
-    rotation.value = toRotate;
-    rotate.x.value = toRotateX;
-    rotate.y.value = toRotateY;
+    translate.x.value = animate ? withTiming(toX) : toX;
+    translate.y.value = animate ? withTiming(toY) : toY;
+    scale.value = animate ? withTiming(toScale) : toScale;
+    rotation.value = animate ? withTiming(toRotate) : toRotate;
+    rotate.x.value = animate ? withTiming(toRotateX) : toRotateX;
+    rotate.y.value = animate ? withTiming(toRotateY) : toRotateY;
   };
 
   useImperativeHandle(ref, () => ({
@@ -397,7 +360,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
   if (mode === CropMode.MANAGED) {
     return (
-      <GestureHandlerRootView style={[root, styles.root]}>
+      <GestureHandlerRootView style={[root, styles.root, styles.center]}>
         <View style={[cropStyle, styles.center]}>
           <Animated.View style={containerStyle}>{children}</Animated.View>
           <View style={[reflectionSyle, StyleSheet.absoluteFill]} />
@@ -428,8 +391,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   absolute: {
     flex: 1,

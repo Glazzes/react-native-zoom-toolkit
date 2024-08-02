@@ -125,14 +125,14 @@ export default GalleryImage;
 
 ## Properties
 ### data
-| Type | Required | 
+| Type | Required |
 |------|----------|
 | `T[]`| `Yes`    |
 
 An array of items to render.
 
 ### renderItem
-| Type | Required | 
+| Type | Required |
 |------|----------|
 | `(item: T, index: number) => JSX.Element` | `Yes`    |
 
@@ -146,28 +146,28 @@ Takes an item from data and renders it into the list, provides additional metada
 Used to extract a unique key for a given item at the specified index.
 
 ### windowSize
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `number` | `5`  |
 
 Maximum number of items to be rendered at once.
 
 ### initialIndex
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `number` | `0`  |
 
 Sets the initial position of the list.
 
 ### vertical
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `boolean` | `false`  |
 
 Modifies the orientation of the component to vertical mode.
 
 ### maxScale
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `SizeVector<number>[] \| number` | `6`  |
 
@@ -176,7 +176,7 @@ Maximum scale value allowed by the pinch gesture for all elements, expects value
 Alternatively you can pass an array with the resolution of your images/videos, for instance `[{ width: 1920, height: 1080 }]`; this will instruct the component to calculate `maxScale`  in such a way it's a value just before images and videos start getting pixelated for each element, the resolutions array must be as big as the `data` property array.
 
 ### tapOnEdgeToItem
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `boolean` | `true`  |
 
@@ -189,7 +189,7 @@ Allow the user to go to the next or previous item by tapping the horizontal edge
 ### allowPinchPanning
 | Type | Default |
 |------|---------|
-| `boolean` | `true` | 
+| `boolean` | `true` |
 
 ::: warning Beware iOS users
 This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
@@ -205,13 +205,13 @@ Lets the user drag the current item around as they pinch, it also provides a mor
 | `PinchCenteringMode` | `PinchCenteringMode.CLAMP` | see [PinchCenteringMode](#pinchcenteringmode-enum) |
 
 ::: tip Tip
-To get the best out of this feature keep `allowPinchPanning` set to `true`.
+To get the best out of this feature keep `allowPinchPanning` property set to `true`.
 :::
 
 Modify the way the pinch gesture reacts to the user interaction.
 
 ### onIndexChange
-| Type | Default  | 
+| Type | Default  |
 |------|----------|
 | `(index: number) => void` | `undefined`  |
 
@@ -371,7 +371,7 @@ Jump to the item at the given index.
 ### PinchCenteringMode Enum
 Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component.
 
-| Property     |  Description |   
+| Property     |  Description |
 |--------------|--------------|
 | `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |
 | `INTERACTION` | Keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds position it will animate back to a position within the bondaries of its enclosing container. |

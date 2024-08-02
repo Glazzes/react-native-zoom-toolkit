@@ -1,4 +1,5 @@
 import type { ViewStyle } from 'react-native';
+import { PinchCenteringMode } from '../../commons/types';
 import type {
   PanGestureCallbacks,
   PinchGestureCallbacks,
@@ -8,11 +9,6 @@ import type {
   ZoomEventCallbacks,
 } from '../../commons/types';
 import type { ResumableZoomState } from '../resumable/types';
-
-export enum PinchCenteringMode {
-  CLAMP,
-  INTERACTION,
-}
 
 export type GalleryTransitionState = {
   index: number;

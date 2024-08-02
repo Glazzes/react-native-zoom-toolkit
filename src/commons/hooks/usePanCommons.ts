@@ -27,8 +27,8 @@ import { useVector } from './useVector';
 import getSwipeDirection from '../utils/getSwipeDirection';
 
 type PanCommmonOptions = {
+  container: SizeVector<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
-  detector: SizeVector<SharedValue<number>>;
   detectorTranslate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
@@ -54,7 +54,7 @@ const DECELERATION = 0.9955;
 
 export const usePanCommons = (options: PanCommmonOptions) => {
   const {
-    detector,
+    container,
     detectorTranslate,
     translate,
     offset,
@@ -69,13 +69,14 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
-
+  const gestureEnd = useSharedValue<number>(0); // Gimmick value to trigger onGestureEnd callback
   const isWithinBoundX = useSharedValue<boolean>(true);
   const isWithinBoundY = useSharedValue<boolean>(true);
 
   const onPanStart = (e: PanGestureEvent) => {
     'worklet';
 
+    userCallbacks.onPanStart && runOnJS(userCallbacks.onPanStart)(e);
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
     cancelAnimation(detectorTranslate.x);
@@ -87,10 +88,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     time.value = performance.now();
     position.x.value = e.absoluteX;
     position.y.value = e.absoluteY;
-
-    if (userCallbacks.onPanStart) {
-      runOnJS(userCallbacks.onPanStart)(e);
-    }
   };
 
   const onPanChange = (e: PanGestureUpdadeEvent) => {
@@ -104,35 +101,27 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const { x: boundX, y: boundY } = boundFn(toScale);
     const exceedX = Math.max(0, Math.abs(toX) - boundX);
     const exceedY = Math.max(0, Math.abs(toY) - boundY);
+    isWithinBoundX.value = exceedX === 0;
+    isWithinBoundY.value = exceedY === 0;
 
-    if (
-      (exceedX > 0 || exceedY > 0) &&
-      userCallbacks.onOverPanning !== undefined
-    ) {
+    if ((exceedX > 0 || exceedY > 0) && userCallbacks.onOverPanning) {
       const ex = Math.sign(toX) * exceedX;
       const ey = Math.sign(toY) * exceedY;
       userCallbacks.onOverPanning(ex, ey);
     }
 
-    if (panMode === PanMode.FREE) {
-      translate.x.value = toX;
-      translate.y.value = toY;
-      detectorTranslate.x.value = toX;
-      detectorTranslate.y.value = toY;
-      return;
-    }
-
-    if (panMode === PanMode.CLAMP) {
-      translate.x.value = clamp(toX, -1 * boundX, boundX);
-      translate.y.value = clamp(toY, -1 * boundY, boundY);
-      detectorTranslate.x.value = clamp(toX, -1 * boundX, boundX);
-      detectorTranslate.y.value = clamp(toX, -1 * boundY, boundY);
-      return;
+    // Simplify both pan modes in one condition due to their similarity
+    if (panMode !== PanMode.FRICTION) {
+      const isFree = panMode === PanMode.FREE;
+      translate.x.value = isFree ? toX : clamp(toX, -1 * boundX, boundX);
+      translate.y.value = isFree ? toY : clamp(toY, -1 * boundY, boundY);
+      detectorTranslate.x.value = translate.x.value;
+      detectorTranslate.y.value = translate.y.value;
     }
 
     if (panMode === PanMode.FRICTION) {
       const overScrollFraction =
-        Math.max(detector.width.value, detector.height.value) * 1.5;
+        Math.max(container.width.value, container.height.value) * 1.5;
 
       if (isWithinBoundX.value) {
         translate.x.value = toX;
@@ -155,7 +144,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    if (panMode === PanMode.CLAMP && userCallbacks.onSwipe !== undefined) {
+    if (panMode === PanMode.CLAMP && userCallbacks.onSwipe) {
       const boundaries = boundFn(scale.value);
       const direction = getSwipeDirection(e, {
         boundaries,
@@ -170,9 +159,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       }
     }
 
-    if (userCallbacks.onPanEnd) {
-      runOnJS(userCallbacks.onPanEnd)(e);
-    }
+    userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
 
     const toScale = clamp(scale.value, minScale, maxScale.value);
     const { x: boundX, y: boundY } = boundFn(toScale);
@@ -181,61 +168,57 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
-    const hasEndCB = userCallbacks.onGestureEnd !== undefined;
 
-    if (decay && isWithinBoundX.value) {
-      detectorTranslate.x.value = translate.x.value;
+    const shouldDecayX = decay && isWithinBoundX.value;
+    const shouldDecayY = decay && isWithinBoundY.value;
+    const decayConfigX = {
+      velocity: e.velocityX,
+      clamp: clampX,
+      deceleration: DECELERATION,
+    };
 
-      translate.x.value = withDecay(
-        {
-          velocity: e.velocityX,
-          clamp: clampX,
-          deceleration: DECELERATION,
-        },
-        (finished) => {
-          if (finished && hasEndCB) {
-            runOnJS(userCallbacks.onGestureEnd!)();
-          }
+    const decayConfigY = {
+      velocity: e.velocityY,
+      clamp: clampY,
+      deceleration: DECELERATION,
+    };
+
+    detectorTranslate.x.value = translate.x.value;
+    detectorTranslate.x.value = shouldDecayX
+      ? withDecay(decayConfigX)
+      : withTiming(toX);
+
+    translate.x.value = shouldDecayX
+      ? withDecay(decayConfigX)
+      : withTiming(toX);
+
+    detectorTranslate.y.value = translate.y.value;
+    detectorTranslate.x.value = shouldDecayY
+      ? withDecay(decayConfigY)
+      : withTiming(toY);
+
+    translate.y.value = shouldDecayY
+      ? withDecay(decayConfigY)
+      : withTiming(toY);
+
+    const restX = Math.max(0, Math.abs(translate.x.value) - boundX);
+    const restY = Math.max(0, Math.abs(translate.y.value) - boundY);
+    gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
+
+    if (shouldDecayX && shouldDecayY) {
+      const config = restX > restY ? decayConfigX : decayConfigY;
+      gestureEnd.value = withDecay(config, (finished) => {
+        if (finished && userCallbacks.onGestureEnd) {
+          runOnJS(userCallbacks.onGestureEnd)();
         }
-      );
-
-      detectorTranslate.x.value = withDecay({
-        velocity: e.velocityX,
-        clamp: clampX,
-        deceleration: DECELERATION,
       });
     } else {
-      translate.x.value = withTiming(toX, undefined, () => {
-        if (!isWithinBoundX.value && hasEndCB) {
-          runOnJS(userCallbacks.onGestureEnd!)();
+      const toValue = restX > restY ? toX : toY;
+      gestureEnd.value = withTiming(toValue, undefined, (finished) => {
+        if (finished && userCallbacks.onGestureEnd) {
+          runOnJS(userCallbacks.onGestureEnd)();
         }
       });
-
-      detectorTranslate.x.value = withTiming(toX);
-    }
-
-    if (decay && isWithinBoundY.value) {
-      detectorTranslate.y.value = translate.y.value;
-
-      translate.y.value = withDecay({
-        velocity: e.velocityY,
-        clamp: clampY,
-        deceleration: DECELERATION,
-      });
-
-      detectorTranslate.y.value = withDecay({
-        velocity: e.velocityY,
-        clamp: clampY,
-        deceleration: DECELERATION,
-      });
-    } else {
-      translate.y.value = withTiming(toY, undefined, () => {
-        if (isWithinBoundX.value && !isWithinBoundY.value && hasEndCB) {
-          runOnJS(userCallbacks.onGestureEnd!)();
-        }
-      });
-
-      detectorTranslate.y.value = withTiming(toY);
     }
   };
 

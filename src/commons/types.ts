@@ -4,12 +4,12 @@ import type {
   TapGestureHandlerEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
-import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 import type {
   EasingFunction,
   EasingFunctionFactory,
   ReduceMotion,
 } from 'react-native-reanimated';
+import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 
 export type TimingConfig = Partial<{
   duration: number;
@@ -73,6 +73,11 @@ export enum ScaleMode {
    * gesture ends the scale value returns to minScale or maxScale respectively.
    */
   BOUNCE,
+}
+
+export enum PinchCenteringMode {
+  CLAMP,
+  INTERACTION,
 }
 
 export type CommonZoomProps = Partial<{

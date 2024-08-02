@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
-import { Image } from 'expo-image';
 import {
   runOnJS,
   useAnimatedReaction,
   type SharedValue,
 } from 'react-native-reanimated';
+import { Image } from 'expo-image';
 import { type Asset } from 'expo-media-library';
 
 import { calculateItemSize } from './utils/utils';

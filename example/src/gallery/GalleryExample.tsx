@@ -1,20 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
+import { StyleSheet } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import {
+  getAssetsAsync,
+  requestPermissionsAsync,
+  MediaType,
+  type Asset,
+} from 'expo-media-library';
 import {
   stackTransition,
   Gallery,
+  PinchCenteringMode,
   type GalleryType,
 } from 'react-native-zoom-toolkit';
-import {
-  getAssetsAsync,
-  MediaType,
-  requestPermissionsAsync,
-  type Asset,
-} from 'expo-media-library';
 
 import GalleryImage from './GalleryImage';
-import { StyleSheet } from 'react-native';
 import VideoControls from './controls/VideoControls';
 import GalleryVideo from './GalleryVideo';
 
@@ -67,6 +72,25 @@ const GalleryExample = () => {
     opacityControls.value = withTiming(toValue);
   }, [assets, activeIndex, opacityControls]);
 
+  // used to derived the color animation when pulling vertically
+  const translateY = useSharedValue<number>(0);
+  const onVerticalPulling = (ty: number) => {
+    'worklet';
+    translateY.value = ty;
+  };
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      translateY.value,
+      [-150, 0, 150],
+      ['#fff', '#000', '#fff'],
+      'RGB',
+      { gamma: 2.2 }
+    );
+
+    return { backgroundColor: color };
+  });
+
   useEffect(() => {
     const requestAssets = async () => {
       const { granted } = await requestPermissionsAsync();
@@ -95,7 +119,7 @@ const GalleryExample = () => {
   }
 
   return (
-    <View style={styles.root}>
+    <Animated.View style={[styles.root, animatedStyle]}>
       <Gallery
         ref={ref}
         data={assets}
@@ -106,6 +130,8 @@ const GalleryExample = () => {
           activeIndex.value = idx;
         }}
         onTap={onTap}
+        pinchCenteringMode={PinchCenteringMode.INTERACTION}
+        onVerticalPull={onVerticalPulling}
         customTransition={customTransition}
       />
 
@@ -116,14 +142,13 @@ const GalleryExample = () => {
         isSeeking={isSeeking}
         opacity={opacityControls}
       />
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#000',
   },
 });
 

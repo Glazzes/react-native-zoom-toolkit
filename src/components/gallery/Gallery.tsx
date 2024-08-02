@@ -8,6 +8,7 @@ import {
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { PinchCenteringMode } from '../../commons/types';
 import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
@@ -15,11 +16,7 @@ import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
 import { GalleryContext } from './context';
-import {
-  PinchCenteringMode,
-  type GalleryProps,
-  type GalleryType,
-} from './types';
+import { type GalleryProps, type GalleryType } from './types';
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
   reference?: React.ForwardedRef<GalleryType>;
@@ -67,7 +64,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     hasZoomed,
   } = useContext(GalleryContext);
 
-  const scrollDirection = useDerivedValue(() => {
+  const itemSize = useDerivedValue(() => {
     return vertical ? rootSize.height.value : rootSize.width.value;
   }, [vertical, rootSize]);
 
@@ -93,12 +90,11 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     scroll.value = activeIndex.value * e.nativeEvent.layout.width;
   };
 
-  useDerivedValue(() => {
-    onScroll?.(
-      scroll.value,
-      data.length * scrollDirection.value - scrollDirection.value
-    );
-  }, [scroll.value, data.length, scrollDirection]);
+  useAnimatedReaction(
+    () => ({ scroll: scroll.value, itemSize: itemSize.value }),
+    (value) => onScroll?.(value.scroll, (data.length - 1) * value.itemSize),
+    [scroll, itemSize]
+  );
 
   useAnimatedReaction(
     () => activeIndex.value,
@@ -118,7 +114,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
       const direction = value ? rootSize.height.value : rootSize.width.value;
       scroll.value = activeIndex.value * direction;
     },
-    [vertical, activeIndex, rootSize]
+    [vertical]
   );
 
   useAnimatedReaction(
@@ -140,7 +136,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     const clamped = clamp(index, 0, data.length);
     activeIndex.value = clamped;
     fetchIndex.value = clamped;
-    scroll.value = clamped * scrollDirection.value;
+    scroll.value = clamped * itemSize.value;
   };
 
   const requestState = () => ({
@@ -190,7 +186,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
 
       <Reflection
         maxScale={maxScale}
-        scrollDirection={scrollDirection}
+        itemSize={itemSize}
         length={data.length}
         vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
