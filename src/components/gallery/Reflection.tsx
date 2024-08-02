@@ -9,6 +9,7 @@ import Animated, {
   withDecay,
   withTiming,
   type SharedValue,
+  type WithDecayConfig,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -21,9 +22,9 @@ import { GalleryContext } from './context';
 import { crop } from '../../commons/utils/crop';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 
-import { type GalleryProps, PinchCenteringMode } from './types';
+import { type GalleryProps } from './types';
 import {
-  PanMode,
+  PinchCenteringMode,
   ScaleMode,
   SwipeDirection,
   type BoundsFuction,
@@ -36,7 +37,7 @@ const config = { duration: 300, easing: Easing.linear };
 type ReflectionProps = {
   length: number;
   maxScale: SharedValue<number>;
-  scrollDirection: Readonly<SharedValue<number>>;
+  itemSize: Readonly<SharedValue<number>>;
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
@@ -59,11 +60,11 @@ type ReflectionProps = {
 const Reflection = ({
   length,
   maxScale,
-  scrollDirection,
+  itemSize,
   vertical,
   tapOnEdgeToItem,
   allowPinchPanning,
-  pinchCenteringMode: pinchMode,
+  pinchCenteringMode,
   onTap,
   onPanStart,
   onPanEnd,
@@ -132,16 +133,16 @@ const Reflection = ({
 
   const clampScroll = (value: number) => {
     'worklet';
-    return clamp(value, 0, (length - 1) * scrollDirection.value);
+    return clamp(value, 0, (length - 1) * itemSize.value);
   };
 
   const onScrollEnd = (e: PanGestureEvent) => {
     'worklet';
     const index = activeIndex.value;
 
-    const prev = scrollDirection.value * (index - 1);
-    const current = scrollDirection.value * index;
-    const next = scrollDirection.value * (index + 1);
+    const prev = itemSize.value * (index - 1);
+    const current = itemSize.value * index;
+    const next = itemSize.value * (index + 1);
 
     const velocity = vertical ? e.velocityY : e.velocityX;
     const points = scroll.value >= current ? [current, next] : [prev, current];
@@ -174,7 +175,7 @@ const Reflection = ({
 
     fetchIndex.value = toIndex;
 
-    const to = clampScroll(toIndex * scrollDirection.value);
+    const to = clampScroll(toIndex * itemSize.value);
     scroll.value = withTiming(to, config, (finished) => {
       activeIndex.value = toIndex;
       if (finished) isScrolling.value = false;
@@ -221,8 +222,7 @@ const Reflection = ({
       delta,
       allowPinchPanning,
       scaleMode: ScaleMode.BOUNCE,
-      panMode:
-        pinchMode === PinchCenteringMode.CLAMP ? PanMode.CLAMP : PanMode.FREE,
+      pinchCenteringMode,
       boundFn: boundsFn,
       userCallbacks: {
         onPinchStart: onUserPinchStart,
@@ -239,27 +239,21 @@ const Reflection = ({
     .maxPointers(1)
     .enabled(gesturesEnabled)
     .onStart((e) => {
-      if (onPanStart !== undefined) {
-        runOnJS(onPanStart)(e);
-      }
-
-      isScrolling.value = true;
-      scrollOffset.value = scroll.value;
-
-      time.value = performance.now();
-      position.x.value = e.absoluteX;
-      position.y.value = e.absoluteY;
-
-      const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
-      if (isVerticalPan && scale.value === 1 && !vertical) {
-        isPullingVertical.value = true;
-      }
-
+      onPanStart && runOnJS(onPanStart)(e);
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
       cancelAnimation(detectorTranslate.x);
       cancelAnimation(detectorTranslate.y);
 
+      const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
+      isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
+      isScrolling.value = true;
+
+      time.value = performance.now();
+      position.x.value = e.absoluteX;
+      position.y.value = e.absoluteY;
+
+      scrollOffset.value = scroll.value;
       offset.x.value = translate.x.value;
       offset.y.value = translate.y.value;
     })
@@ -276,23 +270,13 @@ const Reflection = ({
       const exceedX = Math.max(0, Math.abs(toX) - boundX);
       const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
-      if (exceedX > 0 && !vertical) {
-        const ex = -1 * Math.sign(toX) * exceedX;
-        scroll.value = clamp(
-          scrollOffset.value + ex,
-          0,
-          (length - 1) * rootSize.width.value
-        );
-      }
-
-      if (exceedY > 0 && vertical) {
-        const ey = -1 * Math.sign(toY) * exceedY;
-        scroll.value = clamp(
-          scrollOffset.value + ey,
-          0,
-          (length - 1) * rootSize.height.value
-        );
-      }
+      const scrollX = -1 * Math.sign(toX) * exceedX;
+      const scrollY = -1 * Math.sign(toY) * exceedY;
+      scroll.value = clamp(
+        scrollOffset.value + (vertical ? scrollY : scrollX),
+        0,
+        (length - 1) * itemSize.value
+      );
 
       translate.x.value = clamp(toX, -1 * boundX, boundX);
       translate.y.value = clamp(toY, -1 * boundY, boundY);
@@ -330,18 +314,13 @@ const Reflection = ({
 
       const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];
       const clampY: [number, number] = [-1 * boundaries.y, boundaries.y];
+      const configX: WithDecayConfig = { velocity: e.velocityX, clamp: clampX };
+      const configY: WithDecayConfig = { velocity: e.velocityY, clamp: clampY };
 
-      translate.x.value = withDecay({ velocity: e.velocityX, clamp: clampX });
-      detectorTranslate.x.value = withDecay({
-        velocity: e.velocityX,
-        clamp: clampX,
-      });
-
-      translate.y.value = withDecay({ velocity: e.velocityY, clamp: clampY });
-      detectorTranslate.y.value = withDecay({
-        velocity: e.velocityY,
-        clamp: clampY,
-      });
+      translate.x.value = withDecay(configX);
+      translate.y.value = withDecay(configY);
+      detectorTranslate.x.value = withDecay(configX);
+      detectorTranslate.y.value = withDecay(configY);
     });
 
   const tap = Gesture.Tap()
@@ -371,15 +350,13 @@ const Reflection = ({
       });
 
       const tapEdge = 44 / scale.value;
-      const left = originX + tapEdge;
+      const leftEdge = originX + tapEdge;
       const rightEdge = originX + width - tapEdge;
 
       let toIndex = activeIndex.value;
-      if (e.x <= left && tapOnEdgeToItem && !vertical)
-        toIndex = activeIndex.value - 1;
-
-      if (e.x >= rightEdge && tapOnEdgeToItem && !vertical)
-        toIndex = activeIndex.value + 1;
+      const canGoToItem = tapOnEdgeToItem && !vertical;
+      if (e.x <= leftEdge && canGoToItem) toIndex = activeIndex.value - 1;
+      if (e.x >= rightEdge && canGoToItem) toIndex = activeIndex.value + 1;
 
       if (toIndex === activeIndex.value) {
         onTap?.(e, activeIndex.value);
@@ -387,7 +364,7 @@ const Reflection = ({
       }
 
       toIndex = clamp(toIndex, 0, length - 1);
-      scroll.value = toIndex * scrollDirection.value;
+      scroll.value = toIndex * itemSize.value;
       activeIndex.value = toIndex;
       fetchIndex.value = toIndex;
     });
