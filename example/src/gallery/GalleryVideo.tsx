@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useWindowDimensions } from 'react-native';
+import { type SharedValue } from 'react-native-reanimated';
 import { ResizeMode, Video, type AVPlaybackStatus } from 'expo-av';
 import type { Asset } from 'expo-media-library';
 
@@ -10,7 +11,6 @@ import {
   listenToSeekVideoEvent,
   listenToStopVideoEvent,
 } from './utils/emitter';
-import { type SharedValue } from 'react-native-reanimated';
 
 type GalleryVideoProps = {
   asset: Asset;
