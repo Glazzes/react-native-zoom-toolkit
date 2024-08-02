@@ -193,7 +193,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       : withTiming(toX);
 
     detectorTranslate.y.value = translate.y.value;
-    detectorTranslate.x.value = shouldDecayY
+    detectorTranslate.y.value = shouldDecayY
       ? withDecay(decayConfigY)
       : withTiming(toY);
 
