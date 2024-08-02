@@ -25,7 +25,6 @@ import {
 } from '../types';
 import { useVector } from './useVector';
 import getSwipeDirection from '../utils/getSwipeDirection';
-import type { DecayConfig } from 'react-native-reanimated/lib/typescript/reanimated2/animation/decay/utils';
 
 type PanCommmonOptions = {
   container: SizeVector<SharedValue<number>>;
@@ -172,13 +171,13 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const shouldDecayX = decay && isWithinBoundX.value;
     const shouldDecayY = decay && isWithinBoundY.value;
-    const decayConfigX: DecayConfig = {
+    const decayConfigX = {
       velocity: e.velocityX,
       clamp: clampX,
       deceleration: DECELERATION,
     };
 
-    const decayConfigY: DecayConfig = {
+    const decayConfigY = {
       velocity: e.velocityY,
       clamp: clampY,
       deceleration: DECELERATION,

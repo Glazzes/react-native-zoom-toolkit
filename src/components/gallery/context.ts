@@ -13,6 +13,7 @@ export type GalleryContextType = {
   resetIndex: SharedValue<number>;
   fetchIndex: SharedValue<number>;
   isScrolling: SharedValue<boolean>;
+  hasZoomed: SharedValue<boolean>;
 };
 
 export const GalleryContext = React.createContext<GalleryContextType>(

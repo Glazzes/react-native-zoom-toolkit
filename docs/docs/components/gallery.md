@@ -249,6 +249,13 @@ This property is useful for instance to animate the background color based on th
 
 Callback triggered when the user swipes up, down, left or right.
 
+### onScroll
+| Type | Default | Additional Info |
+|------|---------|----------------|
+| `(scroll: number, contentOffset: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+
+Worklet callback triggered as the user scrolls the gallery.
+
 ### onPanStart
 | Type | Default | Additional Info |
 |------|---------|-----------------|
@@ -277,12 +284,19 @@ Callback triggered when the pinch gesture starts.
 
 Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
-### onScroll
-| Type | Default | Additional Info |
-|------|---------|----------------|
-| `(scroll: number, contentOffset: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+### onZoomBegin
+| Type | Default |
+|------|---------|
+| `(index: number) => void` | `undefined` |
 
-Worklet callback triggered as the user scrolls the gallery.
+Callback triggered when component is zoomed from its base state (scale value at one).
+
+### onZoomEnd
+| Type | Default |
+|------|---------|
+| `(index: number) => void` | `undefined` |
+
+Callback triggered when component returns back to its original state (scale value at one).
 
 ### customTransition
 

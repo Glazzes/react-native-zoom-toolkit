@@ -10,7 +10,13 @@ export * from './components/crop/types';
 export { default as Gallery } from './components/gallery/GalleryProvider';
 export * from './components/gallery/types';
 
-export { PanMode, ScaleMode, SwipeDirection } from './commons/types';
+export {
+  PanMode,
+  ScaleMode,
+  PinchCenteringMode,
+  SwipeDirection,
+} from './commons/types';
+
 export type {
   Vector,
   SizeVector,
