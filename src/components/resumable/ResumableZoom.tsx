@@ -19,7 +19,12 @@ import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
-import { PanMode, ScaleMode, type BoundsFuction } from '../../commons/types';
+import {
+  PanMode,
+  PinchCenteringMode,
+  ScaleMode,
+  type BoundsFuction,
+} from '../../commons/types';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
@@ -46,6 +51,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = PanMode.CLAMP,
     scaleMode = ScaleMode.BOUNCE,
+    pinchCenteringMode = PinchCenteringMode.CLAMP,
     allowPinchPanning: pinchPanning,
     onTap,
     onGestureActive,
@@ -98,11 +104,11 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const boundsFn: BoundsFuction = (scaleValue) => {
     'worklet';
-    const { width: dWidth, height: dHeight } = childSize;
+    const { width: cWidth, height: cHeight } = childSize;
     const { width: rWidth, height: rHeight } = rootSize;
 
-    const boundX = Math.max(0, dWidth.value * scaleValue - rWidth.value) / 2;
-    const boundY = Math.max(0, dHeight.value * scaleValue - rHeight.value) / 2;
+    const boundX = Math.max(0, cWidth.value * scaleValue - rWidth.value) / 2;
+    const boundY = Math.max(0, cHeight.value * scaleValue - rHeight.value) / 2;
     return { x: boundX, y: boundY };
   };
 
@@ -150,7 +156,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       delta,
       allowPinchPanning,
       scaleMode,
-      panMode,
+      pinchCenteringMode,
       boundFn: boundsFn,
       userCallbacks: {
         onGestureEnd,
@@ -160,7 +166,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
-    detector: childSize,
+    container: extendGestures ? extendedSize : childSize,
     detectorTranslate,
     translate,
     offset,

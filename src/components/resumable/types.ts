@@ -2,6 +2,7 @@ import type React from 'react';
 import type {
   CommonResumableProps,
   PanGestureCallbacks,
+  PinchCenteringMode,
   PinchGestureCallbacks,
   SizeVector,
   SwipeDirection,
@@ -28,6 +29,7 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   panEnabled?: boolean;
   pinchEnabled?: boolean;
   maxScale?: SizeVector<number> | number;
+  pinchCenteringMode?: PinchCenteringMode;
   onSwipe?: (direction: SwipeDirection) => void;
   onGestureActive?: (e: ResumableZoomState) => void;
   onGestureEnd?: (() => void) | undefined;
