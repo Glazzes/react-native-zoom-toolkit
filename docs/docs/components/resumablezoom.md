@@ -65,7 +65,7 @@ export default App;
 All properties for this component are optional.
 
 ### extendGestures
-| Type | Default | 
+| Type | Default |
 |------|---------|
 | `boolean` | `false` |
 
@@ -74,7 +74,7 @@ By default the gesture detection area is the same size as the width and height o
 To summarize this property: It improves the gesture detection for small components.
 
 ### minScale
-| Type | Default | 
+| Type | Default |
 |------|---------|
 | `number` | `1` |
 
@@ -103,6 +103,17 @@ Select which one of the three available pan modes to use.
 
 Select which one of the two available scale modes to use.
 
+### pinchCenteringMode
+| Type | Default  | Additional Info |
+|------|----------|-----------------|
+| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` | see [PinchCenteringMode](#pinchcenteringmode-enum) |
+
+::: tip Tip
+To get the best out of this feature keep `allowPinchPanning` property set to `true`.
+:::
+
+Modify the way the pinch gesture reacts to the user interaction.
+
 ### decay
 | Type | Default | Additional Info |
 |------|---------|-----------------|
@@ -113,7 +124,7 @@ Whether to apply a decay animation when the pan gesture ends or not.
 ### allowPinchPanning
 | Type | Default |
 |------|---------|
-| `boolean` | `true` | 
+| `boolean` | `true` |
 
 ::: warning Beware iOS users
 This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
@@ -210,7 +221,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), ideal if you need to mirror its current transformation values to some other component as it updates, see [ResumableZoomState](#resumablezoomstate).
 
 ### onGestureEnd
-| Type | Default | 
+| Type | Default |
 |------|---------|
 | `() => void` | `undefined` |
 
@@ -294,3 +305,11 @@ Determine how your component must behave when the pinch gesture's scale value ex
 |----------|------------|
 | `CLAMP`  | Prevents the user from exceeding the scale boundaries. |
 | `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale` respectively. |
+
+### PinchCenteringMode Enum
+Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component.
+
+| Property     |  Description |
+|--------------|--------------|
+| `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |
+| `INTERACTION` | Keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds position it will animate back to a position within the bondaries of its enclosing container. |
