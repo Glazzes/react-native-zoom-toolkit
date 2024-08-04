@@ -151,8 +151,8 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scale.value = withTiming(toScale, undefined, () => {
-      runOnJS(switchGesturesState)(true);
+    scale.value = withTiming(toScale, undefined, (finished) => {
+      finished && runOnJS(switchGesturesState)(true);
     });
 
     gestureEnd.value = withTiming(toValue, undefined, (finished) => {

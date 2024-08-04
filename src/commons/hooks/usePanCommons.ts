@@ -95,7 +95,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
-
     const toScale = clamp(scale.value, minScale, maxScale.value);
 
     const { x: boundX, y: boundY } = boundFn(toScale);
@@ -110,34 +109,33 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       userCallbacks.onOverPanning(ex, ey);
     }
 
-    // Simplify both pan modes in one condition due to their similarity
+    // Simplify both free and clamp pan modes in one condition due to their similarity
     if (panMode !== PanMode.FRICTION) {
       const isFree = panMode === PanMode.FREE;
       translate.x.value = isFree ? toX : clamp(toX, -1 * boundX, boundX);
       translate.y.value = isFree ? toY : clamp(toY, -1 * boundY, boundY);
       detectorTranslate.x.value = translate.x.value;
       detectorTranslate.y.value = translate.y.value;
+      return;
     }
 
-    if (panMode === PanMode.FRICTION) {
-      const overScrollFraction =
-        Math.max(container.width.value, container.height.value) * 1.5;
+    const overScrollFraction =
+      Math.max(container.width.value, container.height.value) * 1.5;
 
-      if (isWithinBoundX.value) {
-        translate.x.value = toX;
-      } else {
-        const fraction = Math.abs(Math.abs(toX) - boundX) / overScrollFraction;
-        const frictionX = friction(clamp(fraction, 0, 1));
-        translate.x.value += e.changeX * frictionX;
-      }
+    if (isWithinBoundX.value) {
+      translate.x.value = toX;
+    } else {
+      const fraction = Math.abs(Math.abs(toX) - boundX) / overScrollFraction;
+      const frictionX = friction(clamp(fraction, 0, 1));
+      translate.x.value += e.changeX * frictionX;
+    }
 
-      if (isWithinBoundY.value) {
-        translate.y.value = toY;
-      } else {
-        const fraction = Math.abs(Math.abs(toY) - boundY) / overScrollFraction;
-        const frictionY = friction(clamp(fraction, 0, 1));
-        translate.y.value += e.changeY * frictionY;
-      }
+    if (isWithinBoundY.value) {
+      translate.y.value = toY;
+    } else {
+      const fraction = Math.abs(Math.abs(toY) - boundY) / overScrollFraction;
+      const frictionY = friction(clamp(fraction, 0, 1));
+      translate.y.value += e.changeY * frictionY;
     }
   };
 
