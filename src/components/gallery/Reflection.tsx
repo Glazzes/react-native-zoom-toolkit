@@ -131,54 +131,42 @@ const Reflection = ({
     detectorScale.value = animate ? withTiming(toScale) : toScale;
   };
 
-  const clampScroll = (value: number) => {
-    'worklet';
-    return clamp(value, 0, (length - 1) * itemSize.value);
-  };
-
-  const onScrollEnd = (e: PanGestureEvent) => {
+  const snapToScrollPosition = (e: PanGestureEvent) => {
     'worklet';
     const index = activeIndex.value;
-
-    const prev = itemSize.value * (index - 1);
+    const prev = itemSize.value * clamp(index - 1, 0, length - 1);
     const current = itemSize.value * index;
-    const next = itemSize.value * (index + 1);
+    const next = itemSize.value * clamp(index + 1, 0, length - 1);
 
     const velocity = vertical ? e.velocityY : e.velocityX;
-    const points = scroll.value >= current ? [current, next] : [prev, current];
-    const to = clampScroll(snapPoint(scroll.value, velocity, points));
+    const toScroll = snapPoint(scroll.value, velocity, [prev, current, next]);
 
-    if (to !== current) {
-      fetchIndex.value = index + (to === next ? 1 : -1);
-    }
+    if (toScroll !== current)
+      fetchIndex.value = index + (toScroll === next ? 1 : -1);
 
-    scroll.value = withTiming(to, config, () => {
-      if (to !== current) {
-        activeIndex.value = index + (to === next ? 1 : -1);
-        isScrolling.value = false;
-      }
+    scroll.value = withTiming(toScroll, config, () => {
+      activeIndex.value = fetchIndex.value;
+      isScrolling.value = false;
     });
   };
 
   const onSwipe = (direction: SwipeDirection) => {
     'worklet';
 
-    const index = activeIndex.value;
     let acc = 0;
     if (direction === SwipeDirection.UP && vertical) acc = 1;
     if (direction === SwipeDirection.DOWN && vertical) acc = -1;
     if (direction === SwipeDirection.LEFT && !vertical) acc = 1;
     if (direction === SwipeDirection.RIGHT && !vertical) acc = -1;
+    if (acc === 0) return;
 
-    const toIndex = index + acc;
-    if (toIndex < 0 || toIndex > length - 1) return;
+    const toIndex = clamp(activeIndex.value + acc, 0, length - 1);
+    const toScroll = toIndex * itemSize.value;
 
     fetchIndex.value = toIndex;
-
-    const to = clampScroll(toIndex * itemSize.value);
-    scroll.value = withTiming(to, config, (finished) => {
+    scroll.value = withTiming(toScroll, config, (finished) => {
       activeIndex.value = toIndex;
-      if (finished) isScrolling.value = false;
+      isScrolling.value = !finished;
     });
   };
 
@@ -284,6 +272,20 @@ const Reflection = ({
       detectorTranslate.y.value = clamp(toY, -1 * boundY, boundY);
     })
     .onEnd((e) => {
+      const boundaries = boundsFn(scale.value);
+      const direction = getSwipeDirection(e, {
+        boundaries,
+        time: time.value,
+        position: { x: position.x.value, y: position.y.value },
+        translate: {
+          x: isPullingVertical.value ? 100 : translate.x.value,
+          y: isPullingVertical.value ? 0 : translate.y.value,
+        },
+      });
+
+      direction !== undefined && onSwipe(direction);
+      direction !== undefined && onUserSwipe && runOnJS(onUserSwipe)(direction);
+
       if (isPullingVertical.value) {
         pullReleased.value = true;
         translate.y.value = withTiming(0, undefined, (finished) => {
@@ -295,21 +297,7 @@ const Reflection = ({
         return;
       }
 
-      const boundaries = boundsFn(scale.value);
-      const direction = getSwipeDirection(e, {
-        boundaries,
-        time: time.value,
-        position: { x: position.x.value, y: position.y.value },
-        translate: { x: translate.x.value, y: translate.y.value },
-      });
-
-      if (direction !== undefined) {
-        onSwipe(direction);
-        onUserSwipe && runOnJS(onUserSwipe)(direction);
-        return;
-      }
-
-      onScrollEnd(e);
+      direction === undefined && snapToScrollPosition(e);
       onPanEnd && runOnJS(onPanEnd)(e);
 
       const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];

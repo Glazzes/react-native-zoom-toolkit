@@ -167,8 +167,8 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
 
-    const shouldDecayX = decay && isWithinBoundX.value;
-    const shouldDecayY = decay && isWithinBoundY.value;
+    const decayX = decay && isWithinBoundX.value;
+    const decayY = decay && isWithinBoundY.value;
     const decayConfigX = {
       velocity: e.velocityX,
       clamp: clampX,
@@ -182,28 +182,24 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     };
 
     detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.x.value = shouldDecayX
+    detectorTranslate.x.value = decayX
       ? withDecay(decayConfigX)
       : withTiming(toX);
 
-    translate.x.value = shouldDecayX
-      ? withDecay(decayConfigX)
-      : withTiming(toX);
+    translate.x.value = decayX ? withDecay(decayConfigX) : withTiming(toX);
 
     detectorTranslate.y.value = translate.y.value;
-    detectorTranslate.y.value = shouldDecayY
+    detectorTranslate.y.value = decayY
       ? withDecay(decayConfigY)
       : withTiming(toY);
 
-    translate.y.value = shouldDecayY
-      ? withDecay(decayConfigY)
-      : withTiming(toY);
+    translate.y.value = decayY ? withDecay(decayConfigY) : withTiming(toY);
 
     const restX = Math.max(0, Math.abs(translate.x.value) - boundX);
     const restY = Math.max(0, Math.abs(translate.y.value) - boundY);
     gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
 
-    if (shouldDecayX && shouldDecayY) {
+    if (decayX && decayY) {
       const config = restX > restY ? decayConfigX : decayConfigY;
       gestureEnd.value = withDecay(config, (finished) => {
         if (finished && userCallbacks.onGestureEnd) {
