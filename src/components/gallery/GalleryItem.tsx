@@ -31,21 +31,21 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
 }) => {
   const {
     rootSize,
-    activeIndex,
     rootChildSize,
+    activeIndex,
     scroll,
     isScrolling,
     translate,
     scale,
   } = useContext(GalleryContext);
 
-  const childSize = useSizeVector(0, 0);
+  const itemSize = useSizeVector(0, 0);
   const innerTranslate = useVector(0, 0);
   const innerScale = useSharedValue<number>(1);
 
   const measureChild = (e: LayoutChangeEvent) => {
-    childSize.width.value = e.nativeEvent.layout.width;
-    childSize.height.value = e.nativeEvent.layout.height;
+    itemSize.width.value = e.nativeEvent.layout.width;
+    itemSize.height.value = e.nativeEvent.layout.height;
 
     if (index === activeIndex.value) {
       rootChildSize.width.value = e.nativeEvent.layout.width;
@@ -100,8 +100,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
     () => activeIndex.value,
     (value) => {
       if (index === value) {
-        rootChildSize.width.value = childSize.width.value;
-        rootChildSize.height.value = childSize.height.value;
+        rootChildSize.width.value = itemSize.width.value;
+        rootChildSize.height.value = itemSize.height.value;
       } else {
         innerTranslate.x.value = 0;
         innerTranslate.y.value = 0;

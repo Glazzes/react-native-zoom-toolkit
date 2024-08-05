@@ -5,10 +5,9 @@ import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 
-import type { GalleryProps, GalleryType } from './types';
-
 import Gallery from './Gallery';
 import { GalleryContext, type GalleryContextType } from './context';
+import type { GalleryProps, GalleryType } from './types';
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
   ref: React.ForwardedRef<GalleryType>;

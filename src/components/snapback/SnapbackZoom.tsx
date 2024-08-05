@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   measure,
   runOnJS,
@@ -10,6 +9,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
@@ -33,8 +33,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureEnd,
 }) => {
   const [internalGesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
-  const toggleGestures = () => {
-    setGesturesEnabled((prev) => !prev);
+  const switchGestureStatus = (enabled: boolean) => {
+    setGesturesEnabled(enabled);
   };
 
   const position = useVector(0, 0);
@@ -89,9 +89,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled && internalGesturesEnabled)
     .onStart((e) => {
-      if (onPinchStart !== undefined) {
-        runOnJS(onPinchStart)(e);
-      }
+      onPinchStart && runOnJS(onPinchStart)(e);
 
       measurePinchContainer();
       origin.x.value = e.focalX - containerSize.width.value / 2;
@@ -109,20 +107,14 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       scale.value = e.scale;
     })
     .onEnd((e) => {
-      runOnJS(toggleGestures)();
-
-      if (onPinchEnd !== undefined) {
-        runOnJS(onPinchEnd)(e);
-      }
+      runOnJS(switchGestureStatus)(false);
+      onPinchEnd && runOnJS(onPinchEnd)(e);
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        runOnJS(toggleGestures)();
-
-        if (onGestureEnd !== undefined) {
-          runOnJS(onGestureEnd)();
-        }
+        runOnJS(switchGestureStatus)(true);
+        onGestureEnd && runOnJS(onGestureEnd)();
       });
     });
 

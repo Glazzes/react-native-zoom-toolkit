@@ -297,8 +297,8 @@ const Reflection = ({
         return;
       }
 
-      direction === undefined && snapToScrollPosition(e);
       onPanEnd && runOnJS(onPanEnd)(e);
+      direction === undefined && snapToScrollPosition(e);
 
       const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];
       const clampY: [number, number] = [-1 * boundaries.y, boundaries.y];
@@ -322,9 +322,7 @@ const Reflection = ({
         height: rootSize.height.value,
       };
 
-      const {
-        crop: { originX, width },
-      } = crop({
+      const { crop: result } = crop({
         scale: scale.value,
         context: {
           flipHorizontal: false,
@@ -338,8 +336,8 @@ const Reflection = ({
       });
 
       const tapEdge = 44 / scale.value;
-      const leftEdge = originX + tapEdge;
-      const rightEdge = originX + width - tapEdge;
+      const leftEdge = result.originX + tapEdge;
+      const rightEdge = result.originX + result.width - tapEdge;
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
