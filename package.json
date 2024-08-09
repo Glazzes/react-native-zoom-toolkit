@@ -1,7 +1,7 @@
 {
   "name": "react-native-zoom-toolkit",
-  "version": "2.1.1",
-  "description": "Smoothly zoom any image, video or component you want in a performant way!",
+  "version": "2.1.2",
+  "description": "Smoothly zoom any image, video or component you want!",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
