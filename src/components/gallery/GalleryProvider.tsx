@@ -9,12 +9,8 @@ import Gallery from './Gallery';
 import { GalleryContext, type GalleryContextType } from './context';
 import type { GalleryProps, GalleryType } from './types';
 
-type GalleryPropsWithRef<T> = GalleryProps<T> & {
-  ref: React.ForwardedRef<GalleryType>;
-};
-
 const GalleryProvider = <T extends unknown>(
-  props: GalleryPropsWithRef<T>,
+  props: GalleryProps<T>,
   ref: React.ForwardedRef<GalleryType>
 ) => {
   const startIndex = clamp(props.initialIndex ?? 0, 0, props.data.length - 1);
@@ -54,6 +50,10 @@ const GalleryProvider = <T extends unknown>(
       <Gallery {...props} reference={ref} />
     </GalleryContext.Provider>
   );
+};
+
+type GalleryPropsWithRef<T> = GalleryProps<T> & {
+  ref: React.ForwardedRef<GalleryType>;
 };
 
 export default forwardRef(GalleryProvider) as <T>(

@@ -17,11 +17,11 @@ import { clamp } from '../../commons/utils/clamp';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
 import { snapPoint } from '../../commons/utils/snapPoint';
-import getSwipeDirection from '../../commons/utils/getSwipeDirection';
-import { GalleryContext } from './context';
 import { crop } from '../../commons/utils/crop';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
+import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 
+import { GalleryContext } from './context';
 import { type GalleryProps } from './types';
 import {
   PinchCenteringMode,
@@ -52,10 +52,9 @@ type ReflectionProps = {
 };
 
 /*
- * Pinchable views are heavy components, real heavy ones, therefore in order to maximize
- * performance only a single Pinchable view is shared among all the list items, by listening
- * to this component updates the elements in the list get updated only if they're the current
- * index.
+ * Pinchable views are really heavy components, therefore in order to maximize performance
+ * only a single pinchable view is shared among all the list items.
+ * Items listen to this component updates and only update themselves if they are the current item.
  */
 const Reflection = ({
   length,
@@ -178,9 +177,8 @@ const Reflection = ({
       released: pullReleased.value,
     }),
     (val) => {
-      if (!vertical && val.scale === 1 && val.isPulling) {
-        onVerticalPull?.(val.translate, pullReleased.value);
-      }
+      const shouldPull = !vertical && val.scale === 1 && val.isPulling;
+      shouldPull && onVerticalPull?.(val.translate, val.released);
     },
     [translate, scale, isPullingVertical, pullReleased]
   );
@@ -245,14 +243,14 @@ const Reflection = ({
       offset.x.value = translate.x.value;
       offset.y.value = translate.y.value;
     })
-    .onUpdate(({ translationX, translationY }) => {
+    .onUpdate((e) => {
       if (isPullingVertical.value) {
-        translate.y.value = translationY;
+        translate.y.value = e.translationY;
         return;
       }
 
-      const toX = offset.x.value + translationX;
-      const toY = offset.y.value + translationY;
+      const toX = offset.x.value + e.translationX;
+      const toY = offset.y.value + e.translationY;
 
       const { x: boundX, y: boundY } = boundsFn(scale.value);
       const exceedX = Math.max(0, Math.abs(toX) - boundX);
@@ -272,9 +270,9 @@ const Reflection = ({
       detectorTranslate.y.value = clamp(toY, -1 * boundY, boundY);
     })
     .onEnd((e) => {
-      const boundaries = boundsFn(scale.value);
+      const bounds = boundsFn(scale.value);
       const direction = getSwipeDirection(e, {
-        boundaries,
+        boundaries: bounds,
         time: time.value,
         position: { x: position.x.value, y: position.y.value },
         translate: {
@@ -289,26 +287,32 @@ const Reflection = ({
       if (isPullingVertical.value) {
         pullReleased.value = true;
         translate.y.value = withTiming(0, undefined, (finished) => {
-          if (finished) {
-            isPullingVertical.value = false;
-            pullReleased.value = false;
-          }
+          isPullingVertical.value = !finished;
+          pullReleased.value = !finished;
         });
+
         return;
       }
 
+      const isSwipingH =
+        direction === SwipeDirection.LEFT || direction === SwipeDirection.RIGHT;
+
+      const isSwipingV =
+        direction === SwipeDirection.UP || direction === SwipeDirection.DOWN;
+
+      const snapV = vertical && (direction === undefined || isSwipingH);
+      const snapH = !vertical && (direction === undefined || isSwipingV);
+
       onPanEnd && runOnJS(onPanEnd)(e);
-      direction === undefined && snapToScrollPosition(e);
+      (snapV || snapH) && snapToScrollPosition(e);
 
-      const clampX: [number, number] = [-1 * boundaries.x, boundaries.x];
-      const clampY: [number, number] = [-1 * boundaries.y, boundaries.y];
-      const configX: WithDecayConfig = { velocity: e.velocityX, clamp: clampX };
-      const configY: WithDecayConfig = { velocity: e.velocityY, clamp: clampY };
+      const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
+      const configY = { velocity: e.velocityY, clamp: [-bounds.y, bounds.y] };
 
-      translate.x.value = withDecay(configX);
-      translate.y.value = withDecay(configY);
-      detectorTranslate.x.value = withDecay(configX);
-      detectorTranslate.y.value = withDecay(configY);
+      translate.x.value = withDecay(configX as WithDecayConfig);
+      translate.y.value = withDecay(configY as WithDecayConfig);
+      detectorTranslate.x.value = withDecay(configX as WithDecayConfig);
+      detectorTranslate.y.value = withDecay(configY as WithDecayConfig);
     });
 
   const tap = Gesture.Tap()
@@ -341,8 +345,8 @@ const Reflection = ({
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
-      if (e.x <= leftEdge && canGoToItem) toIndex = activeIndex.value - 1;
-      if (e.x >= rightEdge && canGoToItem) toIndex = activeIndex.value + 1;
+      if (e.x <= leftEdge && canGoToItem) toIndex -= 1;
+      if (e.x >= rightEdge && canGoToItem) toIndex += 1;
 
       if (toIndex === activeIndex.value) {
         onTap?.(e, activeIndex.value);
