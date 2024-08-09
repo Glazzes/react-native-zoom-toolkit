@@ -172,8 +172,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     translate,
     offset,
     scale,
-    minScale,
-    maxScale,
     detectorTranslate,
     panMode,
     boundFn: boundsFn,

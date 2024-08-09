@@ -24,7 +24,7 @@ import {
   SwipeDirection,
 } from '../types';
 import { useVector } from './useVector';
-import getSwipeDirection from '../utils/getSwipeDirection';
+import { getSwipeDirection } from '../utils/getSwipeDirection';
 
 type PanCommmonOptions = {
   container: SizeVector<SharedValue<number>>;
@@ -33,15 +33,13 @@ type PanCommmonOptions = {
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
   scale: SharedValue<number>;
-  minScale: number;
-  maxScale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
   userCallbacks: Partial<{
     onGestureEnd: () => void;
-    onSwipe: (direction: SwipeDirection) => void;
     onPanStart: PanGestureEventCallback;
     onPanEnd: PanGestureEventCallback;
+    onSwipe: (direction: SwipeDirection) => void;
     onOverPanning: (x: number, y: number) => void;
   }>;
 };
@@ -60,8 +58,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     offset,
     panMode,
     scale,
-    minScale,
-    maxScale,
     decay,
     boundFn,
     userCallbacks,
@@ -95,9 +91,8 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
-    const toScale = clamp(scale.value, minScale, maxScale.value);
 
-    const { x: boundX, y: boundY } = boundFn(toScale);
+    const { x: boundX, y: boundY } = boundFn(scale.value);
     const exceedX = Math.max(0, Math.abs(toX) - boundX);
     const exceedY = Math.max(0, Math.abs(toY) - boundY);
     isWithinBoundX.value = exceedX === 0;
@@ -159,8 +154,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
 
-    const toScale = clamp(scale.value, minScale, maxScale.value);
-    const { x: boundX, y: boundY } = boundFn(toScale);
+    const { x: boundX, y: boundY } = boundFn(scale.value);
     const clampX: [number, number] = [-1 * boundX, boundX];
     const clampY: [number, number] = [-1 * boundY, boundY];
 

@@ -11,10 +11,10 @@ const SWIPE_TIME = 175;
 const SWIPE_VELOCITY = 500;
 const SWIPE_DISTANCE = 20;
 
-export default function getSwipeDirection(
+export const getSwipeDirection = (
   e: PanGestureEvent,
   options: SwipeDirectionOptions
-): SwipeDirection | undefined {
+): SwipeDirection | undefined => {
   'worklet';
 
   const { time, boundaries, position, translate } = options;
@@ -57,4 +57,4 @@ export default function getSwipeDirection(
   if (swipeDown && inLowerBound) return SwipeDirection.DOWN;
 
   return undefined;
-}
+};
