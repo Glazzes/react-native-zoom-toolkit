@@ -24,7 +24,7 @@ import {
   SwipeDirection,
 } from '../types';
 import { useVector } from './useVector';
-import getSwipeDirection from '../utils/getSwipeDirection';
+import { getSwipeDirection } from '../utils/getSwipeDirection';
 
 type PanCommmonOptions = {
   container: SizeVector<SharedValue<number>>;
@@ -33,15 +33,13 @@ type PanCommmonOptions = {
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
   scale: SharedValue<number>;
-  minScale: number;
-  maxScale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
   userCallbacks: Partial<{
     onGestureEnd: () => void;
-    onSwipe: (direction: SwipeDirection) => void;
     onPanStart: PanGestureEventCallback;
     onPanEnd: PanGestureEventCallback;
+    onSwipe: (direction: SwipeDirection) => void;
     onOverPanning: (x: number, y: number) => void;
   }>;
 };
@@ -60,8 +58,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     offset,
     panMode,
     scale,
-    minScale,
-    maxScale,
     decay,
     boundFn,
     userCallbacks,
@@ -96,9 +92,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    const toScale = clamp(scale.value, minScale, maxScale.value);
-
-    const { x: boundX, y: boundY } = boundFn(toScale);
+    const { x: boundX, y: boundY } = boundFn(scale.value);
     const exceedX = Math.max(0, Math.abs(toX) - boundX);
     const exceedY = Math.max(0, Math.abs(toY) - boundY);
     isWithinBoundX.value = exceedX === 0;
@@ -110,34 +104,33 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       userCallbacks.onOverPanning(ex, ey);
     }
 
-    // Simplify both pan modes in one condition due to their similarity
+    // Simplify both free and clamp pan modes in one condition due to their similarity
     if (panMode !== PanMode.FRICTION) {
       const isFree = panMode === PanMode.FREE;
       translate.x.value = isFree ? toX : clamp(toX, -1 * boundX, boundX);
       translate.y.value = isFree ? toY : clamp(toY, -1 * boundY, boundY);
       detectorTranslate.x.value = translate.x.value;
       detectorTranslate.y.value = translate.y.value;
+      return;
     }
 
-    if (panMode === PanMode.FRICTION) {
-      const overScrollFraction =
-        Math.max(container.width.value, container.height.value) * 1.5;
+    const overScrollFraction =
+      Math.max(container.width.value, container.height.value) * 1.5;
 
-      if (isWithinBoundX.value) {
-        translate.x.value = toX;
-      } else {
-        const fraction = Math.abs(Math.abs(toX) - boundX) / overScrollFraction;
-        const frictionX = friction(clamp(fraction, 0, 1));
-        translate.x.value += e.changeX * frictionX;
-      }
+    if (isWithinBoundX.value) {
+      translate.x.value = toX;
+    } else {
+      const fraction = Math.abs(Math.abs(toX) - boundX) / overScrollFraction;
+      const frictionX = friction(clamp(fraction, 0, 1));
+      translate.x.value += e.changeX * frictionX;
+    }
 
-      if (isWithinBoundY.value) {
-        translate.y.value = toY;
-      } else {
-        const fraction = Math.abs(Math.abs(toY) - boundY) / overScrollFraction;
-        const frictionY = friction(clamp(fraction, 0, 1));
-        translate.y.value += e.changeY * frictionY;
-      }
+    if (isWithinBoundY.value) {
+      translate.y.value = toY;
+    } else {
+      const fraction = Math.abs(Math.abs(toY) - boundY) / overScrollFraction;
+      const frictionY = friction(clamp(fraction, 0, 1));
+      translate.y.value += e.changeY * frictionY;
     }
   };
 
@@ -161,16 +154,15 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
 
-    const toScale = clamp(scale.value, minScale, maxScale.value);
-    const { x: boundX, y: boundY } = boundFn(toScale);
+    const { x: boundX, y: boundY } = boundFn(scale.value);
     const clampX: [number, number] = [-1 * boundX, boundX];
     const clampY: [number, number] = [-1 * boundY, boundY];
 
     const toX = clamp(translate.x.value, -1 * boundX, boundX);
     const toY = clamp(translate.y.value, -1 * boundY, boundY);
 
-    const shouldDecayX = decay && isWithinBoundX.value;
-    const shouldDecayY = decay && isWithinBoundY.value;
+    const decayX = decay && isWithinBoundX.value;
+    const decayY = decay && isWithinBoundY.value;
     const decayConfigX = {
       velocity: e.velocityX,
       clamp: clampX,
@@ -184,28 +176,24 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     };
 
     detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.x.value = shouldDecayX
+    detectorTranslate.x.value = decayX
       ? withDecay(decayConfigX)
       : withTiming(toX);
 
-    translate.x.value = shouldDecayX
-      ? withDecay(decayConfigX)
-      : withTiming(toX);
+    translate.x.value = decayX ? withDecay(decayConfigX) : withTiming(toX);
 
     detectorTranslate.y.value = translate.y.value;
-    detectorTranslate.y.value = shouldDecayY
+    detectorTranslate.y.value = decayY
       ? withDecay(decayConfigY)
       : withTiming(toY);
 
-    translate.y.value = shouldDecayY
-      ? withDecay(decayConfigY)
-      : withTiming(toY);
+    translate.y.value = decayY ? withDecay(decayConfigY) : withTiming(toY);
 
     const restX = Math.max(0, Math.abs(translate.x.value) - boundX);
     const restY = Math.max(0, Math.abs(translate.y.value) - boundY);
     gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
 
-    if (shouldDecayX && shouldDecayY) {
+    if (decayX && decayY) {
       const config = restX > restY ? decayConfigX : decayConfigY;
       gestureEnd.value = withDecay(config, (finished) => {
         if (finished && userCallbacks.onGestureEnd) {

@@ -87,7 +87,9 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;
     rootSize.height.value = e.nativeEvent.layout.height;
-    scroll.value = activeIndex.value * e.nativeEvent.layout.width;
+
+    const direction = vertical ? rootSize.width.value : rootSize.height.value;
+    scroll.value = activeIndex.value * direction;
   };
 
   useAnimatedReaction(
@@ -133,7 +135,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
 
   // Reference handling
   const setIndex = (index: number) => {
-    const clamped = clamp(index, 0, data.length);
+    const clamped = clamp(index, 0, data.length - 1);
     activeIndex.value = clamped;
     fetchIndex.value = clamped;
     scroll.value = clamped * itemSize.value;
@@ -162,19 +164,16 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   return (
     <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
       {data.map((item, index) => {
-        if (
-          index < scrollIndex - nextItems ||
-          index > scrollIndex + nextItems
-        ) {
-          return null;
-        }
+        const inLowerHalf = index < scrollIndex - nextItems;
+        const inUpperHalf = index > scrollIndex + nextItems;
+        if (inLowerHalf || inUpperHalf) return null;
 
         const key = keyExtractor?.(item, index) ?? `item-${index}`;
 
         return (
           <GalleryItem
             key={key}
-            count={data.length}
+            zIndex={data.length - index}
             index={index}
             item={item}
             vertical={vertical}
