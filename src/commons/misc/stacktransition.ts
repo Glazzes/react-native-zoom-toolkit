@@ -9,7 +9,7 @@ export const stackTransition: GalleryTransitionCallback = (options) => {
 
   if (vertical) {
     const translateY = index * gallerySize.height - scroll;
-    return { transform: [{ translateY }], opacity: 1 };
+    return { transform: [{ translateY }] };
   }
 
   if (index < activeIndex - 1 || index > activeIndex + 1) {

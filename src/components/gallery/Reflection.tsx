@@ -74,7 +74,6 @@ const Reflection = ({
 }: ReflectionProps) => {
   const {
     activeIndex,
-    resetIndex,
     fetchIndex,
     scroll,
     scrollOffset,
@@ -146,26 +145,27 @@ const Reflection = ({
     scroll.value = withTiming(toScroll, config, () => {
       activeIndex.value = fetchIndex.value;
       isScrolling.value = false;
+      toScroll !== current && reset(0, 0, minScale, false);
     });
   };
 
   const onSwipe = (direction: SwipeDirection) => {
     'worklet';
 
-    let acc = 0;
-    if (direction === SwipeDirection.UP && vertical) acc = 1;
-    if (direction === SwipeDirection.DOWN && vertical) acc = -1;
-    if (direction === SwipeDirection.LEFT && !vertical) acc = 1;
-    if (direction === SwipeDirection.RIGHT && !vertical) acc = -1;
-    if (acc === 0) return;
+    let toIndex = activeIndex.value;
+    if (direction === SwipeDirection.UP && vertical) toIndex += 1;
+    if (direction === SwipeDirection.DOWN && vertical) toIndex -= 1;
+    if (direction === SwipeDirection.LEFT && !vertical) toIndex += 1;
+    if (direction === SwipeDirection.RIGHT && !vertical) toIndex -= 1;
 
-    const toIndex = clamp(activeIndex.value + acc, 0, length - 1);
-    const toScroll = toIndex * itemSize.value;
+    toIndex = clamp(toIndex, 0, length - 1);
+    if (toIndex === activeIndex.value) return;
 
     fetchIndex.value = toIndex;
-    scroll.value = withTiming(toScroll, config, (finished) => {
+    scroll.value = withTiming(toIndex * itemSize.value, config, () => {
       activeIndex.value = toIndex;
-      isScrolling.value = !finished;
+      isScrolling.value = false;
+      reset(0, 0, minScale, false);
     });
   };
 
@@ -185,12 +185,11 @@ const Reflection = ({
 
   useAnimatedReaction(
     () => ({
-      root: rootSize.width.value,
-      active: activeIndex.value,
-      reset: resetIndex.value,
+      width: rootSize.width.value,
+      height: rootSize.height.value,
     }),
     () => reset(0, 0, minScale, false),
-    [rootSize, activeIndex, resetIndex]
+    [rootSize]
   );
 
   const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
@@ -357,6 +356,8 @@ const Reflection = ({
       scroll.value = toIndex * itemSize.value;
       activeIndex.value = toIndex;
       fetchIndex.value = toIndex;
+
+      reset(0, 0, minScale, false);
     });
 
   const doubleTap = Gesture.Tap()
