@@ -14,20 +14,18 @@ const GalleryProvider = <T extends unknown>(
   ref: React.ForwardedRef<GalleryType>
 ) => {
   const startIndex = clamp(props.initialIndex ?? 0, 0, props.data.length - 1);
+  const activeIndex = useSharedValue<number>(startIndex);
+  const fetchIndex = useSharedValue<number>(startIndex);
 
   const rootSize = useSizeVector(0, 0);
   const rootChildSize = useSizeVector(0, 0);
 
-  const scroll = useSharedValue<number>(0);
-  const scrollOffset = useSharedValue<number>(0);
-  const isScrolling = useSharedValue<boolean>(false);
-
   const translate = useVector(0, 0);
   const scale = useSharedValue<number>(1);
 
-  const activeIndex = useSharedValue<number>(startIndex);
-  const resetIndex = useSharedValue<number>(startIndex);
-  const fetchIndex = useSharedValue<number>(startIndex);
+  const scroll = useSharedValue<number>(0);
+  const scrollOffset = useSharedValue<number>(0);
+  const isScrolling = useSharedValue<boolean>(false);
 
   const hasZoomed = useSharedValue<boolean>(false);
 
@@ -38,7 +36,6 @@ const GalleryProvider = <T extends unknown>(
     scrollOffset,
     translate,
     activeIndex,
-    resetIndex,
     fetchIndex,
     isScrolling,
     scale,
@@ -47,7 +44,7 @@ const GalleryProvider = <T extends unknown>(
 
   return (
     <GalleryContext.Provider value={context}>
-      <Gallery {...props} reference={ref} />
+      <Gallery {...props} initialIndex={startIndex} reference={ref} />
     </GalleryContext.Provider>
   );
 };

@@ -77,7 +77,10 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
       });
     }
 
-    const opacity = rootSize.width.value === 0 && index !== 0 ? 0 : 1;
+    const sizeNotDefined =
+      rootSize.width.value === 0 && rootSize.height.value === 0;
+    const opacity = sizeNotDefined && index !== activeIndex.value ? 0 : 1;
+
     if (vertical) {
       const translateY = index * rootSize.height.value - scroll.value;
       return { transform: [{ translateY }], opacity };

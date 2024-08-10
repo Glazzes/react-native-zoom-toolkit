@@ -85,10 +85,11 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   }, [userMaxScale, activeIndex, rootChildSize]);
 
   const measureRoot = (e: LayoutChangeEvent) => {
-    rootSize.width.value = e.nativeEvent.layout.width;
-    rootSize.height.value = e.nativeEvent.layout.height;
+    const { width, height } = e.nativeEvent.layout;
+    rootSize.width.value = width;
+    rootSize.height.value = height;
 
-    const direction = vertical ? rootSize.width.value : rootSize.height.value;
+    const direction = vertical ? height : width;
     scroll.value = activeIndex.value * direction;
   };
 
@@ -111,12 +112,15 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
   );
 
   useAnimatedReaction(
-    () => vertical,
+    () => ({
+      vertical,
+      size: { width: rootSize.width.value, height: rootSize.height.value },
+    }),
     (value) => {
-      const direction = value ? rootSize.height.value : rootSize.width.value;
+      const direction = value.vertical ? value.size.height : value.size.width;
       scroll.value = activeIndex.value * direction;
     },
-    [vertical]
+    [vertical, rootSize]
   );
 
   useAnimatedReaction(
