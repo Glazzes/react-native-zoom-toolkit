@@ -13,11 +13,12 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { DEFAULT_HITSLOP } from '../../commons/constants';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
 import type { SnapBackZoomProps } from './types';
+
+const DEFAULT_HITSLOP = { vertical: 0, horizontal: 0 };
 
 const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,

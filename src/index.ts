@@ -34,5 +34,5 @@ export {
   type Source,
 } from './hooks/useImageResolution';
 
-export { default as getAspectRatioSize } from './utils/getAspectRatioSize';
+export { getAspectRatioSize } from './utils/getAspectRatioSize';
 export { stackTransition } from './commons/misc/stacktransition';
