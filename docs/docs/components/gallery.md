@@ -1,6 +1,6 @@
 ---
 title: Gallery
-description: An unopinionated component for building galleries
+description: An unopinionated component for building zoomable galleries
 outline: deep
 ---
 
@@ -11,6 +11,7 @@ A practical gallery component which mimics Telegram's gallery behavior, among it
 - **Pinch Gesture:** Accurate pinch gesture calculation, drag your component around as you pinch, scale your component in two different modes.
 - **Double Tap:** Tap twice in a point of interest to trigger a zoom animation.
 - **Tap to Item:** Tap on the edges of an item to go to the previous or next item.
+- **Custom Scroll Transition**: Customize scroll behavior with your own transitions.
 
 The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
@@ -200,15 +201,16 @@ For more information see this [Gesture Handler's issue](https://github.com/softw
 Lets the user drag the current item around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
 ### pinchCenteringMode
-| Type | Default  | Additional Info |
-|------|----------|-----------------|
-| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` | see [PinchCenteringMode](#pinchcenteringmode-enum) |
+| Type | Default  |
+|------|----------|
+| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` |
 
 ::: tip Tip
 To get the best out of this feature keep `allowPinchPanning` property set to `true`.
 :::
 
-Modify the way the pinch gesture reacts to the user interaction.
+Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing container,
+see [PinchCenteringMode](#pinchcenteringmode-enum).
 
 ### onIndexChange
 | Type | Default  |
@@ -342,35 +344,32 @@ ref.current?.requestState();
 ### reset
 Reset all transformations to their initial state.
 
-- Arguments
+- type definition: `(animate?: boolean) => void`
+- parameter information
 
-| Name | Type | Defaut | Description |
-|------|------|------------|---------|
-| animate | `boolean` | `true` | Whether to animate the transition or not. |
+| Name      | Type      | Default | Description                               |
+|-----------|-----------|---------|-------------------------------------------|
+| `animate` | `boolean \| undefined` | `true`  | Whether to animate the transition or not .|
 
-- Returns `void`
 
 ### requestState
-Request internal transformation values of the current item at the moment of the calling.
+Request internal transformation values of the current item at the moment of the calling
 
-- Takes no arguments
-- Returns [ResumableZoomState](#resumablezoomstate)
+- type definition: `() => ResumableZoomState`;
+- return type: [ResumableZoomState](#resumablezoomstate).
 
 ### setIndex
 Jump to the item at the given index.
 
-- Arguments
+- type definition: `(index: number) => void`
+- parameter information
 
-| Name  | Type  | Description |
-|-------|-------|-------------|
-| index | `number` | Index of the item to transition to. |
-
-- Returns `void`
+| Name   | Type     | Description                         |
+|--------|----------|-------------------------------------|
+| index  | `number` | Index of the item to transition to. |
 
 ## Type Definitions
 ### PinchCenteringMode Enum
-Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component.
-
 | Property     |  Description |
 |--------------|--------------|
 | `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |

@@ -1,6 +1,6 @@
 ---
 title: Resumable Zoom
-description: An ideal component for detail screens.
+description: An ideal zoom component for detail screens.
 outline: deep
 ---
 
@@ -11,7 +11,6 @@ Among its more remarkable features you will find:
 - **Pan Gesture:** Drag and your components around in three different modes, optionally let your component slide with a decay animation.
 - **Pinch Gesture:** Accurate pinch gesture calculation, drag your component around as you pinch, scale your component in two different modes.
 - **Double Tap:** Tap twice in a point of interest to trigger a zoom animation.
-- **Swipe Gesture:** Implements swipe to the right and swipe to the left gestures, ideal for galleries, see [gallery example](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
 The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
@@ -69,7 +68,7 @@ All properties for this component are optional.
 |------|---------|
 | `boolean` | `false` |
 
-By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true` the detection area is increased to the size `ResuambleZoom` is taking on screen, if the wrapped component is bigger than the space taken by `ResumableZoom` component, this property will do nothing.
+By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true` the detection area is increased to the size `ResumableZoom` is taking on screen, if the wrapped component is bigger than the space taken by `ResumableZoom` component, this property will do nothing.
 
 To summarize this property: It improves the gesture detection for small components.
 
@@ -90,29 +89,32 @@ Maximum scale value allowed by the pinch gesture, expects values bigger than or 
 Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`; this will instruct the component to calculate `maxScale`  in such a way it's a value just before images and videos start getting pixelated.
 
 ### panMode
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `PanMode` | `PanMode.CLAMP` | see [PanMode](#panmode-enum) |
+| Type | Default |
+|------|---------|
+| `PanMode` | `PanMode.CLAMP` |
 
-Select which one of the three available pan modes to use.
+Determine how your component must behave when it's panned beyond the specified boundaries by the container
+enclosing it, see [PanMode](#panmode-enum).
 
 ### scaleMode
-| Type | Default | Additional Info |
-|------|---------|-----------------|
-| `ScaleMode` | `ScaleMode.BOUNCE` | see [ScaleMode](#scalemode-enum) |
+| Type | Default |
+|------|---------|
+| `ScaleMode` | `ScaleMode.BOUNCE` |
 
-Select which one of the two available scale modes to use.
+Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
+defined by `minScale` and `maxScale` properties, see [ScaleMode](#scalemode-enum).
 
 ### pinchCenteringMode
-| Type | Default  | Additional Info |
-|------|----------|-----------------|
-| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` | see [PinchCenteringMode](#pinchcenteringmode-enum) |
+| Type | Default  |
+|------|----------|
+| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` |
 
 ::: tip Tip
 To get the best out of this feature keep `allowPinchPanning` property set to `true`.
 :::
 
-Modify the way the pinch gesture reacts to the user interaction.
+Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
+see [PinchCenteringMode](#pinchcenteringmode-enum).
 
 ### decay
 | Type | Default | Additional Info |
@@ -247,30 +249,31 @@ ref.current?.reset(false);
 ### reset
 Reset all transformations to their initial state.
 
-- Arguments
+- type definition: `(animate?: boolean) => void`
+- parameter information
 
 | Name | Type | Default |Description |
 |------|------|---------|------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
-- Returns `void`
-
 ### requestState
 Request internal transformation values of this component at the moment of the calling.
 
-- Takes no arguments
-- Returns [ResumableZoomState](#resumablezoomstate)
+- type definition: `() => ResumableZoomState`
+- return type: [ResumableZoomState](#resumablezoomstate)
 
 ### assignState
-Assigns the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
-- Arguments
+Assigns the internal transformation values for this component, if the state you have provided is
+considered to be not achievable by the component's boundaries, it'll be approximated to the closest
+valid state.
+
+- type definition: `(state: ResumableZoomAssignableState, animate?: boolean) => void`
+- parameter information
 
 | Name | Type |Description |
 |------|------|------------|
 | state   | [ResumableZoomAssignableState](#resumablezoomassignablestate) | Object containg the transformation values to assign to `ResumableZoom` component. |
 | animate | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
-
-- Returns `void`
 
 ## Type Definitions
 ### ResumableZoomState
@@ -290,8 +293,6 @@ Assigns the internal transformation values for this component, if the state you 
 | `scale`      | `number` | Scale transformation value.      |
 
 ### PanMode Enum
-Determine how your component must behave when it reaches the specified boundaries by the container enclosing it.
-
 | Property |Description |
 |----------|------------|
 | `CLAMP`  | Prevents the user from dragging the component out of the specified boundaries. |
@@ -299,8 +300,6 @@ Determine how your component must behave when it reaches the specified boundarie
 | `FRICTION` | Lets the user drag the component around freely applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determine how your component must behave when the pinch gesture's scale value exceeds the specified boundaries by `minScale` and `maxScale` properties.
-
 | Property |Description |
 |----------|------------|
 | `CLAMP`  | Prevents the user from exceeding the scale boundaries. |
