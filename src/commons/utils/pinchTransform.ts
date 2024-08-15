@@ -8,14 +8,10 @@ type PinchOptions = {
   offset: Vector<number>;
 };
 
-export const pinchTransform = ({
-  toScale,
-  fromScale,
-  delta,
-  origin,
-  offset,
-}: PinchOptions): Vector<number> => {
+export const pinchTransform = (options: PinchOptions): Vector<number> => {
   'worklet';
+
+  const { toScale, fromScale, delta, origin, offset } = options;
 
   const fromPinchX = -1 * (origin.x * fromScale - origin.x);
   const fromPinchY = -1 * (origin.y * fromScale - origin.y);

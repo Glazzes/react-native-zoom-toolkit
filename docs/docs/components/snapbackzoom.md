@@ -1,6 +1,6 @@
 ---
 title: Snapback Zoom
-description: An ideal component for preview handling
+description: An ideal zoom component for preview handling
 outline: deep
 ---
 
@@ -69,7 +69,7 @@ All properties for this component are optional.
 
 Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
-### timingConfig 
+### timingConfig
 | Type | Default | Additional Info |
 |------|---------|-----------------|
 | `object` | `undefined` | see [TimingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |

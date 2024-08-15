@@ -1,6 +1,6 @@
 import { SwipeDirection, type PanGestureEvent, type Vector } from '../types';
 
-type SwipeDirectionOptions = {
+type SwipeOptions = {
   time: number;
   boundaries: Vector<number>;
   position: Vector<number>;
@@ -13,7 +13,7 @@ const SWIPE_DISTANCE = 20;
 
 export const getSwipeDirection = (
   e: PanGestureEvent,
-  options: SwipeDirectionOptions
+  options: SwipeOptions
 ): SwipeDirection | undefined => {
   'worklet';
 

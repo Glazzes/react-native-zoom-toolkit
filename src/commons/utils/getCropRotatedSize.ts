@@ -1,5 +1,5 @@
 import type { SizeVector } from '../types';
-import getAspectRatioSize from '../../utils/getAspectRatioSize';
+import { getAspectRatioSize } from '../../utils/getAspectRatioSize';
 
 type Options = {
   crop: SizeVector<number>;
@@ -23,11 +23,11 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
     height: cropAspectRatio >= 1 ? crop.height : undefined,
   });
 
-  let resizer = 1;
-  if (base.height < crop.height) resizer = crop.height / base.height;
-  if (base.width < crop.width) resizer = crop.width / base.width;
-  base.width = base.width * resizer;
-  base.height = base.height * resizer;
+  let sizeModifier = 1;
+  if (base.height < crop.height) sizeModifier = crop.height / base.height;
+  if (base.width < crop.width) sizeModifier = crop.width / base.width;
+  base.width = base.width * sizeModifier;
+  base.height = base.height * sizeModifier;
 
   const maxWidth =
     Math.abs(base.height * Math.sin(angle)) +

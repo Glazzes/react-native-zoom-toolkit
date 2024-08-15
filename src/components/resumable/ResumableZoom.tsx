@@ -33,7 +33,7 @@ import type {
   ResumableZoomType,
   ResumableZoomAssignableState,
 } from './types';
-import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
+import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
 
@@ -64,7 +64,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onOverPanning,
   } = props;
 
-  const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
+  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);

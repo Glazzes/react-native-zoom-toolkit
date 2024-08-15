@@ -20,14 +20,14 @@ type GalleryItemProps = {
   customTransition?: GalleryTransitionCallback;
 };
 
-const GalleryItem: React.FC<GalleryItemProps> = ({
+const GalleryItem = ({
   index,
   zIndex,
   item,
   vertical,
   renderItem,
   customTransition,
-}) => {
+}: GalleryItemProps) => {
   const {
     rootSize,
     rootChildSize,

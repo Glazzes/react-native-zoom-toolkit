@@ -19,23 +19,14 @@ const flipVector = (vector: SizeVector<number>): SizeVector<number> => {
   };
 };
 
-export const crop = ({
-  cropSize,
-  canvas,
-  resolution,
-  position,
-  scale,
-  fixedWidth,
-  context,
-}: CanvasToSizeOptions): CropContextResult => {
-  const isFlipped = context.rotationAngle % 180 !== 0;
+export const crop = (options: CanvasToSizeOptions): CropContextResult => {
+  'worklet';
+  const { cropSize, canvas, resolution, position, scale, fixedWidth, context } =
+    options;
 
-  let currentCanvas = canvas;
-  let currentResolution = resolution;
-  if (isFlipped) {
-    currentCanvas = flipVector(canvas);
-    currentResolution = flipVector(resolution);
-  }
+  const isFlipped = context.rotationAngle % 180 !== 0;
+  const currentCanvas = isFlipped ? flipVector(canvas) : canvas;
+  const currentResolution = isFlipped ? flipVector(resolution) : resolution;
 
   const offsetX = (currentCanvas.width * scale - cropSize.width) / 2;
   const offsetY = (currentCanvas.height * scale - cropSize.height) / 2;
@@ -46,7 +37,6 @@ export const crop = ({
   const relativeX = cropSize.width / (currentCanvas.width * scale);
   const relativeY = cropSize.height / (currentCanvas.height * scale);
 
-  // (1 - relative) - (1 - normalized / (2 * offset)) I just do not like NaN checks
   const posX = interpolate(normalizedX, [0, 2 * offsetX], [1 - relativeX, 0]);
   const posY = interpolate(normalizedY, [0, 2 * offsetY], [1 - relativeY, 0]);
 
@@ -56,21 +46,23 @@ export const crop = ({
   const height = currentResolution.height * relativeY;
   let resize: SizeVector<number> | undefined;
 
-  let fixer = 1;
+  // Make a normal crop, if the fixedWidth is defined just resize everything to meet the ratio
+  // between fixedWidth and the width of the crop.
+  let sizeModifier = 1;
   if (fixedWidth !== undefined) {
-    fixer = fixedWidth / width;
+    sizeModifier = fixedWidth / width;
     resize = {
-      width: Math.ceil(resolution.width * fixer),
-      height: Math.ceil(resolution.height * fixer),
+      width: Math.ceil(resolution.width * sizeModifier),
+      height: Math.ceil(resolution.height * sizeModifier),
     };
   }
 
   return {
     crop: {
-      originX: x * fixer,
-      originY: y * fixer,
-      width: Math.round(width * fixer),
-      height: Math.round(height * fixer),
+      originX: x * sizeModifier,
+      originY: y * sizeModifier,
+      width: Math.round(width * sizeModifier),
+      height: Math.round(height * sizeModifier),
     },
     context,
     resize,

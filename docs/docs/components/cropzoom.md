@@ -54,11 +54,11 @@ if(resolution === undefined) {
   return null;
 }
 
-<CropZoom 
+<CropZoom
   ref={ref}
   debug={true}
-  cropSize={cropSize} 
-  resolution={resolution} 
+  cropSize={cropSize}
+  resolution={resolution}
   OverlayComponent={renderOverlay}
 >
   <Image source={{uri: iamgeUrl }} style={{flex: 1}} />
@@ -116,7 +116,7 @@ In case you're color blind and/or have any trouble differentiating colors, pleas
 Highlight the cropping area with a red-ish color as well as the gesture detection area with a light green color, use it to align your `OverlayComponent` with the crop area properly.
 
 ### minScale
-| Type | Default | Required | 
+| Type | Default | Required |
 |------|---------|----------|
 | `number` | `1` | `No`     |
 
@@ -130,23 +130,25 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 Maximum scale value allowed by the pinch gesture, leaving this property as `undefined` will instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
 
 ### panMode
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `PanMode` | `PanMode.FREE` | `No`    | see [PanMode](#panmode-enum) |
+| Type | Default |
+|------|---------|
+| `PanMode` | `PanMode.CLAMP` |
 
-Select which one of the three available pan modes to use.
+Determines how your component must behave when it's panned beyond the boundaries defined by the
+cropping area, see [PanMode](#panmode-enum).
 
 ### scaleMode
-| Type | Default | Required | Additional Info |
-|------|---------|----------|-----------------|
-| `ScaleMode` | `ScaleMode.BOUNCE` | `No`    | see [ScaleMode](#scalemode-enum) |
+| Type | Default |
+|------|---------|
+| `ScaleMode` | `ScaleMode.BOUNCE` |
 
-Select which one of the two available scale modes to use.
+Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
+defined by `minScale` and `maxScale` properties, see [ScaleMode](#scalemode-enum).
 
 ### allowPinchPanning
 | Type | Default | Required |
 |------|---------|----------|
-| `boolean` | `true` | `No` | 
+| `boolean` | `true` | `No` |
 
 ::: warning Beware iOS users
 This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
@@ -233,34 +235,41 @@ ref.current?.crop(200);
 ```
 
 ### crop
-Map all the transformations applied to your component into a simple and ready to use object specifying the context necessary for a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance Expo Image Manipulator, see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo) guide.
 
-- Arguments
+::: warning Beware
+Calling this method with the `fixedWidth` argument will subject your crops to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+:::
+
+Map all the transformations applied to your component into a simple and ready to use object specifying the
+context necessary for a crop operation,such object must be used along with a library capable of cropping
+images and/or videos, for instance Expo Image Manipulator,
+see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo) guide.
+
+- type definition: `(fixedWidth?: number) => CropContextResult`
+- parameter information
 
 | Name | Type | Default | Description |
 |------|------|-------------|---------|
 | fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is inferred by the computed aspect ratio of CropZoom's `cropSize` property. |
 
-- Returns [CropContextResult](#cropcontextresult)
-
-::: warning Beware
-If you call this method with the `fixedWidth` argument, resulting crops may be subject to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
-:::
+- return type: [CropContextResult](#cropcontextresult-enum)
 
 ### rotate
 Rotate the component 90 degrees clockwise in a range from 0 to 360 degrees.
-- Arguments
+
+- type definition: `(animate?: boolean, cb?: (angle: number) => void) => void`
+- parameter information
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 | cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (at 360 degrees it's clamped to 0). |
 
-- Returns `void`
-
 ### rotateWithDirection
 Rotate the component 90 degrees (or -90 degrees) clockwise or counterclockwise in a range from 0 to 360 degrees (or 0 to -360 degrees).
-- Arguments
+
+- type definition: `(animate?: boolean, clockwise?: boolean, cb?: (angle: number) => void) => void`
+- paramter information
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
@@ -268,57 +277,54 @@ Rotate the component 90 degrees (or -90 degrees) clockwise or counterclockwise i
 | clockwise | `boolean \| undefined` | `true` | Whether to rotate clockwise (90 degrees) or counterclockwise (-90 degrees) |
 | cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (or -360 degrees) (at 360 or -360 degrees it's clamped to 0). |
 
-- Returns `void`
-
 ### flipHorizontal
 Flip the component horizontally.
-- Arguments
+
+- type definition: `(animate?: boolean, cb?: (angle: number) => void) => void`
+- parameter information
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 | cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, values are 0 or 180. |
-
-- Returns `void`
 
 ### flipVertical
 Flip the component vertically.
-- Arguments
+
+- type definition: `(animate?: boolean, cb?: (angle: number) => void) => void`
+- parameter information
 
 | Name | Type | Default |Description |
 |------|------|-----|--------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 | cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, values are 0 or 180. |
 
-- Returns `void`
-
 ### reset
 Reset all transformations to their initial state.
-- Arguments
+
+- type definition: `(animate:? boolean) => void`
+- parameter information:
 
 | Name | Type | Default |Description |
 |------|------|---------|------------|
 | animate | `boolean \| undefined` | `true` | Whether to animate the transition or not. |
 
-- Returns `void`
-
 ### requestState
-Request internal transformation values of this component at the moment of the calling.
+Request internal transformation values of this component at the moment of the call.
 
-- Takes no arguments
-- Returns [CropZoomState](#cropzoomstate)
+- type definition `() => CropZoomState`
+- return type [CropZoomState](#cropzoomstate).
 
 ### assignState
-Assign the internal transformation values for this component, if the state you have provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+Assign the internal transformation values for this component, if the state provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
 
-- Arguments
+- type definition: `(state: CropZoomAssignableState, animate?: boolean) => void`
+- parameter information
 
 | Name | Type |Description |
 |------|------|------------|
 | state   | [CropZoomAssignableState](#cropzoomassignablestate) | Object containg the transformation values to assign to `CropZoom` component. |
 | animate | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
-
-- Returns `void`
 
 ## Type Definitions
 
@@ -350,7 +356,6 @@ Assign the internal transformation values for this component, if the state you h
 | `OVERLAY`| Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode). |
 
 ### PanMode Enum
-Determines how your component must behave when it reaches the specified boundaries by the cropping area.
 
 | Property |Description |
 |----------|------------|
@@ -359,7 +364,6 @@ Determines how your component must behave when it reaches the specified boundari
 | `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
 
 ### ScaleMode Enum
-Determine how your component must behave when the pinch gesture's scale value exceeds the specified boundaries by `minScale` and `maxScale` properties.
 
 | Property |Description |
 |----------|------------|
@@ -381,9 +385,9 @@ Determine how your component must behave when the pinch gesture's scale value ex
 
 ```typescript
 {
-  originX: number; 
-  originY: number; 
-  width: number; 
+  originX: number;
+  originY: number;
+  width: number;
   height: number;
 }
 ```
@@ -397,8 +401,8 @@ Determine how your component must behave when the pinch gesture's scale value ex
 
 ```typescript
 {
-  rotationAngle: number; 
-  flipHorizontal: boolean; 
+  rotationAngle: number;
+  flipHorizontal: boolean;
   flipVertical: boolean;
 }
 ```
@@ -412,8 +416,8 @@ Determine how your component must behave when the pinch gesture's scale value ex
 
 ```typescript
 {
-  width: number; 
-  height: number; 
+  width: number;
+  height: number;
 } | undefined
 ```
 </td>

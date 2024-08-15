@@ -11,26 +11,25 @@ type Options = {
  * @param options An object describing the aspect ratio of an image/video, and optional width and height
  * parameters, calculates height if this is undefined based on width and vice versa.
  * @returns An object containing the computed width and height by the aspect ratio.
- * @see https://glazzes.github.io/react-native-zoom-toolkit/utilities/getAspectRatioSize.html
  */
-export default function (options: Options): SizeVector<number> {
+export const getAspectRatioSize = (options: Options): SizeVector<number> => {
   'worklet';
-  const { aspectRatio, width: maxWidth, height: maxHeight } = options;
-  if (maxWidth === undefined && maxHeight === undefined) {
+  const { aspectRatio, width, height } = options;
+  if (width === undefined && height === undefined) {
     throw Error(
       'maxWidth and maxHeight parameters are undefined, provide at least one of them'
     );
   }
 
-  if (maxWidth !== undefined) {
+  if (width !== undefined) {
     return {
-      width: Math.floor(maxWidth),
-      height: Math.floor(maxWidth / aspectRatio),
+      width: Math.floor(width),
+      height: Math.floor(width / aspectRatio),
     };
   }
 
   return {
-    width: Math.floor(maxHeight! * aspectRatio),
-    height: Math.floor(maxHeight!),
+    width: Math.floor(height! * aspectRatio),
+    height: Math.floor(height!),
   };
-}
+};

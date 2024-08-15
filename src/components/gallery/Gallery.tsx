@@ -11,7 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PinchCenteringMode } from '../../commons/types';
 import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
-import { getPanWithPinchStatus } from '../../commons/utils/getPanWithPinchStatus';
+import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
@@ -49,7 +49,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     onVerticalPull,
   } = props;
 
-  const allowPinchPanning = pinchPanning ?? getPanWithPinchStatus();
+  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
   const nextItems = Math.floor(windowSize / 2);
 
   const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);

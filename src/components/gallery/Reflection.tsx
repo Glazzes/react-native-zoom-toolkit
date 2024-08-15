@@ -53,8 +53,8 @@ type ReflectionProps = {
 
 /*
  * Pinchable views are really heavy components, therefore in order to maximize performance
- * only a single pinchable view is shared among all the list items.
- * Items listen to this component updates and only update themselves if they are the current item.
+ * only a single pinchable view is shared among all the list items, items listen to this
+ * component updates and only update themselves if they are the current item.
  */
 const Reflection = ({
   length,
@@ -318,7 +318,6 @@ const Reflection = ({
     .enabled(gesturesEnabled)
     .numberOfTaps(1)
     .maxDuration(250)
-    .runOnJS(true)
     .onEnd((e) => {
       const gallerySize = {
         width: rootSize.width.value,
@@ -347,8 +346,8 @@ const Reflection = ({
       if (e.x <= leftEdge && canGoToItem) toIndex -= 1;
       if (e.x >= rightEdge && canGoToItem) toIndex += 1;
 
-      if (toIndex === activeIndex.value) {
-        onTap?.(e, activeIndex.value);
+      if (toIndex === activeIndex.value && onTap) {
+        runOnJS(onTap)(e, activeIndex.value);
         return;
       }
 
