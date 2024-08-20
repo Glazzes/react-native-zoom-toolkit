@@ -1,6 +1,8 @@
 import React, { useImperativeHandle } from 'react';
 import { StyleSheet, type LayoutChangeEvent } from 'react-native';
 import Animated, {
+  cancelAnimation,
+  runOnJS,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -112,12 +114,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     return { x: boundX, y: boundY };
   };
 
-  const reset = (
-    toX: number,
-    toY: number,
-    toScale: number,
-    animate: boolean = true
-  ) => {
+  const set = (toX: number, toY: number, toScale: number, animate: boolean) => {
     'worklet';
     detectorTranslate.x.value = translate.x.value;
     detectorTranslate.y.value = translate.y.value;
@@ -211,7 +208,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       const originX = e.x - extendedSize.width.value / 2;
       const originY = e.y - extendedSize.height.value / 2;
       const toScale =
-        scale.value >= maxScale.value * 0.8 ? minScale : maxScale.value;
+        scale.value >= maxScale.value * 0.75 ? minScale : maxScale.value;
 
       const { x, y } = pinchTransform({
         toScale: toScale,
@@ -225,7 +222,13 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       const toX = clamp(x, -1 * boundX, boundX);
       const toY = clamp(y, -1 * boundY, boundY);
 
-      reset(toX, toY, toScale, true);
+      set(toX, toY, toScale, true);
+
+      // Gimmick to trigger onGestureEnd callback
+      cancelAnimation(detectorScale);
+      detectorScale.value = withTiming(toScale, undefined, (finished) => {
+        finished && onGestureEnd && runOnJS(onGestureEnd)();
+      });
     });
 
   const measureRoot = (e: LayoutChangeEvent) => {
@@ -260,7 +263,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
         { scale: detectorScale.value },
       ],
     };
-  }, [childSize, rootSize, detectorTranslate, detectorScale]);
+  }, [childSize, extendedSize, detectorTranslate, detectorScale]);
 
   const requestState = (): ResumableZoomState => {
     return {
@@ -278,11 +281,11 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     const toX = clamp(state.translateX, -1 * boundX, boundX);
     const toY = clamp(state.translateY, -1 * boundY, boundY);
 
-    reset(toX, toY, toScale, animate);
+    set(toX, toY, toScale, animate);
   };
 
   useImperativeHandle(ref, () => ({
-    reset: (animate) => reset(0, 0, minScale, animate),
+    reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
   }));
