@@ -228,7 +228,7 @@ to some other component, see [ResumableZoomState](#resumablezoomstate).
 |------|---------|
 | `() => void` | `undefined` |
 
-Callback triggered when a pan, pinch or double tap geture ends, if an animation started at the end of one
+Callback triggered when a pan, pinch or double tap gesture ends, if an animation started at the end of one
 of the gestures this callback's execution will be delayed until the animation has finished.
 
 ## Methods
