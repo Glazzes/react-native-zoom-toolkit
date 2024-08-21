@@ -13,31 +13,33 @@ import {
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
 
+import { crop } from '../../commons/utils/crop';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { getCropRotatedSize } from '../../commons/utils/getCropRotatedSize';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
+import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
+
 import {
   PanMode,
   type BoundsFuction,
   ScaleMode,
   PinchCenteringMode,
 } from '../../commons/types';
-import { crop } from '../../commons/utils/crop';
+
 import {
   CropMode,
   type CropZoomProps,
   type CropContextResult,
   type CropZoomType,
   type RotateTransitionCallback,
-  type DirectionRotationCallback,
   type CropZoomState,
   type CropZoomAssignableState,
+  type DirectionRotationCallback,
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 const detectorColor = 'rgba(50, 168, 82, 0.5)';
 const containerColor = 'rgba(238, 66, 102, 0.5)';
@@ -46,7 +48,7 @@ const RAD2DEG = 180 / Math.PI;
 type Reference = React.ForwardedRef<CropZoomType> | undefined;
 
 const CropZoom: React.FC<CropZoomProps> = (props) => {
-  const ref = (props as any).reference as Reference;
+  const reference = (props as any).reference as Reference;
 
   const {
     children,
@@ -242,7 +244,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
 
     // Determine the direction multiplier based on clockwise or counterclockwise rotation
     const direction = clockwise ? 1 : -1;
-    const toAngle = rotation.value + (Math.PI / 2) * direction;
+    const toAngle = rotation.value + direction * (Math.PI / 2);
     sizeAngle.value = toAngle;
     cb?.(toAngle % (Math.PI * 2));
 
@@ -286,7 +288,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
       cropSize: cropSize,
       resolution: resolution,
       canvas: { width: container.width.value, height: container.height.value },
-      position: { x: translate.x.value, y: translate.y.value },
+      offset: { x: translate.x.value, y: translate.y.value },
       scale: scale.value,
       context: {
         rotationAngle: rotation.value * RAD2DEG,
@@ -331,9 +333,8 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     rotate.y.value = animate ? withTiming(toRotateY) : toRotateY;
   };
 
-  useImperativeHandle(ref, () => ({
-    rotate: (animate, cb) => handleRotate(animate, true, cb),
-    rotateWithDirection: handleRotate,
+  useImperativeHandle(reference, () => ({
+    rotate: handleRotate,
     flipHorizontal: flipHorizontal,
     flipVertical: flipVertical,
     reset: handleReset,
