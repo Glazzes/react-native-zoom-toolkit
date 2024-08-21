@@ -17,12 +17,10 @@ import { clamp } from '../../commons/utils/clamp';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
 import { snapPoint } from '../../commons/utils/snapPoint';
-import { crop } from '../../commons/utils/crop';
+import { getVisibleRect } from '../../commons/utils/getVisibleRect';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 
-import { GalleryContext } from './context';
-import { type GalleryProps } from './types';
 import {
   PinchCenteringMode,
   ScaleMode,
@@ -30,6 +28,8 @@ import {
   type BoundsFuction,
   type PanGestureEvent,
 } from '../../commons/types';
+import { GalleryContext } from './context';
+import { type GalleryProps } from './types';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -172,15 +172,13 @@ const Reflection = ({
   useAnimatedReaction(
     () => ({
       translate: translate.y.value,
-      scale: scale.value,
       isPulling: isPullingVertical.value,
       released: pullReleased.value,
     }),
     (val) => {
-      const shouldPull = !vertical && val.scale === 1 && val.isPulling;
-      shouldPull && onVerticalPull?.(val.translate, val.released);
+      val.isPulling && onVerticalPull?.(val.translate, val.released);
     },
-    [translate, scale, isPullingVertical, pullReleased]
+    [translate, isPullingVertical, pullReleased]
   );
 
   useAnimatedReaction(
@@ -324,30 +322,25 @@ const Reflection = ({
         height: rootSize.height.value,
       };
 
-      const { crop: result } = crop({
+      const { x, width } = getVisibleRect({
         scale: scale.value,
-        context: {
-          flipHorizontal: false,
-          flipVertical: false,
-          rotationAngle: 0,
-        },
-        canvas: gallerySize,
-        cropSize: gallerySize,
-        resolution: gallerySize,
-        position: { x: translate.x.value, y: translate.y.value },
+        visibleSize: gallerySize,
+        canvasSize: gallerySize,
+        elementSize: gallerySize,
+        offset: { x: translate.x.value, y: translate.y.value },
       });
 
       const tapEdge = 44 / scale.value;
-      const leftEdge = result.originX + tapEdge;
-      const rightEdge = result.originX + result.width - tapEdge;
+      const leftEdge = x + tapEdge;
+      const rightEdge = x + width - tapEdge;
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
       if (e.x <= leftEdge && canGoToItem) toIndex -= 1;
       if (e.x >= rightEdge && canGoToItem) toIndex += 1;
 
-      if (toIndex === activeIndex.value && onTap) {
-        runOnJS(onTap)(e, activeIndex.value);
+      if (toIndex === activeIndex.value) {
+        onTap && runOnJS(onTap)(e, activeIndex.value);
         return;
       }
 

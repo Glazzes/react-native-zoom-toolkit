@@ -39,6 +39,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     onIndexChange,
     onScroll,
     onTap,
+    onUpdate,
     onPanStart,
     onPanEnd,
     onPinchStart,
@@ -97,6 +98,18 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     () => ({ scroll: scroll.value, itemSize: itemSize.value }),
     (value) => onScroll?.(value.scroll, (data.length - 1) * value.itemSize),
     [scroll, itemSize]
+  );
+
+  useAnimatedReaction(
+    () => ({
+      width: rootChildSize.width.value,
+      height: rootChildSize.height.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    }),
+    (state) => onUpdate && onUpdate(state),
+    [rootChildSize, translate, scale]
   );
 
   useAnimatedReaction(
