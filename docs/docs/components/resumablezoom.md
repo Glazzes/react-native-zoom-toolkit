@@ -1,6 +1,6 @@
 ---
 title: Resumable Zoom
-description: An ideal zoom component for detail screens.
+description: A zoomable component designed for detail screens.
 outline: deep
 ---
 
@@ -134,9 +134,8 @@ This feature is disabled by default for iOS users when a version of React Native
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
-
-This feature is not a pan gesture, therefore it won't trigger any of the following callbacks while you pinch: `onPanStart`, `onPanEnd` and `onOverPanning`.
+Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
+to user interaction. panning as you pinch will not trigger any pan gesture related callbacks.
 
 ### panEnabled
 | Type | Default |
@@ -190,9 +189,9 @@ Callback triggered when the pan gesture starts.
 |------|---------|----------------|
 | `(x: number, y: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the wrapped component has been panned beyond the boundaries defined by its enclosing container, receives as an argument how much the component has been panned beyond such boundaries in both `x` and `y` axis.
-
-For the `x` axis you will get negative values from the left and positive values from the right, for the `y` axis positive values going up and negative values going down.
+Worklet callback triggered when the wrapped component has been panned beyond the boundaries defined by
+its enclosing container, receives as an argument how much the component has been panned beyond such
+boundaries in both `x` and `y` axis.
 
 ### onPanEnd
 | Type | Default | Additional Info |
@@ -220,16 +219,17 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 |------|---------|----------------|
 | `(state: ResumableZoomState) = void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), ideal if you need to mirror its current transformation values to some other component as it updates, see [ResumableZoomState](#resumablezoomstate).
+Worklet callback triggered as the internal transformations change, this by using the gestures or executing this
+component's [methods](#methods), this property is useful for instance to mirror the current state of the component
+to some other component, see [ResumableZoomState](#resumablezoomstate).
 
 ### onGestureEnd
 | Type | Default |
 |------|---------|
 | `() => void` | `undefined` |
 
-Callback triggered when a pan gesture or a pinch gesture ends, if the gesture finished when the wrapped component was not in bounds, this one will wait for the snapback animation to end.
-
-If the `decay` property is set to `true`, it will wait for the decay animation to end.
+Callback triggered when a pan, pinch or double tap geture ends, if an animation started at the end of one
+of the gestures this callback's execution will be delayed until the animation has finished.
 
 ## Methods
 All methods are accessible through a ref object.
@@ -263,9 +263,8 @@ Request internal transformation values of this component at the moment of the ca
 - return type: [ResumableZoomState](#resumablezoomstate)
 
 ### assignState
-Assigns the internal transformation values for this component, if the state you have provided is
-considered to be not achievable by the component's boundaries, it'll be approximated to the closest
-valid state.
+Assign the internal transformation values for this component, if the state you have provided is considered
+to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
 
 - type definition: `(state: ResumableZoomAssignableState, animate?: boolean) => void`
 - parameter information
@@ -306,8 +305,6 @@ valid state.
 | `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale` respectively. |
 
 ### PinchCenteringMode Enum
-Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component.
-
 | Property     |  Description |
 |--------------|--------------|
 | `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |
