@@ -26,11 +26,11 @@ import {
   PinchCenteringMode,
   ScaleMode,
   type BoundsFuction,
+  type CommonZoomState,
 } from '../../commons/types';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
-  ResumableZoomState,
   ResumableZoomProps,
   ResumableZoomType,
   ResumableZoomAssignableState,
@@ -265,7 +265,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     };
   }, [childSize, extendedSize, detectorTranslate, detectorScale]);
 
-  const requestState = (): ResumableZoomState => {
+  const requestState = (): CommonZoomState => {
     return {
       width: childSize.width.value,
       height: childSize.height.value,

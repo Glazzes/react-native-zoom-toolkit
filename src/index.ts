@@ -18,6 +18,7 @@ export {
 } from './commons/types';
 
 export type {
+  CommonZoomState,
   Vector,
   SizeVector,
   PanGestureEvent,
