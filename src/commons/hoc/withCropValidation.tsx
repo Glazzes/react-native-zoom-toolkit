@@ -1,31 +1,20 @@
 import React, { forwardRef } from 'react';
 import { CropMode, type CropZoomProps } from '../../components/crop/types';
-import { getInvalidChildrenMessage } from '../utils/messages';
 
 export default function withCropValidation<T, P extends CropZoomProps>(
-  WrappedComponent: React.ComponentType<P>
+  Component: React.ComponentType<P>
 ) {
   return forwardRef<T, P>((props, ref) => {
     const { mode, minScale, maxScale, children } = props;
 
     const childrenCount = React.Children.count(children);
     if (childrenCount !== 1 && mode === CropMode.MANAGED) {
-      const message = getInvalidChildrenMessage({
-        name: 'CropZoom',
-        expected: 1,
-        actual: childrenCount,
-      });
-
+      const message = `CropZoom expected one child but received ${childrenCount} children`;
       throw new Error(message);
     }
 
     if (childrenCount !== 0 && mode === CropMode.OVERLAY) {
-      const message = getInvalidChildrenMessage({
-        name: 'CropZoom',
-        expected: 0,
-        actual: childrenCount,
-      });
-
+      const message = `CropZoom expected no children but received ${childrenCount} children`;
       throw new Error(message);
     }
 
@@ -45,6 +34,6 @@ export default function withCropValidation<T, P extends CropZoomProps>(
       throw new Error('minScale property must not be greater than maxScale');
     }
 
-    return <WrappedComponent {...props} reference={ref} />;
+    return <Component {...props} reference={ref} />;
   });
 }

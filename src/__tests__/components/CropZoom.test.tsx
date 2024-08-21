@@ -1,12 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
+import { render } from '@testing-library/react-native';
+
 import CropZoom from '../../components/crop/CropZoom';
 import { CropMode } from '../../components/crop/types';
-import { render } from '@testing-library/react-native';
 import type { SizeVector } from '../../commons/types';
-import { getInvalidChildrenMessage } from '../../commons/utils/messages';
 
-const componentName = 'CropZoom';
 const cropSize: SizeVector<number> = { width: 100, height: 100 };
 const resolution: SizeVector<number> = { width: 100, height: 200 };
 
@@ -26,11 +25,7 @@ describe('CropZoom', () => {
   });
 
   test('should throw error in managed mode when no child is passed', () => {
-    const message = getInvalidChildrenMessage({
-      name: componentName,
-      expected: 1,
-      actual: 0,
-    });
+    const message = `CropZoom expected one child but received 0 children`;
 
     expect(() =>
       render(
@@ -56,11 +51,7 @@ describe('CropZoom', () => {
   });
 
   test('should throw error in overlay mode when children are passed', () => {
-    const message = getInvalidChildrenMessage({
-      name: componentName,
-      expected: 0,
-      actual: 1,
-    });
+    const message = `CropZoom expected no children but received 1 children`;
 
     expect(() =>
       render(
