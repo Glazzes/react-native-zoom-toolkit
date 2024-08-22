@@ -61,7 +61,7 @@ export const useResumableValues = (): ResumableTransformationValues => {
     ];
   }, [scale, translateY, translateX]);
 
-  const onUpdate = (updateState: CommonZoomState) => {
+  const onUpdate = (updateState: ResumableZoomState) => {
     'worklet';
     translateX.value = updateState.translateX;
     translateY.value = updateState.translateY;
@@ -194,7 +194,7 @@ Let's see what we can take from this example
 - The overlying zoom component must be the same size as the canvas.
 - You can assign a color to the transparent view and lower the opacity if you are having trouble centering the
   zoom component with your Skia component.
-- Skia Images pixelate at a faster rate than RN image component, therefore setting maxscale to the image
-  resolution is a recommended practice.
+- Skia Images pixelate at a faster rate than RN image component, therefore setting ResumableZoom's maxscale
+  to the image resolution is a recommended practice.
 
 And that's pretty much it, thanks for reading!
