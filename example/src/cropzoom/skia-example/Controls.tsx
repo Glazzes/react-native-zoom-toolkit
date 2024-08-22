@@ -53,7 +53,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   const [isRotated, setIsRotated] = useState<boolean>(false);
 
   const rotate = () => {
-    cropRef?.current?.rotate(true, (angle) => {
+    cropRef?.current?.rotate(true, true, (angle) => {
       setIsRotated(angle !== 0);
     });
   };

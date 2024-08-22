@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import type { CropZoomType } from '../../../../src/components/crop/types';
-import { theme } from '../../constants';
 import { FlipType, type Action, manipulateAsync } from 'expo-image-manipulator';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import type { CropZoomType } from 'react-native-zoom-toolkit';
+
+import { theme } from '../../constants';
 import { activeColor, baseColor } from '../commons/contants';
 
 type ControlProps = {
@@ -20,7 +21,7 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
   const [isRotated, setIsRotated] = useState<boolean>(false);
 
   const rotate = () => {
-    cropRef?.current?.rotate(true, (angle) => {
+    cropRef?.current?.rotate(true, true, (angle) => {
       setIsRotated(angle !== 0);
     });
   };
