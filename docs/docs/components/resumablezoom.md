@@ -104,6 +104,20 @@ enclosing it, see [PanMode](#panmode-enum).
 Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
 defined by `minScale` and `maxScale` properties, see [ScaleMode](#scalemode-enum).
 
+### allowPinchPanning
+| Type | Default |
+|------|---------|
+| `boolean` | `true` |
+
+::: warning Beware iOS users
+This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
+
+For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
+:::
+
+Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
+to user interaction. Panning as you pinch will not trigger any pan gesture related callbacks.
+
 ### pinchCenteringMode
 | Type | Default  |
 |------|----------|
@@ -122,20 +136,6 @@ see [PinchCenteringMode](#pinchcenteringmode-enum).
 | `boolean` | `true` | see [WithDecay](https://docs.swmansion.com/react-native-reanimated/docs/animations/withDecay/) |
 
 Whether to apply a decay animation when the pan gesture ends or not.
-
-### allowPinchPanning
-| Type | Default |
-|------|---------|
-| `boolean` | `true` |
-
-::: warning Beware iOS users
-This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
-
-For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
-:::
-
-Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
-to user interaction. panning as you pinch will not trigger any pan gesture related callbacks.
 
 ### panEnabled
 | Type | Default |

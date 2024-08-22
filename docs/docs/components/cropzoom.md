@@ -11,7 +11,7 @@ we can find the following:
 
 - **Custom UI:** Build your own custom UI on top of it.
 - **Resumable:** Resumable and accurate pinch to zoom features; pan, pinch and even pan with the pinch gesture! It will resume where you left.
-- **Barebones:** For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance [React Native Skia](https://shopify.github.io/react-native-skia/)'s components.
+- **Barebones:** For complex use cases, use it as an overlay view and mirror its transformation values to some other components, for instance React Native Skia's components.
 - **Fixed size:** Enforce all resulting crops to be of a fixed size, ideal for profile pictures.
 
 This component comes with a handy algorithm to perform cropping operations for you, however you will need the
@@ -173,9 +173,8 @@ This feature is disabled by default for iOS users when a version of React Native
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
 
-Lets the user drag the component around as they pinch, it also provides a more accurate pinch gesture calculation at the cost of a subtle "staircase feeling", disable for a smoother but less accurate experience.
-
-This feature will not trigger any pan gesture related callbacks.
+Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
+to user interaction. Panning as you pinch will not trigger any pan gesture related callbacks.
 
 ### onTap
 
@@ -223,7 +222,9 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 | -------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------- |
 | `(state: CropZoomState) => void` | `undefined` | `No`     | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the internal state of the component changes, the internal state is updated as the user makes use of the gestures or execute its [methods](#methods), ideal if you need to mirror its current transformation values to some other component as it updates, see [CropZoomState](#cropzoomstate).
+Worklet callback triggered when the internal state of the component changes, the internal state is updated as
+the user makes use of the gestures or execute its methods, ideal if you need to mirror its current transformation
+values to some other component as it updates, see [CropZoomState](#cropzoomstate).
 
 ### onGestureEnd
 
@@ -275,7 +276,7 @@ Expo Image Manipulator, see [Use Crop Zoom with Expo Image Manipulator](../guide
 | ---------- | --------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | fixedWidth | `number \| undefined` | `undefined` | Enforce all resulting crops to be of a fixed width, height is inferred by the computed aspect ratio of CropZoom's `cropSize` property. |
 
-- return type: [CropContextResult](#cropcontextresult-enum)
+- return type: [CropContextResult](#cropcontextresult)
 
 ::: warning Beware
 Calling rotate method with the `fixedWidth` argument will subject your crops to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.

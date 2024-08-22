@@ -8,7 +8,8 @@ outline: deep
 Gets width and height based on the aspect ratio.
 
 ## How to use
-Let's assume you've got a HD image and you want to render this image with a max width of 200px, however you don't want to compromise its aspect ratio.
+Let's assume you've got a HD image and you want to render this image with a max width of 200px, however you
+don't want to compromise its aspect ratio.
 
 ```js
 import { getAspectRatioSize } from 'react-native-zoom-toolkit';

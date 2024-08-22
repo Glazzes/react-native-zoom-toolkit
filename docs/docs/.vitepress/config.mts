@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {
-        text: '2.1.1',
+        text: '2.1.4',
         items: [
           {
             text: 'Releases',
@@ -55,6 +55,10 @@ export default defineConfig({
           {
             text: 'Use CropZoom with Expo Image Manipulator',
             link: '/guides/cropzoomexpo',
+          },
+          {
+            text: 'How to use with Skia Components',
+            link: '/guides/skia',
           },
         ],
       },

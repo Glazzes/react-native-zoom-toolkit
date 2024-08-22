@@ -25,13 +25,13 @@ const { isFetching, resolution, error } = useImageResolution({
 })
 
 ```
-- Arguments
+- parameter information
 
 | Property | Type |Description |
 |----------|------|------------|
 | `source`    | `Source \| number` | An url pointing to a network image and headers or a require statement to a bundle image asset. |
 
-- Returns [FetchImageResolutionResult](#fetchimageresolutionresult)
+- returns [FetchImageResolutionResult](#fetchimageresolutionresult)
 
 ## Type Definitions
 ### Source
