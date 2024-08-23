@@ -17,7 +17,7 @@ we can find the following:
 This component comes with a handy algorithm to perform cropping operations for you, however you will need the
 help a of deidicated library for this task.
 
-- see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo) guide.
+- see [CropZoom and Expo Image Manipulator](../guides/cropzoomexpo) guide.
 
 The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
@@ -267,7 +267,7 @@ ref.current?.crop(200);
 
 Map all the transformations applied to your component into an object describing the context necessary to perform
 a crop operation, such object must be used along with a library capable of cropping images and/or videos, for instance
-Expo Image Manipulator, see [Use Crop Zoom with Expo Image Manipulator](../guides/cropzoomexpo).
+Expo Image Manipulator, see [CropZoom and Expo Image Manipulator](../guides/cropzoomexpo).
 
 - type definition: `(fixedWidth?: number) => CropContextResult`
 - parameter information

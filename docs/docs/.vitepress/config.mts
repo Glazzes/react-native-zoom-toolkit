@@ -44,6 +44,7 @@ export default defineConfig({
       },
       {
         text: 'Utilities',
+        collapsed: true,
         items: [
           { text: 'useImageResolution', link: '/utilities/useimageresolution' },
           { text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize' },
@@ -51,9 +52,10 @@ export default defineConfig({
       },
       {
         text: 'Guides',
+        collapsed: true,
         items: [
           {
-            text: 'Use CropZoom with Expo Image Manipulator',
+            text: 'CropZoom and Expo Image Manipulator',
             link: '/guides/cropzoomexpo',
           },
           {
