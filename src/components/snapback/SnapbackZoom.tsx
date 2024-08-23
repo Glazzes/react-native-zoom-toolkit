@@ -33,6 +33,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onGestureActive,
   onGestureEnd,
 }) => {
+  const containerRef = useAnimatedRef();
+
   const [internalGesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
   const switchGestureStatus = (enabled: boolean) => {
     setGesturesEnabled(enabled);
@@ -57,19 +59,6 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     });
   }, [resizeConfig, scale, containerSize]);
 
-  const containerRef = useAnimatedRef();
-  const measurePinchContainer = () => {
-    'worklet';
-
-    const measuremet = measure(containerRef);
-    if (measuremet !== null) {
-      containerSize.width.value = measuremet.width;
-      containerSize.height.value = measuremet.height;
-      position.x.value = measuremet.pageX;
-      position.y.value = measuremet.pageY;
-    }
-  };
-
   useDerivedValue(() => {
     const { width, height } = childrenSize.value;
 
@@ -92,7 +81,12 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onStart((e) => {
       onPinchStart && runOnJS(onPinchStart)(e);
 
-      measurePinchContainer();
+      const measuremet = measure(containerRef)!;
+      containerSize.width.value = measuremet.width;
+      containerSize.height.value = measuremet.height;
+      position.x.value = measuremet.pageX;
+      position.y.value = measuremet.pageY;
+
       origin.x.value = e.focalX - containerSize.width.value / 2;
       origin.y.value = e.focalY - containerSize.height.value / 2;
     })

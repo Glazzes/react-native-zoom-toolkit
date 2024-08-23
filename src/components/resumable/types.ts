@@ -11,7 +11,7 @@ import type {
 } from '../../commons/types';
 
 export type ResumableZoomAssignableState = Omit<
-  CommonZoomState,
+  CommonZoomState<number>,
   'width' | 'height'
 >;
 
@@ -24,7 +24,7 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   maxScale?: SizeVector<number> | number;
   pinchCenteringMode?: PinchCenteringMode;
   onSwipe?: (direction: SwipeDirection) => void;
-  onGestureActive?: (e: CommonZoomState) => void;
+  onGestureActive?: (e: CommonZoomState<number>) => void;
   onGestureEnd?: (() => void) | undefined;
   onOverPanning?: (x: number, y: number) => void;
 }> &
@@ -35,6 +35,6 @@ export type ResumableZoomProps = React.PropsWithChildren<{
 
 export type ResumableZoomType = {
   reset: (animate?: boolean) => void;
-  requestState: () => CommonZoomState;
+  requestState: () => CommonZoomState<number>;
   assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
 };

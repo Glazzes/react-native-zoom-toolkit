@@ -39,7 +39,7 @@ export type GalleryProps<T = unknown> = {
   onSwipe?: (direction: SwipeDirection) => void;
   onIndexChange?: (index: number) => void;
   onScroll?: (scroll: number, contentOffset: number) => void;
-  onUpdate?: (state: CommonZoomState) => void;
+  onUpdate?: (state: CommonZoomState<number>) => void;
   onVerticalPull?: (translateY: number, released: boolean) => void;
 } & PinchGestureCallbacks &
   PanGestureCallbacks &
@@ -48,5 +48,5 @@ export type GalleryProps<T = unknown> = {
 export type GalleryType = {
   setIndex: (index: number) => void;
   reset: (animate: boolean | undefined) => void;
-  requestState: () => CommonZoomState;
+  requestState: () => CommonZoomState<number>;
 };

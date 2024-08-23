@@ -299,7 +299,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     });
   };
 
-  const handleRequestState = (): CropZoomState => ({
+  const handleRequestState = (): CropZoomState<number> => ({
     width: container.width.value,
     height: container.height.value,
     translateX: translate.x.value,

@@ -12,17 +12,17 @@ export type ResizeConfig = {
   scale: number;
 };
 
-export type SnapbackZoomState = {
-  x: number;
-  y: number;
-  resizedWidth: number | undefined;
-  resizedHeight: number | undefined;
-} & CommonZoomState;
+export type SnapbackZoomState<T> = {
+  x: T;
+  y: T;
+  resizedWidth: T | undefined;
+  resizedHeight: T | undefined;
+} & CommonZoomState<T>;
 
 export type SnapBackZoomProps = React.PropsWithChildren<{
   resizeConfig?: ResizeConfig;
   gesturesEnabled?: boolean;
-  onGestureActive?: (e: SnapbackZoomState) => void;
+  onGestureActive?: (e: SnapbackZoomState<number>) => void;
 }> &
   PinchGestureCallbacks &
   TapGestureCallbacks &

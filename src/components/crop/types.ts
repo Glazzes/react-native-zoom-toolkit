@@ -28,18 +28,21 @@ export type CropContextResult = {
   resize?: SizeVector<number>;
 };
 
-export type CropZoomState = {
-  width: number;
-  height: number;
-  translateX: number;
-  translateY: number;
-  scale: number;
-  rotate: number;
-  rotateX: number;
-  rotateY: number;
+export type CropZoomState<T> = {
+  width: T;
+  height: T;
+  translateX: T;
+  translateY: T;
+  scale: T;
+  rotate: T;
+  rotateX: T;
+  rotateY: T;
 };
 
-export type CropZoomAssignableState = Omit<CropZoomState, 'width' | 'height'>;
+export type CropZoomAssignableState = Omit<
+  CropZoomState<number>,
+  'width' | 'height'
+>;
 
 export type RotateTransitionCallback = (
   animate?: boolean,
@@ -53,7 +56,7 @@ export type DirectionRotationCallback = (
 ) => void;
 
 export type CropZoomType = {
-  requestState: () => CropZoomState;
+  requestState: () => CropZoomState<number>;
   assignState: (state: CropZoomAssignableState, animate?: boolean) => void;
   rotate: DirectionRotationCallback;
   flipHorizontal: RotateTransitionCallback;
@@ -62,7 +65,7 @@ export type CropZoomType = {
   crop: (fixedWidth?: number) => CropContextResult;
 };
 
-export type CropGestureEventCallBack = (event: CropZoomState) => void;
+export type CropGestureEventCallBack = (event: CropZoomState<number>) => void;
 
 export type CropZoomProps = React.PropsWithChildren<{
   cropSize: SizeVector<number>;

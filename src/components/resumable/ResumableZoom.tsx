@@ -265,7 +265,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     };
   }, [childSize, extendedSize, detectorTranslate, detectorScale]);
 
-  const requestState = (): CommonZoomState => {
+  const requestState = (): CommonZoomState<number> => {
     return {
       width: childSize.width.value,
       height: childSize.height.value,

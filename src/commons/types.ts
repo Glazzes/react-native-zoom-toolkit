@@ -52,12 +52,12 @@ export enum PinchCenteringMode {
   INTERACTION,
 }
 
-export type CommonZoomState = {
-  width: number;
-  height: number;
-  translateX: number;
-  translateY: number;
-  scale: number;
+export type CommonZoomState<T> = {
+  width: T;
+  height: T;
+  translateX: T;
+  translateY: T;
+  scale: T;
 };
 
 export type CommonZoomProps = Partial<{
