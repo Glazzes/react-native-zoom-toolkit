@@ -49,7 +49,7 @@ import { SnapbackZoom } from "react-native-zoom-toolkit"
   onDoubleTap={(e) => console.log(e)}
   onPinchStart={(e) => console.log(e)}
   onPinchEnd={(e) => console.log(e)}
-  onGestureActive={(e) => {
+  onUpdate={(e) => {
     'worklet';
      console.log(e);
   }}
@@ -136,13 +136,14 @@ Callback triggered when the pinch gesture starts.
 
 Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
-### onGestureActive
+### onUpdate
 
-| Type                                 | Default     | Additional Info                                                                                    |
-| ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
-| `(state: SnapbackZoomState) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| Type                                         | Default     | Additional Info                                                                                    |
+| -------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `(state: SnapbackZoomState<number>) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered from the moment pinch gesture starts until the snap back animation finishes, ideal if you need to mirror the current state of the gesture to some other component, see [SnapbackZoomState](#snapbackzoomstate).
+Worklet callback triggered from the moment pinch gesture starts until the snap back animation finishes, ideal
+if you need to mirror the current state of the gesture to some other component, see [SnapbackZoomState](#snapbackzoomstate).
 
 ### onGestureEnd
 

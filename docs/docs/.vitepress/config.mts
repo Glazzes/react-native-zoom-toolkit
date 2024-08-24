@@ -47,6 +47,10 @@ export default defineConfig({
         collapsed: true,
         items: [
           { text: 'useImageResolution', link: '/utilities/useimageresolution' },
+          {
+            text: 'useTransformationState',
+            link: '/utilities/usetransformationstate',
+          },
           { text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize' },
         ],
       },

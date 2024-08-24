@@ -216,13 +216,13 @@ Callback triggered when the pinch gesture starts.
 
 Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
-### onGestureActive
+### onUpdate
 
-| Type                             | Default     | Required | Additional Info                                                                                    |
-| -------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------- |
-| `(state: CropZoomState) => void` | `undefined` | `No`     | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| Type                                     | Default     | Required | Additional Info                                                                                    |
+| ---------------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `(state: CropZoomState<number>) => void` | `undefined` | `No`     | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback triggered when the internal state of the component changes, the internal state is updated as
+Worklet callback triggered when the transformation state of the component changes, the internal state is updated as
 the user makes use of the gestures or execute its methods, ideal if you need to mirror its current transformation
 values to some other component as it updates, see [CropZoomState](#cropzoomstate).
 

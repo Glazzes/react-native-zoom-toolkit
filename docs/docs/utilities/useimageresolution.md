@@ -5,7 +5,7 @@ outline: deep
 ---
 
 # useImageResolution hook
-Gets the resolution of a bundle or network image.
+Get the resolution of a bundle or network image.
 
 ### How to use
 ```jsx
