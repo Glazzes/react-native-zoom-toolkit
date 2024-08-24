@@ -106,11 +106,12 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const boundsFn: BoundsFuction = (scaleValue) => {
     'worklet';
+    const scaleVal = scaleValue ?? scale.value;
     const { width: cWidth, height: cHeight } = childSize;
     const { width: rWidth, height: rHeight } = rootSize;
 
-    const boundX = Math.max(0, cWidth.value * scaleValue - rWidth.value) / 2;
-    const boundY = Math.max(0, cHeight.value * scaleValue - rHeight.value) / 2;
+    const boundX = Math.max(0, cWidth.value * scaleVal - rWidth.value) / 2;
+    const boundY = Math.max(0, cHeight.value * scaleVal - rHeight.value) / 2;
     return { x: boundX, y: boundY };
   };
 
@@ -167,7 +168,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     detectorTranslate,
     translate,
     offset,
-    scale,
     panMode,
     boundFn: boundsFn,
     decay,

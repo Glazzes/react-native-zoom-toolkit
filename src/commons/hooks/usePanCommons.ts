@@ -32,7 +32,6 @@ type PanCommmonOptions = {
   detectorTranslate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
-  scale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
   userCallbacks: Partial<{
@@ -55,7 +54,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     translate,
     offset,
     panMode,
-    scale,
     decay,
     boundFn,
     userCallbacks,
@@ -92,7 +90,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    const { x: boundX, y: boundY } = boundFn();
     const exceedX = Math.max(0, Math.abs(toX) - boundX);
     const exceedY = Math.max(0, Math.abs(toY) - boundY);
     isWithinBoundX.value = exceedX === 0;
@@ -138,7 +136,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     'worklet';
 
     if (panMode === PanMode.CLAMP && onSwipe) {
-      const boundaries = boundFn(scale.value);
+      const boundaries = boundFn();
       const direction = getSwipeDirection(e, {
         boundaries,
         time: time.value,
@@ -154,7 +152,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    const { x: boundX, y: boundY } = boundFn();
     const clampX: [number, number] = [-1 * boundX, boundX];
     const clampY: [number, number] = [-1 * boundY, boundY];
 
