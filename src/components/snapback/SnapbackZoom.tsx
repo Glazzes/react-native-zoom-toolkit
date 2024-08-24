@@ -30,7 +30,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onDoubleTap,
   onPinchStart,
   onPinchEnd,
-  onGestureActive,
+  onUpdate,
   onGestureEnd,
 }) => {
   const containerRef = useAnimatedRef();
@@ -62,7 +62,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   useDerivedValue(() => {
     const { width, height } = childrenSize.value;
 
-    onGestureActive?.({
+    onUpdate?.({
       x: position.x.value,
       y: position.y.value,
       width: containerSize.width.value,

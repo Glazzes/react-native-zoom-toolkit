@@ -72,7 +72,7 @@ export type CropZoomProps = React.PropsWithChildren<{
   resolution: SizeVector<number>;
   debug?: boolean;
   mode?: CropMode;
-  onGestureActive?: CropGestureEventCallBack;
+  onUpdate?: CropGestureEventCallBack;
   OverlayComponent?: () => React.ReactElement<any>;
 }> &
   PanGestureCallbacks &

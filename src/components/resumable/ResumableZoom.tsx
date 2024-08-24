@@ -56,7 +56,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     pinchCenteringMode = PinchCenteringMode.CLAMP,
     allowPinchPanning: pinchPanning,
     onTap,
-    onGestureActive,
+    onUpdate,
     onGestureEnd,
     onSwipe,
     onPinchStart: onUserPinchStart,
@@ -129,7 +129,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   };
 
   useDerivedValue(() => {
-    onGestureActive?.({
+    onUpdate?.({
       width: childSize.width.value,
       height: childSize.height.value,
       translateX: translate.x.value,

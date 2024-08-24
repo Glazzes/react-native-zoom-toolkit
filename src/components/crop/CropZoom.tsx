@@ -61,7 +61,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     panMode = PanMode.FREE,
     allowPinchPanning: pinchPanning,
     mode = CropMode.MANAGED,
-    onGestureActive,
+    onUpdate,
     onGestureEnd,
     OverlayComponent,
     onPanStart: onUserPanStart,
@@ -119,7 +119,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   }, [cropSize, resolution, sizeAngle, rotation, container, detector]);
 
   useDerivedValue(() => {
-    onGestureActive?.({
+    onUpdate?.({
       width: container.width.value,
       height: container.height.value,
       translateX: translate.x.value,

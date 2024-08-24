@@ -22,7 +22,7 @@ export type SnapbackZoomState<T> = {
 export type SnapBackZoomProps = React.PropsWithChildren<{
   resizeConfig?: ResizeConfig;
   gesturesEnabled?: boolean;
-  onGestureActive?: (e: SnapbackZoomState<number>) => void;
+  onUpdate?: (e: SnapbackZoomState<number>) => void;
 }> &
   PinchGestureCallbacks &
   TapGestureCallbacks &

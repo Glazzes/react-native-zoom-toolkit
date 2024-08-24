@@ -63,7 +63,7 @@ export const useTransformationState = <T extends ComponentSelection>(
       { rotateX: rotate.x.value },
       { rotateY: rotate.y.value },
     ];
-  }, [translate, rotate, scale, rotate]);
+  }, [translate, rotate, scale, rotation]);
 
   const createSharedState = (): StateSelection<T, SharedValue<number>> => {
     // @ts-ignore

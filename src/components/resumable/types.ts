@@ -24,7 +24,7 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   maxScale?: SizeVector<number> | number;
   pinchCenteringMode?: PinchCenteringMode;
   onSwipe?: (direction: SwipeDirection) => void;
-  onGestureActive?: (e: CommonZoomState<number>) => void;
+  onUpdate?: (e: CommonZoomState<number>) => void;
   onGestureEnd?: (() => void) | undefined;
   onOverPanning?: (x: number, y: number) => void;
 }> &
