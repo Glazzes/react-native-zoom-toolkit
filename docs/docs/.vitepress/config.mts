@@ -66,6 +66,10 @@ export default defineConfig({
             text: 'How to use with Skia Components',
             link: '/guides/skia',
           },
+          {
+            text: 'Downscaling Nested Components',
+            link: '/guides/downscale',
+          },
         ],
       },
     ],

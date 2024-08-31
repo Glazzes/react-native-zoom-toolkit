@@ -18,19 +18,20 @@ When calling this hook it will provide the three following properties:
 - `state` is an object holding the shared values describing the current transformation state in case
   you need them.
 
-```tsx{8,20}
+```tsx{9,21}
 import { useTransformationState } from 'react-native-zoom-toolkit';
 
 // Pass 'crop' as argument if you want to mirror CropZoom's state
 // Pass 'snapback' as argument if you want to mirror SnapbackZoom's state
+// Pass 'resumable' as argument for any other component state
 const { onUpdate, transform, state } = useTransformationState('resumable');
 
-...
+//...
 <ResumableZoom onUpdate={onUpdate}>
   <Image source={{uri}} style={styles.image} />
 </ResumableZoom>
 
-...
+//...
 <Canvas>
   <Image
     source={image}
