@@ -13,23 +13,23 @@ import type {
 } from 'react-native-gesture-handler';
 
 import { clamp } from '../utils/clamp';
+import { useVector } from './useVector';
 import { friction } from '../utils/friction';
-import {
+import { getSwipeDirection } from '../utils/getSwipeDirection';
+
+import type {
   PanMode,
-  type BoundsFuction,
-  type Vector,
-  type SizeVector,
-  type PanGestureEventCallback,
-  type PanGestureEvent,
+  BoundsFuction,
+  Vector,
+  SizeVector,
+  PanGestureEventCallback,
+  PanGestureEvent,
   SwipeDirection,
 } from '../types';
-import { useVector } from './useVector';
-import { getSwipeDirection } from '../utils/getSwipeDirection';
 
 type PanCommmonOptions = {
   container: SizeVector<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
-  detectorTranslate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
   decay?: boolean;
@@ -50,7 +50,6 @@ type PanGestureUpdadeEvent = GestureUpdateEvent<
 export const usePanCommons = (options: PanCommmonOptions) => {
   const {
     container,
-    detectorTranslate,
     translate,
     offset,
     panMode,
@@ -73,8 +72,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     userCallbacks.onPanStart && runOnJS(userCallbacks.onPanStart)(e);
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
-    cancelAnimation(detectorTranslate.x);
-    cancelAnimation(detectorTranslate.y);
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
@@ -103,12 +100,11 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     }
 
     // Simplify both free and clamp pan modes in one condition due to their similarity
-    if (panMode !== PanMode.FRICTION) {
-      const isFree = panMode === PanMode.FREE;
+    if (panMode !== 'friction') {
+      const isFree = panMode === 'free';
       translate.x.value = isFree ? toX : clamp(toX, -1 * boundX, boundX);
       translate.y.value = isFree ? toY : clamp(toY, -1 * boundY, boundY);
-      detectorTranslate.x.value = translate.x.value;
-      detectorTranslate.y.value = translate.y.value;
+
       return;
     }
 
@@ -135,7 +131,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    if (panMode === PanMode.CLAMP && onSwipe) {
+    if (panMode === 'clamp' && onSwipe) {
       const boundaries = boundFn();
       const direction = getSwipeDirection(e, {
         boundaries,
@@ -164,18 +160,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const decayConfigX = { velocity: e.velocityX, clamp: clampX };
     const decayConfigY = { velocity: e.velocityY, clamp: clampY };
 
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.x.value = decayX
-      ? withDecay(decayConfigX)
-      : withTiming(toX);
-
     translate.x.value = decayX ? withDecay(decayConfigX) : withTiming(toX);
-
-    detectorTranslate.y.value = translate.y.value;
-    detectorTranslate.y.value = decayY
-      ? withDecay(decayConfigY)
-      : withTiming(toY);
-
     translate.y.value = decayY ? withDecay(decayConfigY) : withTiming(toY);
 
     const restX = Math.max(0, Math.abs(Math.abs(translate.x.value) - boundX));

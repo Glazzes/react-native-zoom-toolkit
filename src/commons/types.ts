@@ -4,18 +4,6 @@ import type {
   TapGestureHandlerEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
-import type {
-  EasingFunction,
-  EasingFunctionFactory,
-  ReduceMotion,
-} from 'react-native-reanimated';
-import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
-
-export type TimingConfig = Partial<{
-  duration: number;
-  easing: EasingFunction | EasingFunctionFactory;
-  reduceMotion: ReduceMotion;
-}>;
 
 export type Vector<T> = {
   x: T;
@@ -27,30 +15,10 @@ export type SizeVector<T> = {
   height: T;
 };
 
-export type BoundsFuction = (scale: number) => Vector<number>;
-
-export enum SwipeDirection {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
-}
-
-export enum PanMode {
-  CLAMP,
-  FREE,
-  FRICTION,
-}
-
-export enum ScaleMode {
-  CLAMP,
-  BOUNCE,
-}
-
-export enum PinchCenteringMode {
-  CLAMP,
-  INTERACTION,
-}
+export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
+export type PanMode = 'clamp' | 'free' | 'friction';
+export type ScaleMode = 'clamp' | 'bounce';
+export type PinchCenteringMode = 'clamp' | 'free';
 
 export type CommonZoomState<T> = {
   width: T;
@@ -60,18 +28,13 @@ export type CommonZoomState<T> = {
   scale: T;
 };
 
-export type CommonZoomProps = Partial<{
-  hitSlop: HitSlop;
-  timingConfig: TimingConfig;
-  onGestureEnd: () => void;
-}>;
-
 export type CommonResumableProps = Partial<{
   minScale: number;
   maxScale: number;
   panMode: PanMode;
   scaleMode: ScaleMode;
   allowPinchPanning: boolean;
+  onGestureEnd: () => void;
 }>;
 
 export type TapGestureEvent =
@@ -106,3 +69,5 @@ export type ZoomEventCallbacks = Partial<{
   onZoomBegin: (index: number) => void;
   onZoomEnd: (index: number) => void;
 }>;
+
+export type BoundsFuction = (scale?: number) => Vector<number>;

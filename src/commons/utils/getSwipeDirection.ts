@@ -1,4 +1,4 @@
-import { SwipeDirection, type PanGestureEvent, type Vector } from '../types';
+import type { PanGestureEvent, SwipeDirection, Vector } from '../types';
 
 type SwipeOptions = {
   time: number;
@@ -30,7 +30,7 @@ export const getSwipeDirection = (
     deltaTime <= SWIPE_TIME;
 
   const inRightBound = translate.x === boundX;
-  if (swipeRight && inRightBound) return SwipeDirection.RIGHT;
+  if (swipeRight && inRightBound) return 'right';
 
   const swipeLeft =
     e.velocityX <= -1 * SWIPE_VELOCITY &&
@@ -38,7 +38,7 @@ export const getSwipeDirection = (
     deltaTime <= SWIPE_TIME;
 
   const inLeftBound = translate.x === -1 * boundX;
-  if (swipeLeft && inLeftBound) return SwipeDirection.LEFT;
+  if (swipeLeft && inLeftBound) return 'left';
 
   const swipeUp =
     e.velocityY <= -1 * SWIPE_VELOCITY &&
@@ -46,7 +46,7 @@ export const getSwipeDirection = (
     deltaTime <= SWIPE_TIME;
 
   const inUpperBound = translate.y === -1 * boundY;
-  if (swipeUp && inUpperBound) return SwipeDirection.UP;
+  if (swipeUp && inUpperBound) return 'up';
 
   const swipeDown =
     e.velocityY >= SWIPE_VELOCITY &&
@@ -54,7 +54,7 @@ export const getSwipeDirection = (
     deltaTime <= SWIPE_TIME;
 
   const inLowerBound = translate.y === boundY;
-  if (swipeDown && inLowerBound) return SwipeDirection.DOWN;
+  if (swipeDown && inLowerBound) return 'down';
 
   return undefined;
 };

@@ -1,20 +1,15 @@
 import React, { forwardRef } from 'react';
-import { CropMode, type CropZoomProps } from '../../components/crop/types';
+import { type CropZoomProps } from '../../components/crop/types';
 
 export default function withCropValidation<T, P extends CropZoomProps>(
   Component: React.ComponentType<P>
 ) {
   return forwardRef<T, P>((props, ref) => {
-    const { mode, minScale, maxScale, children } = props;
+    const { minScale, maxScale, children } = props;
 
     const childrenCount = React.Children.count(children);
-    if (childrenCount !== 1 && mode === CropMode.MANAGED) {
+    if (childrenCount !== 1) {
       const message = `CropZoom expected one child but received ${childrenCount} children`;
-      throw new Error(message);
-    }
-
-    if (childrenCount !== 0 && mode === CropMode.OVERLAY) {
-      const message = `CropZoom expected no children but received ${childrenCount} children`;
       throw new Error(message);
     }
 
