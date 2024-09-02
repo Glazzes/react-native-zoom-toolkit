@@ -44,4 +44,4 @@ npx expo install react-native-gesture-handler react-native-reanimated
 :::
 
 ### Additional Setup
-No additiontal setup is required.
+No additional setup is required.

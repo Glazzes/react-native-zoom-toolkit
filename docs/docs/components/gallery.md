@@ -201,16 +201,22 @@ For more information see this [Gesture Handler's issue](https://github.com/softw
 Lets the user drag the current item around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
 ### pinchCenteringMode
-| Type | Default  |
-|------|----------|
-| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` |
+
+| Type                | Default   |
+| ------------------- | --------- |
+| `'clamp' \| 'free'` | `'clamp'` |
 
 ::: tip Tip
-To get the best out of this feature keep `allowPinchPanning` property set to `true`.
+This property is meant to be used when `allowPinchPanning` property is set to `true`.
 :::
 
-Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing container,
-see [PinchCenteringMode](#pinchcenteringmode-enum).
+Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
+possible values are:
+
+- `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
+  gesture, just like seen on Android galleries.
+- `free` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+  position it will animate back to a position within the bondaries of its enclosing container.
 
 ### onIndexChange
 | Type | Default  |
@@ -369,13 +375,8 @@ Jump to the item at the given index.
 | index  | `number` | Index of the item to transition to. |
 
 ## Type Definitions
-### PinchCenteringMode Enum
-| Property     |  Description |
-|--------------|--------------|
-| `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |
-| `INTERACTION` | Keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds position it will animate back to a position within the bondaries of its enclosing container. |
 
-### ResumableZoomState
+### CommonZoomState
 | Property     |  Type    | Description                              |
 |--------------|----------|------------------------------------------|
 | `width`      | `number` | Width of the current item.               |

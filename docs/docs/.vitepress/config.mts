@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {
-        text: '2.1.4',
+        text: '3.0.0',
         items: [
           {
             text: 'Releases',

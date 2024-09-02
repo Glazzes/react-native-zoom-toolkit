@@ -91,14 +91,6 @@ For an overlay mode example, see Example App's [CropZoom Skia Example](https://g
 
 ## Properties
 
-### mode
-
-| Type       | Default            | Required | Additional Info                |
-| ---------- | ------------------ | -------- | ------------------------------ |
-| `CropMode` | `CropMode.MANAGED` | `No`     | see [CropMode](#cropmode-enum) |
-
-Select which one of the two available modes to use.
-
 ### cropSize
 
 | Type                                 | Required |
@@ -115,18 +107,6 @@ Size of the cropping area.
 
 Resolution of your image, video or how big whatever you are trying to crop really is.
 
-### debug
-
-| Type      | Default | Required |
-| --------- | ------- | -------- |
-| `boolean` | `false` | `No`     |
-
-::: tip Note
-In case you're color blind and/or have any trouble differentiating colors, please consider opening an issue suggesting a suitable pair of colors.
-:::
-
-Highlight the cropping area with a red-ish color as well as the gesture detection area with a light green color, use it to align your `OverlayComponent` with the crop area properly.
-
 ### minScale
 
 | Type     | Default | Required |
@@ -141,25 +121,36 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 | -------- | ----------- | -------- |
 | `number` | `undefined` | `No`     |
 
-Maximum scale value allowed by the pinch gesture, leaving this property as `undefined` will instruct the component to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is a value just before images and videos start getting pixelated.
+Maximum scale value allowed by the pinch gesture, leaving this property as `undefined` will instruct the component
+to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is
+a value just before images and videos start getting pixelated.
 
 ### panMode
 
-| Type      | Default         |
-| --------- | --------------- |
-| `PanMode` | `PanMode.CLAMP` |
+| Type                              | Default   | Required |
+| --------------------------------- | --------- | -------- |
+| `'clamp' \| 'free' \| 'friction'` | `'clamp'` | `No`     |
 
-Determines how your component must behave when it's panned beyond the boundaries defined by the
-cropping area, see [PanMode](#panmode-enum).
+Determine how your component must behave when it's panned beyond the specified boundaries by the container
+enclosing it, possible values are:
+
+- `clamp` prevents the user from dragging the component out of its enclosing container boundaries.
+- `free` lets the user drag the component around freely, if the pan gesture ends in an out of bounds position
+  it will animate back to a position with the boundaries of its enclosing container.
+- `friction` is the same as `free`mode, however it just adds some amount of friction as you pan.
 
 ### scaleMode
 
-| Type        | Default            |
-| ----------- | ------------------ |
-| `ScaleMode` | `ScaleMode.BOUNCE` |
+| Type                  | Default    | Required |
+| --------------------- | ---------- | -------- |
+| `'clamp' \| 'bounce'` | `'bounce'` | `No`     |
 
 Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
-defined by `minScale` and `maxScale` properties, see [ScaleMode](#scalemode-enum).
+defined by `minScale` and `maxScale` properties, possible values are:
+
+- `clamp` keeps the scale whithin the already mentioned scale boundaries.
+- `bounce` lets the user scale above and below the scale boundary values, at the end of the pinch gesture
+  the scale value animates back to `minScale` or `maxScale` respectively.
 
 ### allowPinchPanning
 
@@ -218,9 +209,9 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 
 ### onUpdate
 
-| Type                                     | Default     | Required | Additional Info                                                                                    |
-| ---------------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------- |
-| `(state: CropZoomState<number>) => void` | `undefined` | `No`     | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+| Type                             | Default     | Required | Additional Info                                                                                    |
+| -------------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `(state: CropZoomState) => void` | `undefined` | `No`     | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Worklet callback triggered when the transformation state of the component changes, the internal state is updated as
 the user makes use of the gestures or execute its methods, ideal if you need to mirror its current transformation
@@ -373,30 +364,6 @@ Assign the internal transformation values for this component, if the state provi
 | `rotate`     | `number` | Rotate transformation value, angle measured in radians.  |
 | `rotateX`    | `number` | RotateX transformation value, angle measured in radians. |
 | `rotateY`    | `number` | RotateY transformation value, angle measured in radians. |
-
-### CropMode Enum
-
-| Property  | Description                                                                                              |
-| --------- | -------------------------------------------------------------------------------------------------------- |
-| `MANAGED` | Mode designed for common uses cases, see [How to use](#managed-mode).                                    |
-| `OVERLAY` | Mode designed for complex use cases, it provides a barebones component, see [How to use](#overlay-mode). |
-
-### PanMode Enum
-
-| Property   | Description                                                                                                                                                                                                                  |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CLAMP`    | Prevents the user from dragging the component out of the specified boundaries.                                                                                                                                               |
-| `FREE`     | Lets the user drag the component around freely, when the pan gesture ends the component will return to a position within the specified boundaries.                                                                           |
-| `FRICTION` | Lets the user drag the component around applying friction to the pan gesture up to a point where it's stopped completely, when the pan gesture ends the component will return to a position within the specified boundaries. |
-
-### ScaleMode Enum
-
-| Property | Description                                                                                                                                                  |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `CLAMP`  | Prevents the scale from exceeding the scale boundaries.                                                                                                      |
-| `BOUNCE` | Lets the user scale above and below the scale boundary values, when the pinch gesture ends the scale value returns to `minScale` or `maxScale` respectively. |
-
-### CropContextResult
 
 <table>
 <tr>

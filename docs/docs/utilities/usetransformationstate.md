@@ -10,7 +10,7 @@ your choice, for a hands on example see [How to use with Skia Components](../gui
 
 ## How to use
 
-When calling this hook it will provide the three following properties:
+When calling this hook it will provide you with the three following properties:
 
 - `onUpdate` is a worklet function which must be passed as a property to the zoom component's onUpdate
   callback property, this way the zoom component will update transform and state properties.

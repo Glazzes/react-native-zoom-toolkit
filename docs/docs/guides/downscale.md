@@ -73,7 +73,7 @@ onUpdate callback property and scale value to the Downscale component's scale pr
 
 ::: code-group
 
-```tsx [Manual]
+```tsx [Manual]{8,10}
 const scale = useSharedValue<number>(1);
 const onUpdate = (state) => {
   'worklet';
@@ -90,7 +90,7 @@ const onUpdate = (state) => {
 </ResumableZoom>;
 ```
 
-```tsx [Hook]
+```tsx [Hook]{4,6}
 const { onUpdate, state } = useTransformationState('resumable');
 //...
 
@@ -112,7 +112,7 @@ This is pretty much it, you can expand this basic setup to your particular requi
 YOU as a user of this library may be wondering why I the author of this library do not ship this component as
 part of the library, here are the reasons:
 
-- This is way too niche, therefore it does not serve a general purporse usage.
+- This is way too niche, therefore it does not serve a general purpose usage.
 - Context! I can't tell what kind of components you need to downscale, you may be working with RN's components,
   Skia components or SVG components, each one of these contexts require custom code to achieve the same result,
   so I better show the solution and you work around it.
