@@ -94,7 +94,7 @@ Custom React Native Reanimated's timing configuration used to snap back to the o
 | `ResizeConfig` | `undefined` |
 
 Dynamically recalculates SnapbackZoom component's width and height to align with a given aspect ratio based on a
-scale value as the gesture scale increases, see [notes](#notes) for a detailed example.
+scale value as the gesture scale increases, see [About resizeConfig Property](#about-resizeconfig-property) for a detailed example.
 
 ### gesturesEnabled
 
@@ -102,7 +102,7 @@ scale value as the gesture scale increases, see [notes](#notes) for a detailed e
 | --------- | ------- |
 | `boolean` | `true`  |
 
-Enables or disable gestures, when gestures are disabled your component can detect pointer events again.
+Enables or disable all gestures.
 
 ### onTap
 
@@ -153,22 +153,32 @@ if you need to mirror the current state of the gesture to some other component, 
 
 Callback triggered once the snap back animation has finished.
 
-## Notes
+## About resizeConfig Property
 
-### On resizeConfig Property
+Before you start reading, for a visual reference watch the video above and pay attention to the parrot image.
 
-Imagine you've got a lot of images you want to display as tiles of 200x200 pixel size, for many of those images the aspect ratio has been compromised, assume one of those images is 1920x1080 pixel size and you would like this image to resize in such a way the aspect ratio is no longer compromised when the image has been scaled two times by the pinch gesture, your object would look like this one.
+Imagine you've got a lot of images you want to display as tiles of 200x200 pixel size, for many of those images
+the aspect ratio has been compromised, assume one of those images is 1920x1080 pixel size and you would like
+this image to resize in such a way the aspect ratio is no longer compromised when the image has been scaled two
+times by the pinch gesture, your component will look like this.
 
-```javascript
-{
+```tsx
+const resizeConfig = {
   size: { width: 200, height: 200 }, // size of your tile
   aspectRatio: 1920 / 1080, // aspect ratio based on the size of your image/video
   scale: 2 // at which scale the aspect ratio is no longer compromised
 }
+
+//...
+<SnapbackZoom resizeConfig={resizeConfig}>
+  {/* Use width and height properties not flex: 1 */ }
+  <SomeImage style={{ width: '100%', height: '100%' } />
+</SnapbackZoom>
 ```
 
 ::: tip Important
-`SnapbackZoom` resizes its own dimensions not your component's ones, remember to use `{width: '100%', height: '100%'}` for images and videos so they cover the entire area of `SnapbackZoom` as it resizes.
+SnapbackZoom resizes its own dimensions not your component's ones, therefore your component must have the
+following styles `{width: '100%', height: '100%'}`.
 :::
 
 At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.
