@@ -163,8 +163,8 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     translate.x.value = decayX ? withDecay(decayConfigX) : withTiming(toX);
     translate.y.value = decayY ? withDecay(decayConfigY) : withTiming(toY);
 
-    const restX = Math.max(0, Math.abs(Math.abs(translate.x.value) - boundX));
-    const restY = Math.max(0, Math.abs(Math.abs(translate.y.value) - boundY));
+    const restX = Math.abs(Math.abs(translate.x.value) - boundX);
+    const restY = Math.abs(Math.abs(translate.y.value) - boundY);
     gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
 
     if (decayX || decayY) {

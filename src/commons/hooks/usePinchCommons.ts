@@ -6,10 +6,10 @@ import {
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated';
-import {
-  type GestureTouchEvent,
-  type GestureUpdateEvent,
-  type PinchGestureHandlerEventPayload,
+import type {
+  GestureTouchEvent,
+  GestureUpdateEvent,
+  PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
 import { clamp } from '../utils/clamp';
@@ -124,7 +124,10 @@ export const usePinchCommons = (options: PinchOptions) => {
       fromScale: scaleOffset.value,
       origin: { x: origin.x.value, y: origin.y.value },
       offset: { x: offset.x.value, y: offset.y.value },
-      delta: allowPinchPanning ? { x: deltaX, y: deltaY } : { x: 0, y: 0 },
+      delta: {
+        x: allowPinchPanning ? deltaX : 0,
+        y: allowPinchPanning ? deltaY : 0,
+      },
     });
 
     const { x: boundX, y: boundY } = boundFn(toScale);
@@ -168,15 +171,18 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     userCallbacks.onPinchEnd && runOnJS(userCallbacks.onPinchEnd)(e);
 
-    const deltaY = currentFocal.y.value - initialFocal.y.value;
     const toScale = clamp(scale.value, minScale, maxScale.value);
+    const deltaY =
+      !scaleClamp && allowPinchPanning && scale.value > maxScale.value
+        ? (currentFocal.y.value - initialFocal.y.value) / 2
+        : 0;
 
     const { x, y } = pinchTransform({
       toScale: toScale,
       fromScale: scale.value,
       origin: { x: origin.x.value, y: origin.y.value },
       offset: { x: translate.x.value, y: translate.y.value },
-      delta: { x: 0, y: allowPinchPanning ? deltaY / 2 : 0 },
+      delta: { x: 0, y: deltaY },
     });
 
     const { x: boundX, y: boundY } = boundFn(toScale);
