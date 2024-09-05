@@ -25,7 +25,6 @@ export type ResumableZoomProps = React.PropsWithChildren<{
   pinchCenteringMode?: PinchCenteringMode;
   onSwipe?: (direction: SwipeDirection) => void;
   onUpdate?: (e: CommonZoomState<number>) => void;
-  onGestureEnd?: (() => void) | undefined;
   onOverPanning?: (x: number, y: number) => void;
 }> &
   PanGestureCallbacks &
