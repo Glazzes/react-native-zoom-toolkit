@@ -6,9 +6,9 @@ export type GalleryContextType = {
   rootSize: SizeVector<SharedValue<number>>;
   rootChildSize: SizeVector<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
+  scale: SharedValue<number>;
   scroll: SharedValue<number>;
   scrollOffset: SharedValue<number>;
-  scale: SharedValue<number>;
   activeIndex: SharedValue<number>;
   fetchIndex: SharedValue<number>;
   isScrolling: SharedValue<boolean>;

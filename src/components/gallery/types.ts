@@ -1,9 +1,10 @@
 import type { ViewStyle } from 'react-native';
-import { PinchCenteringMode } from '../../commons/types';
 import type {
   CommonZoomState,
   PanGestureCallbacks,
+  PinchCenteringMode,
   PinchGestureCallbacks,
+  ScaleMode,
   SizeVector,
   SwipeDirection,
   TapGestureEvent,
@@ -32,6 +33,8 @@ export type GalleryProps<T = unknown> = {
   windowSize?: number;
   vertical?: boolean;
   tapOnEdgeToItem?: boolean;
+  zoomEnabled?: boolean;
+  scaleMode?: ScaleMode;
   allowPinchPanning?: boolean;
   pinchCenteringMode?: PinchCenteringMode;
   customTransition?: GalleryTransitionCallback;
@@ -41,6 +44,7 @@ export type GalleryProps<T = unknown> = {
   onScroll?: (scroll: number, contentOffset: number) => void;
   onUpdate?: (state: CommonZoomState<number>) => void;
   onVerticalPull?: (translateY: number, released: boolean) => void;
+  onGestureEnd?: () => void;
 } & PinchGestureCallbacks &
   PanGestureCallbacks &
   ZoomEventCallbacks;
