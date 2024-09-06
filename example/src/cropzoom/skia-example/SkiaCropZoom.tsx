@@ -9,22 +9,17 @@ import {
   ColorMatrix,
   Lerp,
   useCanvasRef,
-  type Transforms3d,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
 
 import {
   CropZoom,
-  CropMode,
-  PanMode,
-  ScaleMode,
-  useImageResolution,
   type CropZoomType,
-  type CropGestureEventCallBack,
+  useTransformationState,
 } from 'react-native-zoom-toolkit';
 
 import CropModal from '../commons/CropModal';
-import CropOverlay from '../commons/CropOverlay';
+import SVGOverlay from '../commons/SVGOverlay';
 import Controls from './Controls';
 import {
   buttonSize,
@@ -34,84 +29,50 @@ import {
 } from '../commons/contants';
 import { theme } from '../../constants';
 
-const useVector = (x: number, y?: number) => {
-  const first = useSharedValue(x);
-  const second = useSharedValue(y ?? x);
-  return { x: first, y: second };
-};
-
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
-/*
- * Dealing with Skia components is more complicated as it involves creating your own
- * shared values and update them with onGestureActive callback property.
- *
- * It also requires you to
- * - Calculate where the image is initally located
- * - Where is the center of your image so transformations are applicated properly
- */
-const SkiaCropZoom: React.FC = ({}) => {
-  const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
-
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const cropSize = screenWidth * 0.9;
-
+const SkiaCropZoom = () => {
   const ref = useRef<CropZoomType>(null);
   const canvasRef = useCanvasRef();
 
   const image = useImage(IMAGE);
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { onUpdate, transform, state } = useTransformationState('crop');
+
+  const cropSize = screenWidth * 0.9;
   const [cropImage, setCropImage] = useState<string | undefined>(undefined);
 
   const progress = useSharedValue(0);
-
-  const width = useSharedValue(0);
-  const height = useSharedValue(0);
-  const translate = useVector(0, 0);
-  const scale = useSharedValue(1);
-  const rotation = useSharedValue(0);
-
   const posX = useDerivedValue(
-    () => (screenWidth - width.value) / 2,
-    [width, screenWidth]
+    () => (screenWidth - state.width.value) / 2,
+    [state, screenWidth]
   );
+
   const posY = useDerivedValue(
-    () => (screenHeight - height.value - buttonSize - theme.spacing.s) / 2,
-    [height, screenHeight]
+    () =>
+      (screenHeight - state.height.value - buttonSize - theme.spacing.s) / 2,
+    [state, screenHeight]
   );
 
-  const transform = useDerivedValue<Transforms3d>(() => {
-    return [
-      { translateX: translate.x.value },
-      { translateY: translate.y.value },
-      { scale: scale.value },
-      { rotate: rotation.value },
-    ];
-  }, [translate, rotation, scale]);
-
-  const onGestureActive: CropGestureEventCallBack = (e) => {
-    'worklet';
-    width.value = e.width;
-    height.value = e.height;
-    translate.x.value = e.translateX;
-    translate.y.value = e.translateY;
-    scale.value = e.scale;
-    rotation.value = e.rotate;
+  const renderOverlay = () => {
+    return <SVGOverlay cropSize={{ width: cropSize, height: cropSize }} />;
   };
 
-  if (isFetching || image === null || resolution === undefined) {
-    return null;
+  if (image === null) {
+    return;
   }
+
+  const resolution = { width: image.width(), height: image.height() };
 
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
       <Canvas style={StyleSheet.absoluteFill} ref={canvasRef}>
         <Image
           x={posX}
           y={posY}
-          width={width}
-          height={height}
+          width={state.width}
+          height={state.height}
           image={image}
           fit={'cover'}
           origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT) / 2)}
@@ -124,19 +85,13 @@ const SkiaCropZoom: React.FC = ({}) => {
         </Image>
       </Canvas>
 
-      <View style={StyleSheet.absoluteFill}>
-        <CropOverlay cropSize={cropSize} />
-      </View>
-
       <View style={styles.container}>
         <CropZoom
           ref={ref}
-          mode={CropMode.OVERLAY}
           cropSize={{ width: cropSize, height: cropSize }}
           resolution={resolution}
-          onGestureActive={onGestureActive}
-          scaleMode={ScaleMode.BOUNCE}
-          panMode={PanMode.FREE}
+          onUpdate={onUpdate}
+          OverlayComponent={renderOverlay}
         />
       </View>
 
@@ -152,6 +107,8 @@ const SkiaCropZoom: React.FC = ({}) => {
       {cropImage !== undefined ? (
         <CropModal uri={cropImage} setCrop={setCropImage} />
       ) : null}
+
+      <StatusBar style="light" translucent={true} />
     </View>
   );
 };

@@ -1,8 +1,8 @@
 import React from 'react';
-import { CropManagedExample } from '../src/cropzoom';
+import { BasicCropZoom } from '../src/cropzoom';
 
 const cropmanaged = () => {
-  return <CropManagedExample />;
+  return <BasicCropZoom />;
 };
 
 export default cropmanaged;

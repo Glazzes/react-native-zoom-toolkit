@@ -1,9 +1,10 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'expo-router';
-import { theme } from '../../src/constants';
 import Constans from 'expo-constants';
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
+
+import { theme } from '../../src/constants';
 
 type LinkProps = {
   name: string;
@@ -16,9 +17,9 @@ const barHeight = Constans.statusBarHeight;
 const screens = [
   { name: 'ResumableZoom Example', screen: 'index' },
   { name: 'ResumableZoom Skia Example', screen: 'resumableskia' },
-  { name: 'Gallery Example', screen: 'resumablegallery' },
-  { name: 'CropZoom Managed Example', screen: 'cropmanaged' },
-  { name: 'CropZoom Skia Example', screen: 'cropoverlay' },
+  { name: 'Gallery Example', screen: 'gallery' },
+  { name: 'CropZoom Basic Example', screen: 'cropbasic' },
+  { name: 'CropZoom Skia Example', screen: 'cropskia' },
   { name: 'SnapbackZoom Example', screen: 'snapback' },
 ];
 

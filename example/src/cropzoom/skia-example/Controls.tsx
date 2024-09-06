@@ -51,11 +51,16 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [isRotated, setIsRotated] = useState<boolean>(false);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
   const rotate = () => {
     cropRef?.current?.rotate(true, true, (angle) => {
       setIsRotated(angle !== 0);
     });
+  };
+
+  const flipVertical = () => {
+    cropRef.current?.flipHorizontal(true, () => setIsFlipped((prev) => !prev));
   };
 
   /*
@@ -112,6 +117,14 @@ const Controls: React.FC<EffectIndicatorProps> = ({
           name={'format-rotate-90'}
           size={24}
           color={isRotated ? activeColor : baseColor}
+        />
+      </Pressable>
+
+      <Pressable onPress={flipVertical}>
+        <Icon
+          name={'flip-horizontal'}
+          size={24}
+          color={isFlipped ? activeColor : baseColor}
         />
       </Pressable>
 

@@ -1,49 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Canvas, Image, useImage, vec } from '@shopify/react-native-skia';
 import {
-  useDerivedValue,
-  useSharedValue,
-  type SharedValue,
-} from 'react-native-reanimated';
-import {
-  Canvas,
-  Image,
-  useImage,
-  vec,
-  type Transforms3d,
-} from '@shopify/react-native-skia';
-import { ResumableZoom, getAspectRatioSize } from 'react-native-zoom-toolkit';
+  ResumableZoom,
+  getAspectRatioSize,
+  useTransformationState,
+} from 'react-native-zoom-toolkit';
 
-import type { CommonZoomState } from 'react-native-zoom-toolkit';
 import { StatusBar } from 'expo-status-bar';
-
-type ResumableTransformationValues = {
-  transform: Readonly<SharedValue<Transforms3d>>;
-  onUpdate: (state: CommonZoomState) => void;
-};
-
-const useResumableValues = (): ResumableTransformationValues => {
-  const translateX = useSharedValue<number>(0);
-  const translateY = useSharedValue<number>(0);
-  const scale = useSharedValue<number>(1);
-
-  const transform = useDerivedValue<Transforms3d>(() => {
-    return [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ];
-  }, [scale, translateY, translateX]);
-
-  const onUpdate = (updateState: CommonZoomState) => {
-    'worklet';
-    translateX.value = updateState.translateX;
-    translateY.value = updateState.translateY;
-    scale.value = updateState.scale;
-  };
-
-  return { onUpdate, transform };
-};
 
 const uri =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -51,7 +15,7 @@ const uri =
 const App = () => {
   const image = useImage(uri);
   const { width, height } = useWindowDimensions();
-  const { onUpdate, transform } = useResumableValues();
+  const { onUpdate, transform } = useTransformationState('resumable');
 
   if (image === null) {
     return null;
@@ -82,11 +46,12 @@ const App = () => {
         />
       </Canvas>
 
-      <View style={{ width, height, position: 'absolute' }}>
+      <View style={[styles.absolute, { width, height }]}>
         <ResumableZoom
           maxScale={resolution}
           extendGestures={true}
-          onGestureActive={onUpdate}
+          pinchCenteringMode={'sync'}
+          onUpdate={onUpdate}
         >
           <View style={{ width: imageSize.width, height: imageSize.height }} />
         </ResumableZoom>
@@ -101,6 +66,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#151515',
+  },
+  absolute: {
+    position: 'absolute',
   },
 });
 
