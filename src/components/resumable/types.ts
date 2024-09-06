@@ -8,6 +8,7 @@ import type {
   SizeVector,
   SwipeDirection,
   TapGestureCallbacks,
+  Vector,
 } from '../../commons/types';
 
 export type ResumableZoomAssignableState = Omit<
@@ -36,4 +37,5 @@ export type ResumableZoomType = {
   reset: (animate?: boolean) => void;
   requestState: () => CommonZoomState<number>;
   assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
+  zoom: (accScale: number, xy?: Vector<number>) => void;
 };

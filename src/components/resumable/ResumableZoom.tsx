@@ -16,8 +16,10 @@ import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
+import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
@@ -26,8 +28,11 @@ import type {
   ResumableZoomType,
   ResumableZoomAssignableState,
 } from './types';
-import type { BoundsFuction, CommonZoomState } from '../../commons/types';
-import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
+import type {
+  BoundsFuction,
+  CommonZoomState,
+  Vector,
+} from '../../commons/types';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
 
@@ -161,7 +166,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const { onDoubleTapEnd } = useDoubleTapCommons({
-    container: rootSize,
+    container: extendedSize,
     translate,
     scale,
     minScale,
@@ -248,10 +253,41 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     set(toX, toY, toScale, animate);
   };
 
+  const zoom = (multiplier: number, xy?: Vector<number>) => {
+    let originX = -1 * (translate.x.value / scale.value);
+    let originY = -1 * (translate.y.value / scale.value);
+    const toScale = clamp(scale.value * multiplier, minScale, maxScale.value);
+
+    if (xy !== undefined) {
+      const diffX = xy.x / childSize.width.value;
+      const diffY = xy.y / childSize.height.value;
+      const actualX = extendGestures ? diffX * extendedSize.width.value : xy.x;
+      const actualY = extendGestures ? diffY * extendedSize.height.value : xy.y;
+
+      originX = actualX - extendedSize.width.value / 2;
+      originY = actualY - extendedSize.height.value / 2;
+    }
+
+    const { x, y } = pinchTransform({
+      toScale,
+      fromScale: scale.value,
+      origin: { x: originX, y: originY },
+      offset: { x: translate.x.value, y: translate.y.value },
+      delta: { x: 0, y: 0 },
+    });
+
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(x, -1 * boundX, boundX);
+    const toY = clamp(y, -1 * boundY, boundY);
+
+    set(toX, toY, toScale, true);
+  };
+
   useImperativeHandle(ref, () => ({
     reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
+    zoom: zoom,
   }));
 
   const composedTap = Gesture.Exclusive(doubleTap, tap);
