@@ -12,81 +12,113 @@ by [CroopZoom](/components/cropzoom#crop) component.
 
 ## What you'll be building
 
-You'll build a simple example in which you'll overlay the resulting crop image on top of CropZoom component's
-crop area so you can see results are accurate, in order to see both the crop and gesture detection areas
-you will make use of the [debug](/components/cropzoom#debug) property.
+You will focus on replicating the footage example seen in CropZoom's documentation, in other words a simple
+full-screen cropper screen, however this one has a small difference rather than a dimiss menu you will overlay
+the resulting on top of the cropper so you can see crops are accurate.
 
-The next video footage shows what the end result looks like.
+The next footage is pretty much how the end result will look like.
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
-  <video src="../assets/guideexpo.mp4" controls />
+  <video src="../assets/cropzoom.mp4" controls />
 </div>
 
 ## Setup
 
-Make sure you've followed the [Installation](/installation) guide first then you will need to install
-Expo image manipulator library.
+For mere simplicity we'll create an expo managed project and install the required dependencies by running the
+following commands:
 
-::: code-group
-
-```sh [npm]
-npm install expo-image-manipulator
+```sh
+npx create-expo-app "crop-example" --template "blank-typescript"
+cd crop-example
+npx expo install react-native-reanimated react-native-gesture-handler @shopify/react-native-skia react-native-zoom-toolkit
 ```
 
-```sh [yarn]
-yarn add expo-image-manipulator
-```
+By watching the video we can split the logic into the three following files:
 
-```sh [expo]
-expo install expo-image-manipulator
-```
-
-:::
+- `App.tsx` the main file contaning structure of your cropper.
+- `SVGOverlay.tsx` the file with the svg with a hole in it to determine the crop section.
+- `Controls.tsx` the file contaning the pressables to flip, rotate and crop. This one is absolute positioned at the
+  bottom of the screen.
 
 Copy and paste the following boilerplate code into your app and pay attention to crop method in Controls.tsx file.
 
 ::: code-group
 
-```tsx:line-numbers=1 [App.tsx]
+```tsx [App.tsx]
 import React, { useRef, useState } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
-import { CropZoom, useImageResolution, type CropZoomType } from 'react-native-zoom-toolkit';
+import {
+  Image,
+  Pressable,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+
+import {
+  CropZoom,
+  useImageResolution,
+  type CropZoomType,
+  type SizeVector,
+} from 'react-native-zoom-toolkit';
+
 import Controls from './Controls';
+import SVGOverlay from './SVGOverlay';
 
-const image = 'https://eskipaper.com/images/happy-dog-background-1.jpg';
-const cropSize = { width: 280, height: 280 };
+const IMAGE =
+  'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
-const App: React.FC = ({}) => {
-  const ref = useRef<CropZoomType>(null);
-  const [crop, setCrop] = useState<string | undefined>(undefined);
+const App = ({}) => {
+  const cropRef = useRef<CropZoomType>(null);
 
-  const { isFetching, resolution } = useImageResolution({ uri: image });
+  const { width } = useWindowDimensions();
+  const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
+
+  const [result, setResult] = useState<string | undefined>(undefined);
+
+  const cropSize: SizeVector<number> = {
+    width: width * 0.8,
+    height: width * 0.8,
+  };
+
+  const renderOverlay = () => {
+    return <SVGOverlay cropSize={cropSize} />;
+  };
+
   if (isFetching || resolution === undefined) {
     return null;
   }
 
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
       <CropZoom
-        debug={true}
-        ref={ref}
+        ref={cropRef}
         cropSize={cropSize}
         resolution={resolution}
+        OverlayComponent={renderOverlay}
       >
         <Image
-          source={{ uri: image }}
+          source={{ uri: IMAGE }}
           style={styles.image}
           resizeMethod="scale"
         />
       </CropZoom>
 
-      <Controls uri={image} cropRef={ref} setCrop={setCrop} />
+      <Controls uri={IMAGE} cropRef={cropRef} setCrop={setResult} />
 
-      {crop && (
-        <Image source={{ uri: crop }} style={[styles.overlay, cropSize]} />
-      )}
+      {/*
+       * Display the resulting image on top of the crop screen
+       */}
+      {result !== undefined ? (
+        <Pressable
+          onPress={() => setResult(undefined)}
+          style={{ position: 'absolute' }}
+        >
+          <Image source={{ uri: result }} style={cropSize} />
+        </Pressable>
+      ) : null}
+
+      <StatusBar style="light" translucent={true} />
     </View>
   );
 };
@@ -94,38 +126,101 @@ const App: React.FC = ({}) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#121212',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#121212',
   },
   image: {
     width: '100%',
     height: '100%',
-  },
-  overlay: {
-    position: 'absolute',
   },
 });
 
 export default App;
 ```
 
-```tsx{17-19} [Controls.tsx]
-import React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
-import type { CropZoomType } from 'react-native-zoom-toolkit';
-import { type Action, FlipType, manipulateAsync } from 'expo-image-manipulator';
+```tsx [SVGOverlay.tsx]
+import React, { useMemo } from 'react';
+import { useWindowDimensions, type ViewStyle } from 'react-native';
+import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 
-type ControlsProps = {
-  uri: string;
-  cropRef: React.RefObject<CropZoomType>;
-  setCrop: (value: string | undefined) => void;
+import type { SizeVector } from 'react-native-zoom-toolkit';
+
+type SVGOverlayProps = {
+  cropSize: SizeVector<number>;
 };
 
-const Controls: React.FC<ControlsProps> = ({ uri, cropRef, setCrop }) => {
-  const rotate = () => cropRef.current?.rotate();
-  const flipH = () => cropRef.current?.flipHorizontal();
-  const flipV = () => cropRef.current?.flipVertical();
+/*
+ * Draws an SVG as big as the space cropzoom is ocuppying in the screen, this
+ * one also draws a "hole" in it as big as the crop size.
+ */
+const SVGOverlay: React.FC<CropOverlayProps> = ({ cropSize }) => {
+  const { width, height } = useWindowDimensions();
+
+  const path = useMemo(() => {
+    const center = { x: width / 2, y: height / 2 };
+    const commands = [
+      'M 0 0',
+      `h ${width} v ${height}`,
+      `h ${-width} v ${-height}`,
+      `M ${center.x - cropSize.width / 2} ${center.y}`,
+      `a 1 1 0 0 0 ${cropSize.width} 0`,
+      `a 1 1 0 0 0 ${-1 * cropSize.height} 0`,
+    ].join(' ');
+
+    return Skia.Path.MakeFromSVGString(commands)!;
+  }, [width, height, cropSize]);
+
+  return (
+    <Canvas style={{ width, height }}>
+      <Path path={path} color={'rgba(0, 0, 0, 0.4)'} />
+    </Canvas>
+  );
+};
+
+export default SVGOverlay;
+```
+
+```tsx{41-43,71} [Controls.tsx]
+import React, { useState } from 'react';
+import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+
+import type { CropZoomType } from 'react-native-zoom-toolkit';
+
+type ControlProps = {
+  uri: string;
+  setCrop: (uri: string | undefined) => void;
+  cropRef: React.RefObject<CropZoomType>;
+};
+
+const activeColor = "#75DAEA";
+const baseColor = "#FFFFFF";
+
+const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
+  const [isCropping, setIsCropping] = useState<boolean>(false);
+
+  const [isFlippedH, setIsFlippedH] = useState<boolean>(false);
+  const [isFlippedV, setIsFlippedV] = useState<boolean>(false);
+  const [isRotated, setIsRotated] = useState<boolean>(false);
+
+  const rotate = () => {
+    cropRef?.current?.rotate(true, true, (angle) => {
+      setIsRotated(angle !== 0);
+    });
+  };
+
+  const flipHorizontal = () => {
+    cropRef?.current?.flipHorizontal(true, (angle) => {
+      setIsFlippedH(angle === 180);
+    });
+  };
+
+  const flipVertical = () => {
+    cropRef.current?.flipVertical(true, (angle) => {
+      setIsFlippedV(angle === 180);
+    });
+  };
 
   const crop = async () => {
 
@@ -133,10 +228,37 @@ const Controls: React.FC<ControlsProps> = ({ uri, cropRef, setCrop }) => {
 
   return (
     <View style={styles.root}>
-      <Button title="Rotate" onPress={rotate} />
-      <Button title="Flip H" onPress={flipH} />
-      <Button title="Flip V" onPress={flipV} />
-      <Button title="Crop" onPress={crop} />
+      <Pressable onPress={rotate}>
+        <Icon
+          name={'format-rotate-90'}
+          size={24}
+          color={isRotated ? activeColor : baseColor}
+        />
+      </Pressable>
+
+      <Pressable onPress={flipHorizontal}>
+        <Icon
+          name={'flip-horizontal'}
+          size={24}
+          color={isFlippedH ? activeColor : baseColor}
+        />
+      </Pressable>
+
+      <Pressable onPress={flipVertical}>
+        <Icon
+          name={'flip-vertical'}
+          size={24}
+          color={isFlippedV ? activeColor : baseColor}
+        />
+      </Pressable>
+
+      <Pressable style={styles.button} onPress={crop}>
+        {isCropping ? (
+          <ActivityIndicator size={'small'} color={baseColor} />
+        ) : (
+          <Icon name={'check'} size={24} color={'#fff'} />
+        )}
+      </Pressable>
     </View>
   );
 };
@@ -145,9 +267,21 @@ const styles = StyleSheet.create({
   root: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    gap: 24,
     position: 'absolute',
-    bottom: 0,
+    bottom: 0
+  },
+  button: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#75DAEA',
   },
 });
 
@@ -223,7 +357,6 @@ setTimeout(() => {
 
 This example is pretty basic, you can check out both [Example app](https://github.com/Glazzes/react-native-zoomable/tree/main/example)'s CroopZoom examples, however you can keep working in this example, how about:
 
-- make it look pretty.
 - use different aspect ratio size images.
 - test with different `cropSize` property values, nobody said width and height dimensions must be equals.
 - use `fixedWidth` argument with CropZoom's [crop method](/components/cropzoom#crop) to enforce resulting

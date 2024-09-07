@@ -79,9 +79,9 @@ All properties for this component are optional.
 | --------- | ------- |
 | `boolean` | `false` |
 
-By default the gesture detection area is the same size as the width and height of the wrapped component, by setting this property to `true` the detection area is increased to the size `ResumableZoom` is taking on screen, if the wrapped component is bigger than the space taken by `ResumableZoom` component, this property will do nothing.
-
-To summarize this property: It improves the gesture detection for small components.
+By default the gesture detection area is the same size as the width and height of the wrapped component,
+by setting this property to `true` the detection area is increased to the size `ResumableZoom` is taking
+on screen, see [this picture](../assets/extendgestures.jpg) for a visual reference.
 
 ### minScale
 
@@ -147,7 +147,7 @@ to user interaction. Panning as you pinch will not trigger any pan gesture relat
 
 | Type                | Default   |
 | ------------------- | --------- |
-| `'clamp' \| 'free'` | `'clamp'` |
+| `'clamp' \| 'sync'` | `'clamp'` |
 
 ::: tip Tip
 This property is meant to be used when `allowPinchPanning` property is set to `true`.
@@ -158,7 +158,7 @@ possible values are:
 
 - `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
   gesture, just like seen on Android galleries.
-- `free` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+- `sync` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
   position it will animate back to a position within the bondaries of its enclosing container.
 
 ### decay
@@ -230,7 +230,7 @@ Callback triggered when the pan gesture starts.
 | `(x: number, y: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Worklet callback triggered when the wrapped component has been panned beyond the boundaries defined by
-its enclosing container, receives as an argument how much the component has been panned beyond such
+its enclosing container, receives as an argument the amount the component has been panned beyond such
 boundaries in both `x` and `y` axis.
 
 ### onPanEnd
@@ -280,14 +280,14 @@ of the gestures this callback's execution will be delayed until the animation ha
 
 All methods are accessible through a ref object.
 
-```jsx
+```tsx
 import { useRef } from 'react';
 import {
   ResumableZoom,
   type ResumableZoomType,
 } from 'react-native-zoom-toolkit';
 
-const ref = useRef < ResumableZoomType > null;
+const ref = useRef<ResumableZoomType>(null);
 ref.current?.reset(false);
 
 <ResumableZoom ref={ref}>// some component here</ResumableZoom>;
@@ -303,6 +303,18 @@ Reset all transformations to their initial state.
 | Name    | Type                   | Default | Description                               |
 | ------- | ---------------------- | ------- | ----------------------------------------- |
 | animate | `boolean \| undefined` | `true`  | Whether to animate the transition or not. |
+
+### zoom
+
+Programmatically zoom in or out to a xy position within the child component.
+
+- type definition: `(multiplier: number, xy?: Vector<number>) => void`
+- parameter information
+
+| Name       | Type                          | Description                                                                                                                                                                                                                      |
+| ---------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| multiplier | `number`                      | Value to multiply the current scale for, values greater than one zoom in and values less than one zoom out.                                                                                                                      |
+| xy         | `Vector<number> \| undefined` | Position of the point to zoom in or out starting from the top left corner of your component, leaving this value as undefined will be infered as zooming in or out from the center of the child component's current visible area. |
 
 ### requestState
 

@@ -20,11 +20,16 @@ it will produce a pixelated result because your canvas is getting scaled directl
 In order to get this working as expected we want to mirror the transformation state from the zoom component
 to the Skia component, this way the Skia canvas never gets scaled but the items within it do.
 
-Luckily for you, the components exposed by this library have a property called `onUpdate` which reports
-the changes in the transformation state.
+In order to mirror the "zoom state" from one component to another we need to follow some simple rules:
 
-To make it short, we can to use these zoom components by nesting a transparent view and update the Skia components
-accordingly to the values provided by `onUpdate` callback.
+- The zoom component must overlay the Skia canvas (either translation or absolute position), it's also required
+  to have the same size and location at the screen as the Skia canvas.
+- The zoom component's child component must be a transparent view with the same size as the element to mirror
+  the zoom state to in Skia canvas.
+- With the previous two rules satisfied, we need to listen to the transformation state via zoom's component
+  `onUpdate` callback property by using [useTransformationState](../utilities/usetransformationstate) hook.
+
+Don't worry too much about the last one for now, with these three simple rules we're ready to go!
 
 ## The Heart of the Matter
 
@@ -35,10 +40,12 @@ that burden away from you in the form of [useTransformationState](../utilities/u
 ## Skia and ResumableZoom
 
 ResumableZoom is the heart of this library, therefore it makes the most sense to showcase the Skia usage with it,
-however the techniques you will use are also applicable to the other components as well. As an example we'll focus
-on replicating the example seen in ResumableZoom documentation, let's set up our basic structure with Skia first.
+however the techniques you will use are also applicable to the other components as well.
 
-```tsx{38-39}
+As an example we'll focus on replicating the example seen in ResumableZoom documentation, let's set up our
+basic structure with Skia first.
+
+```tsx{38-44}
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage } from '@shopify/react-native-skia';
@@ -64,7 +71,7 @@ const App = () => {
 
   const x = 0;
   const y = (height - imageSize.height) / 2;
-  const centerX = width / 2;
+  const centerX = x + imageSize.width / 2;
   const centerY = y + imageSize.height / 2;
 
   return (
@@ -76,7 +83,12 @@ const App = () => {
           y={y}
           width={imageSize.width}
           height={imageSize.height}
-          // Center of transformation must match the center of the image
+          {/*
+            Center of transformation must match the center of
+            the image, by default the tranformation center is
+            located at the top left corner of the image, x and y
+            properties to be exact.
+          */}
           origin={vec(centerX, centerY)}
         />
       </Canvas>
@@ -96,7 +108,7 @@ With our basic structure in place, let's address the two missing steps to make t
 
 Let's see how the end result looks like:
 
-```tsx{12,39,43-51}
+```tsx{12,39,43-53}
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage } from '@shopify/react-native-skia';
@@ -108,7 +120,7 @@ const uri =
 const App = () => {
   const image = useImage(uri);
   const { width, height } = useWindowDimensions();
-  const { onUpdate, transform } = useTransformationState();
+  const { onUpdate, transform } = useTransformationState('resumable');
 
   if (image === null) {
     return null;
@@ -122,7 +134,7 @@ const App = () => {
 
   const x = 0;
   const y = (height - imageSize.height) / 2;
-  const centerX = width / 2;
+  const centerX = x + imageSize.width / 2;
   const centerY = y + imageSize.height / 2;
 
   return (
@@ -139,12 +151,14 @@ const App = () => {
         />
       </Canvas>
 
+      {/* Same size and position (0, 0) as the canvas above */}
       <View style={{ width, height, position: 'absolute' }}>
         <ResumableZoom
           maxScale={resolution}
           extendGestures={true}
           onUpdate={onUpdate}
-      >
+        >
+          {/* Nested child is the same as the Skia image */}
           <View style={{ width: imageSize.width, height: imageSize.height }} />
         </ResumableZoom>
       </View>
@@ -157,9 +171,9 @@ export default App;
 
 Let's see what we can take from this example
 
-- The overlying zoom component must be the same size as the canvas, this also applies to the transparent view
-  size and the Skia component to zoom.
-- You can assign a color to the transparent view and lower the opacity if you are having trouble centering the
+- The overlying zoom component must have the same size and location as the canvas, the transparent view must
+  have the same size as the component to pinch.
+- You can assign a color to the transparent view and lower the opacity if you are having trouble aligning the
   zoom component with your Skia component.
 - Skia Images get pixelated at a faster rate than RN image component does, therefore setting ResumableZoom's
   maxscale to the image resolution is a recommended practice.

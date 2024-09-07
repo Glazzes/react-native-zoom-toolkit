@@ -31,7 +31,7 @@ const { onUpdate, transform, state } = useTransformationState('resumable');
   <Image source={{uri}} style={styles.image} />
 </ResumableZoom>
 
-//...
+// Skia canvas
 <Canvas>
   <Image
     source={image}

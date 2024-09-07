@@ -27,17 +27,17 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 
 ## How to use
 
-### Managed mode
-
 Managed mode is the default mode and its designed for simple use cases as the one shown in the video footage above.
 Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things
 to keep in mind:
 
 ::: tip Remember
 
-- This component uses `flex: 1` style property therefore it will attempt to take all available space, its minimum dimensions are the values provided to `cropSize` property.
-- The crop area is centered using `justifyContent` and `alignItems` center.
-- This component calculates the dimensions needed to meet the `resolution` property's aspect ratio, therefore your images and videos must use `{ flex: 1 }` style property so they cover the gesture detection area properly.
+- This component uses `flex: 1` style property therefore it will attempt to take all available space, its
+  minimum dimensions are the values provided to cropSize property.
+- This component calculates the dimensions needed to meet the resolution property's aspect ratio, therefore
+  your images and videos must use `{ width: '100%', height: '100%' }` styles so they cover the gesture detection
+  area properly.
   :::
 
 ```jsx
@@ -71,24 +71,6 @@ if(resolution === undefined) {
 </CropZoom>
 ```
 
-For a detailed managed mode example, see Example App's [CropZoom Managed Example](https://github.com/Glazzes/react-native-zoomable/blob/dev/example/src/cropzoom/common-example/CropManagedExample.tsx)
-
-### Overlay mode
-
-In contrast to managed mode, overlay mode is designed to provide a barebones component with the very minimum necessary to work for complex use cases; it provides the crop and gesture detection areas only.
-
-There are some things to keep in mind
-
-::: tip Remember
-
-- You lose access to `OverlayComponent` and `children` properties.
-- The dimensions for this component are the values passed to `cropSize` property.
-- Use the `debug` property so you can see the crop and gesture detection areas as you develop.
-- Create your own [shared values](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/your-first-animation#defining-a-shared-value) and update them with `onGestureActive` worklet callback.
-  :::
-
-For an overlay mode example, see Example App's [CropZoom Skia Example](https://github.com/Glazzes/react-native-zoomable/tree/dev/example/src/cropzoom/skia-example)
-
 ## Properties
 
 ### cropSize
@@ -106,6 +88,15 @@ Size of the cropping area.
 | `{ width: number; height: number; }` | `Yes`    |
 
 Resolution of your image, video or how big whatever you are trying to crop really is.
+
+### OverlayComponent
+
+| Type                       | Default     | Required |
+| -------------------------- | ----------- | -------- |
+| `() => React.ReactElement` | `undefined` | `No`     |
+
+A function that returns a component, such component will be located on top of the component to crop and below
+the gesture detection area, for instance you can pass an svg component with a hole in it.
 
 ### minScale
 
@@ -226,29 +217,15 @@ values to some other component as it updates, see [CropZoomState](#cropzoomstate
 Callback triggered when a pan or pinch gesture ends, if an animation started at the end of one
 of the gestures this callback's execution will be delayed until the animation has finished.
 
-### OverlayComponent
-
-| Type       | Default     | Required |
-| ---------- | ----------- | -------- |
-| `function` | `undefined` | `No`     |
-
-::: tip Condition
-
-- Only visible if the `mode` property is set to `CropMode.MANAGED` (default value).
-  :::
-
-A function that returns a React Component, such component will sit between your desired component to crop
-and the gesture detector, for instance you can pass an svg component with a hole in it.
-
 ## Methods
 
 All methods are accessible through a ref object.
 
-```jsx
+```tsx
 import { useRef } from 'react';
 import { CropZoom, type CropZoomType } from 'react-native-zoom-toolkit';
 
-const ref = useRef < CropZoomType > null;
+const ref = useRef<CropZoomType>(null);
 ref.current?.crop(200);
 
 <CropZoom ref={ref} />;
@@ -270,7 +247,8 @@ Expo Image Manipulator, see [CropZoom and Expo Image Manipulator](../guides/crop
 - return type: [CropContextResult](#cropcontextresult)
 
 ::: warning Beware
-Calling rotate method with the `fixedWidth` argument will subject your crops to one pixel margin of error, this is an intentional behavior in order to prevent some image cropping libraries from crashing your app.
+Calling crop method with the `fixedWidth` argument will subject your crops to one pixel margin of error,
+this behavior is intentional in order to prevent image cropping libraries from crashing your app.
 :::
 
 ### rotate
@@ -333,13 +311,13 @@ Request internal transformation values of this component at the moment of the ca
 
 Assign the internal transformation values for this component, if the state provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
 
-- type definition: `(state: CropZoomAssignableState, animate?: boolean) => void`
+- type definition: `(state: CropAssignableState, animate?: boolean) => void`
 - parameter information
 
-| Name    | Type                                                | Description                                                                  |
-| ------- | --------------------------------------------------- | ---------------------------------------------------------------------------- |
-| state   | [CropZoomAssignableState](#cropzoomassignablestate) | Object containg the transformation values to assign to `CropZoom` component. |
-| animate | `boolean \| undefined`                              | Whether to animate the transition or not, defaults to `true`.                |
+| Name    | Type                                            | Description                                                                  |
+| ------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| state   | [CropAssignableState](#cropzoomassignablestate) | Object describing the transformation values to assign to CropZoom component. |
+| animate | `boolean \| undefined`                          | Whether to animate the transition or not, defaults to `true`.                |
 
 ## Type Definitions
 
@@ -355,7 +333,7 @@ Assign the internal transformation values for this component, if the state provi
 | `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians. |
 | `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians. |
 
-### CropZoomAssignableState
+### CropAssignableState
 
 | Name         | Type     | Description                                              |
 | ------------ | -------- | -------------------------------------------------------- |

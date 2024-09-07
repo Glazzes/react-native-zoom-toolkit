@@ -169,10 +169,9 @@ const resizeConfig = {
   scale: 2 // at which scale the aspect ratio is no longer compromised
 }
 
-//...
 <SnapbackZoom resizeConfig={resizeConfig}>
   {/* Use width and height properties not flex: 1 */ }
-  <SomeImage style={{ width: '100%', height: '100%' } />
+  <SomeImage style={{ width: '100%', height: '100%' }} />
 </SnapbackZoom>
 ```
 
