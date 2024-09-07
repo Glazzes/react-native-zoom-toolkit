@@ -19,6 +19,7 @@
 
 - **Limitless**: Smoothly zoom in and out any component you want, you're not limited to images only.
 - **Performance:** Smooth gesture interactions powered by Reanimated and Gesture Handler.
+- **Customizable:** Highly customizable components, tailor them to your needs.
 - **SnapBackZoom:** Zoom in and snap back, this component automatically snaps back to its original position once the gesture ends, making it ideal for previews.
 - **ResumableZoom**: Pick up where you left last time! This component remembers your previous interactions with it, just the same way it works in your Android/IOS OS integrated gallery application, making it ideal for detail screens and gallery screens.
 - **CropZoom:** An ideal, practical and unopinionated component for image and video cropping needs.
