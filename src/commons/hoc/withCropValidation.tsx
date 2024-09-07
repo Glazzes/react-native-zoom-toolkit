@@ -5,13 +5,7 @@ export default function withCropValidation<T, P extends CropZoomProps>(
   Component: React.ComponentType<P>
 ) {
   return forwardRef<T, P>((props, ref) => {
-    const { minScale, maxScale, children } = props;
-
-    const childrenCount = React.Children.count(children);
-    if (childrenCount !== 1) {
-      const message = `CropZoom expected one child but received ${childrenCount} children`;
-      throw new Error(message);
-    }
+    const { minScale, maxScale } = props;
 
     if (minScale !== undefined && minScale < 1) {
       throw new Error('minScale property must be greater than or equals one');

@@ -10,7 +10,7 @@ export * from './components/crop/types';
 export { default as Gallery } from './components/gallery/GalleryProvider';
 export * from './components/gallery/types';
 
-export {
+export type {
   PanMode,
   ScaleMode,
   PinchCenteringMode,

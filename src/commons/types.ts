@@ -18,7 +18,7 @@ export type SizeVector<T> = {
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
 export type PanMode = 'clamp' | 'free' | 'friction';
 export type ScaleMode = 'clamp' | 'bounce';
-export type PinchCenteringMode = 'clamp' | 'free';
+export type PinchCenteringMode = 'clamp' | 'sync';
 
 export type CommonZoomState<T> = {
   width: T;

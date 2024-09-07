@@ -63,7 +63,7 @@ export const useTransformationState = <T extends ComponentSelection>(
       { rotateX: rotate.x.value },
       { rotateY: rotate.y.value },
     ];
-  }, [translate, rotate, scale, rotation]);
+  }, [translate, scale, rotation, rotate]);
 
   const createSharedState = (): StateSelection<T, SharedValue<number>> => {
     // @ts-ignore
@@ -103,9 +103,10 @@ export const useTransformationState = <T extends ComponentSelection>(
     scale.value = state.scale;
 
     if (param === 'crop') {
-      rotate.x.value = (state as CropZoomState<number>).rotateX;
-      rotate.y.value = (state as CropZoomState<number>).rotateY;
-      rotation.value = (state as CropZoomState<number>).rotate;
+      const cropState = state as CropZoomState<number>;
+      rotate.x.value = cropState.rotateX;
+      rotate.y.value = cropState.rotateY;
+      rotation.value = cropState.rotate;
     }
 
     if (param === 'snapback') {
