@@ -27,48 +27,51 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 
 ## How to use
 
-Managed mode is the default mode and its designed for simple use cases as the one shown in the video footage above.
-Its usage is pretty straight forward, just wrap a component of your choice with it, however there are some things
-to keep in mind:
+It's usage is quite similar to the one of ResumableZoom component, reading [CropZoom and Expo Image Manipulator](../guides/cropzoomexpo)
+guide is highly advised for a better understanding of this component's usage, however here is a pseudo-example of
+its usage:
 
 ::: tip Remember
 
 - This component uses `flex: 1` style property therefore it will attempt to take all available space, its
   minimum dimensions are the values provided to cropSize property.
-- This component calculates the dimensions needed to meet the resolution property's aspect ratio, therefore
-  your images and videos must use `{ width: '100%', height: '100%' }` styles so they cover the gesture detection
-  area properly.
+- Child component must use the following styles `{width: 100%, height: '100%'}`.
   :::
 
-```jsx
-import {Image} from 'react-native';
-import {CropZoom, useImageResolution, type CropZoomType} from 'react-native-zoom-toolkit`;
+```tsx
+import { Image, View, StyleSheet } from 'react-native';
+import { CropZoom, useImageResolution, type CropZoomType } from 'react-native-zoom-toolkit`;
 
 const imageUrl = 'url to some image';
-const cropSize = {width: 200, height: 200};
+const cropSize = { width: 200, height: 200 };
 
-// A reference so you can access all methods
-const ref = useRef<CropZoomType>(null);
+const App = () => {
+  // A reference so you can access all methods
+  const ref = useRef<CropZoomType>(null);
 
-// Utility hook to get the resolution of a network image
-const { resolution } = useImageResolution({uri: imageUrl });
+  // Utility hook to get the resolution of a network image
+  const { resolution } = useImageResolution({uri: imageUrl });
 
-// A function that renders an svg with a hole in it.
-const renderOverlay = () => <SomeComponent />
+  // A function that renders an svg with a hole in it.
+  const renderOverlay = () => <SomeComponent />
 
-if(resolution === undefined) {
-  return null;
+  if(resolution === undefined) {
+    return null;
+  }
+
+  return (
+    <CropZoom
+      ref={ref}
+      cropSize={cropSize}
+      resolution={resolution}
+      OverlayComponent={renderOverlay}
+    >
+      <Image source={{uri: iamgeUrl }} style={{ width: '100%', height: '100%' }} />
+    </CropZoom>
+  );
 }
 
-<CropZoom
-  ref={ref}
-  debug={true}
-  cropSize={cropSize}
-  resolution={resolution}
-  OverlayComponent={renderOverlay}
->
-  <Image source={{uri: iamgeUrl }} style={{flex: 1}} />
-</CropZoom>
+export default App;
 ```
 
 ## Properties

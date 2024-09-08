@@ -43,7 +43,7 @@ export default Downscale;
 ```
 
 Pay attention to the highlighted lines, it requires a shared value describing the current state of the zoom scale
-and why is it `1 / scale`? Let's address the last one first, this a pretty common pattern in math, for instance
+and why is it `1 / scale`? Let's address the last one first, this is a pretty common pattern in math, for instance
 the inverse square root of a number is `1 / sqrt(n)`, you don't need to know much about math just know this
 is the inverse scaling process.
 
