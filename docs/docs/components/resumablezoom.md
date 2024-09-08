@@ -81,7 +81,7 @@ All properties for this component are optional.
 
 By default the gesture detection area is the same size as the width and height of the wrapped component,
 by setting this property to `true` the detection area is increased to the size `ResumableZoom` is taking
-on screen, see [this picture](../assets/extendgestures.jpg) for a visual reference.
+on screen, see [this picture](/extendgestures.jpg) for a visual reference.
 
 ### minScale
 
