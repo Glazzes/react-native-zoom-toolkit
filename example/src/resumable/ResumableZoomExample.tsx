@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
-import { StatusBar } from 'expo-status-bar';
-import { setStatusBarHidden } from 'expo-status-bar';
+import { StatusBar, setStatusBarHidden } from 'expo-status-bar';
 
 import {
   ResumableZoom,
@@ -47,19 +46,17 @@ const ResumableZoomExample: React.FC = ({}) => {
     height: isPortrait ? undefined : height,
   });
 
-  const imageStyle: ImageStyle = {
-    width: imageWidth,
-    height: imageHeight,
-  };
-
   const onTap = () => {
     let toY = -1 * barHeight * 3.1;
-    if (translateY.value !== 0) {
-      toY = 0;
-    }
+    if (translateY.value !== 0) toY = 0;
 
     translateY.value = withTiming(toY);
     setStatusBarHidden(toY !== 0, 'slide');
+  };
+
+  const imageStyle: ImageStyle = {
+    width: imageWidth,
+    height: imageHeight,
   };
 
   return (
@@ -69,8 +66,9 @@ const ResumableZoomExample: React.FC = ({}) => {
 
       <ResumableZoom
         ref={ref}
-        maxScale={resolution}
         extendGestures={true}
+        maxScale={resolution}
+        pinchCenteringMode={'sync'}
         onTap={onTap}
       >
         <Image
@@ -87,6 +85,11 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#000000',
+  },
+  pressable: {
+    width: 80,
+    height: 80,
+    backgroundColor: 'orange',
   },
 });
 

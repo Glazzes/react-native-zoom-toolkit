@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {
-        text: '2.1.4',
+        text: '3.0.0',
         items: [
           {
             text: 'Releases',
@@ -44,17 +44,31 @@ export default defineConfig({
       },
       {
         text: 'Utilities',
+        collapsed: true,
         items: [
           { text: 'useImageResolution', link: '/utilities/useimageresolution' },
+          {
+            text: 'useTransformationState',
+            link: '/utilities/usetransformationstate',
+          },
           { text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize' },
         ],
       },
       {
         text: 'Guides',
+        collapsed: true,
         items: [
           {
-            text: 'Use CropZoom with Expo Image Manipulator',
+            text: 'CropZoom and Expo Image Manipulator',
             link: '/guides/cropzoomexpo',
+          },
+          {
+            text: 'How to use with Skia Components',
+            link: '/guides/skia',
+          },
+          {
+            text: 'Downscaling Nested Components',
+            link: '/guides/downscale',
           },
         ],
       },

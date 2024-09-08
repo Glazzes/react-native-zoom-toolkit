@@ -1,8 +1,8 @@
 import React from 'react';
 import { SkiaCropZoom } from '../src/cropzoom';
 
-const cropoverlay = () => {
+const cropskia = () => {
   return <SkiaCropZoom />;
 };
 
-export default cropoverlay;
+export default cropskia;

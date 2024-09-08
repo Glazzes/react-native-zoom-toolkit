@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -6,39 +6,42 @@ import {
   CropZoom,
   useImageResolution,
   type CropZoomType,
+  type SizeVector,
 } from 'react-native-zoom-toolkit';
 
 import Controls from './Controls';
 import CropModal from '../commons/CropModal';
-import CropOverlay from '../commons/CropOverlay';
+import SVGOverlay from '../commons/SVGOverlay';
 
 const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
-const CropManagedExample = ({}) => {
-  const ref = useRef<CropZoomType>(null);
-  const [result, setResult] = useState<string | undefined>(undefined);
+const BasicCropZoom = ({}) => {
+  const cropRef = useRef<CropZoomType>(null);
 
   const { width } = useWindowDimensions();
-  const cropSize = width * 0.9;
+  const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
 
-  const { resolution } = useImageResolution({ uri: IMAGE });
+  const [result, setResult] = useState<string | undefined>(undefined);
 
-  // Renders an svg with a hole in it
-  const renderOverlay = useCallback(() => {
-    return <CropOverlay cropSize={cropSize} />;
-  }, [cropSize]);
+  const cropSize: SizeVector<number> = {
+    width: width * 0.8,
+    height: width * 0.8,
+  };
 
-  if (resolution === undefined) {
+  const renderOverlay = () => {
+    return <SVGOverlay cropSize={cropSize} />;
+  };
+
+  if (isFetching || resolution === undefined) {
     return null;
   }
 
   return (
     <View style={styles.root}>
-      <StatusBar style="light" backgroundColor="transparent" />
       <CropZoom
-        ref={ref}
-        cropSize={{ width: cropSize, height: cropSize }}
+        ref={cropRef}
+        cropSize={cropSize}
         resolution={resolution}
         OverlayComponent={renderOverlay}
       >
@@ -54,7 +57,7 @@ const CropManagedExample = ({}) => {
        * The height of this component is subtracted from the screen height, so the overlay
        * height is screen height - controls height
        */}
-      <Controls uri={IMAGE} cropRef={ref} setCrop={setResult} />
+      <Controls uri={IMAGE} cropRef={cropRef} setCrop={setResult} />
 
       {/*
        * Display a modal with the resulting crop, nothing relevant in that component
@@ -62,6 +65,8 @@ const CropManagedExample = ({}) => {
       {result !== undefined ? (
         <CropModal uri={result} setCrop={setResult} />
       ) : null}
+
+      <StatusBar style="light" translucent={true} />
     </View>
   );
 };
@@ -79,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CropManagedExample;
+export default BasicCropZoom;

@@ -16,9 +16,11 @@ const _layout = () => {
         drawerContent={CustomDrawer}
       >
         <Drawer.Screen name="index" />
-        <Drawer.Screen name="resumablegallery" />
-        <Drawer.Screen name="cropmanaged" />
-        <Drawer.Screen name="cropoverlay" />
+        <Drawer.Screen name="resumableskia" />
+        <Drawer.Screen name="gallery" />
+        <Drawer.Screen name="cropbasic" />
+        <Drawer.Screen name="cropskia" />
+        <Drawer.Screen name="snapback" />
       </Drawer>
     </GestureHandlerRootView>
   );

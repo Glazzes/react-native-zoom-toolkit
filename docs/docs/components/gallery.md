@@ -5,6 +5,7 @@ outline: deep
 ---
 
 # Gallery
+
 A practical gallery component which mimics Telegram's gallery behavior, among its more remarkable features you will find:
 
 - **Flatlist API:** A simple API which resembles React Native Flatlist's API
@@ -20,19 +21,25 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 </div>
 
 ## How to use
+
 The following example is a full screen image gallery.
 
 ::: tip Remember
+
 - Follow React Native's [performance recommendations](https://reactnative.dev/docs/optimizing-flatlist-configuration#list-items) for list components.
 
 - Each cell is as big as the size of the `Gallery` component itself.
-:::
+  :::
 
 ::: code-group
 
 ```tsx [Gallery.tsx]
 import React, { useCallback, useRef } from 'react';
-import { stackTransition, Gallery, type GalleryType } from 'react-native-zoom-toolkit';
+import {
+  stackTransition,
+  Gallery,
+  type GalleryType,
+} from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
 
@@ -125,72 +132,103 @@ export default GalleryImage;
 :::
 
 ## Properties
+
 ### data
-| Type | Required |
-|------|----------|
-| `T[]`| `Yes`    |
+
+| Type  | Required |
+| ----- | -------- |
+| `T[]` | `Yes`    |
 
 An array of items to render.
 
 ### renderItem
-| Type | Required |
-|------|----------|
+
+| Type                                      | Required |
+| ----------------------------------------- | -------- |
 | `(item: T, index: number) => JSX.Element` | `Yes`    |
 
 Takes an item from data and renders it into the list, provides additional metadata like index if you need it.
 
 ### keyExtractor
-| Type | Default |
-|------|----------|
-| `(item: T, index: number) => string;` | `undefined`    |
+
+| Type                                  | Default     |
+| ------------------------------------- | ----------- |
+| `(item: T, index: number) => string;` | `undefined` |
 
 Used to extract a unique key for a given item at the specified index.
 
 ### windowSize
-| Type | Default  |
-|------|----------|
-| `number` | `5`  |
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `5`     |
 
 Maximum number of items to be rendered at once.
 
 ### initialIndex
-| Type | Default  |
-|------|----------|
-| `number` | `0`  |
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `0`     |
 
 Sets the initial position of the list.
 
 ### vertical
-| Type | Default  |
-|------|----------|
-| `boolean` | `false`  |
+
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `false` |
 
 Modifies the orientation of the component to vertical mode.
 
 ### maxScale
-| Type | Default  |
-|------|----------|
-| `SizeVector<number>[] \| number` | `6`  |
+
+| Type                             | Default |
+| -------------------------------- | ------- |
+| `SizeVector<number>[] \| number` | `6`     |
 
 Maximum scale value allowed by the pinch gesture for all elements, expects values bigger than or equals one.
 
-Alternatively you can pass an array with the resolution of your images/videos, for instance `[{ width: 1920, height: 1080 }]`; this will instruct the component to calculate `maxScale`  in such a way it's a value just before images and videos start getting pixelated for each element, the resolutions array must be as big as the `data` property array.
+Alternatively you can pass an array with the resolution of your images/videos, for instance `[{ width: 1920, height: 1080 }]`; this will instruct the component to calculate `maxScale` in such a way it's a value just before images and videos start getting pixelated for each element, the resolutions array must be as big as the `data` property array.
+
+### zoomEnabled
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `true`  |
+
+Enables or disables both pinch and double tap gestures.
 
 ### tapOnEdgeToItem
-| Type | Default  |
-|------|----------|
+
+| Type      | Default |
+| --------- | ------- |
 | `boolean` | `true`  |
 
 ::: tip Condition
+
 - This property only works in horizontal mode.
-:::
+  :::
 
 Allow the user to go to the next or previous item by tapping the horizontal edges of the gallery.
 
+### scaleMode
+
+| Type                  | Default    |
+| --------------------- | ---------- |
+| `'clamp' \| 'bounce'` | `'bounce'` |
+
+Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
+defined by `minScale` and `maxScale` properties, possible values are:
+
+- `clamp` keeps the scale whithin the already mentioned scale boundaries.
+- `bounce` lets the user scale above and below the scale boundary values, at the end of the pinch gesture
+  the scale value animates back to `minScale` or `maxScale` respectively.
+
 ### allowPinchPanning
-| Type | Default |
-|------|---------|
-| `boolean` | `true` |
+
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `true`  |
 
 ::: warning Beware iOS users
 This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
@@ -201,115 +239,153 @@ For more information see this [Gesture Handler's issue](https://github.com/softw
 Lets the user drag the current item around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
 ### pinchCenteringMode
-| Type | Default  |
-|------|----------|
-| `PinchCenteringMode` | `PinchCenteringMode.CLAMP` |
+
+| Type                | Default   |
+| ------------------- | --------- |
+| `'clamp' \| 'free'` | `'clamp'` |
 
 ::: tip Tip
-To get the best out of this feature keep `allowPinchPanning` property set to `true`.
+This property is meant to be used when `allowPinchPanning` property is set to `true`.
 :::
 
-Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing container,
-see [PinchCenteringMode](#pinchcenteringmode-enum).
+Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
+possible values are:
+
+- `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
+  gesture, just like seen on Android galleries.
+- `free` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+  position it will animate back to a position within the bondaries of its enclosing container.
 
 ### onIndexChange
-| Type | Default  |
-|------|----------|
-| `(index: number) => void` | `undefined`  |
+
+| Type                      | Default     |
+| ------------------------- | ----------- |
+| `(index: number) => void` | `undefined` |
 
 Callback triggered when the list scrolls to the next or previous item.
 
 ### onTap
-| Type | Default  | Additional Info |
-|------|----------|-----------------|
+
+| Type                                          | Default     | Additional Info                                                                                                            |
+| --------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `(e: TapGestureEvent, index: number) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
 Callback triggered when the user taps the current item once, provides additional metadata like index if you need it.
 
 ### onVerticalPull
-| Type | Default  | Additional Info |
-|------|----------|-----------------|
+
+| Type                                              | Default     | Additional Info                                                                                    |
+| ------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
 | `(translateY: number, released: boolean) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 ::: tip Conditions
+
 - Gallery must be on horizontal mode
 - The current item must be at a scale of one.
-:::
+  :::
 
 Worklet callback triggered as the user drags the component vertically when this one is at a scale of one, it includes metadata like `released` parameter which indicates whether the user stopped pulling.
 
 This property is useful for instance to animate the background color based on the translateY parameter.
 
 ### onSwipe
-| Type | Default |
-|------|---------|
-| `(direction: SwipeDirection) => void` | `undefined` |
+
+| Type                                  | Default     |
+| ------------------------------------- | ----------- |
+| `(direction: 'up' \| 'down' \| 'left' \| 'right') => void` | `undefined` |
 
 ::: tip Trigger Conditions
+
 - Edges of the current item must be in contact with the edges of `Gallery` component.
-:::
+  :::
 
 Callback triggered when the user swipes up, down, left or right.
 
 ### onScroll
-| Type | Default | Additional Info |
-|------|---------|----------------|
+
+| Type                                              | Default     | Additional Info                                                                                    |
+| ------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
 | `(scroll: number, contentOffset: number) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Worklet callback triggered as the user scrolls the gallery.
 
 ### onPanStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 Callback triggered when the pan gesture starts.
 
 ### onPanEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `(e: PanGestureEvent) => void` | `undefined` | see [pan gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pan-gesture#event-data) |
 
 Callback triggered as soon as the user lifts their finger off the screen.
 
 ### onPinchStart
-| Type | Default | Additional Info |
-|------|---------|-----------------|
+
+| Type                             | Default     | Additional Info                                                                                                                |
+| -------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 Callback triggered when the pinch gesture starts.
 
 ### onPinchEnd
-| Type | Default | Additional Info |
-|------|---------|-----------------|
+
+| Type                             | Default     | Additional Info                                                                                                                |
+| -------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `(e: PinchGestureEvent) => void` | `undefined` | see [pinch gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/pinch-gesture#event-data) |
 
 Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
+### onUpdate
+
+| Type                                      | Default     | Additional Info                                                                                    |
+| ----------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `(state: CommonZoomState<number>) = void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
+
+Worklet callback triggered when the transformation state of the component changes, the internal state is updated as
+the user makes use of the gestures or execute its methods, ideal if you need to mirror its current transformation
+values to some other component as it updates, see [CommonZoomState](#commonzoomstate).
+
+### onGestureEnd
+
+| Type         | Default     |
+| ------------ | ----------- |
+| `() => void` | `undefined` |
+
+Callback triggered when a pan, pinch or double tap gesture ends, if an animation started at the end of one
+of the gestures this callback's execution will be delayed until the animation has finished.
+
 ### onZoomBegin
-| Type | Default |
-|------|---------|
+
+| Type                      | Default     |
+| ------------------------- | ----------- |
 | `(index: number) => void` | `undefined` |
 
 Callback triggered when component is zoomed from its base state (scale value at one).
 
 ### onZoomEnd
-| Type | Default |
-|------|---------|
+
+| Type                      | Default     |
+| ------------------------- | ----------- |
 | `(index: number) => void` | `undefined` |
 
 Callback triggered when component returns back to its original state (scale value at one).
 
 ### customTransition
 
-| Type | Default | Additional Info |
-|------|---------|----------------|
+| Type                                           | Default     | Additional Info                                                                                    |
+| ---------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
 | `(state: GalleryTransitionState) => ViewStyle` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
 Worklet callback used to modify the scroll animation used by the gallery, keep in mind the following when building a custom transition, see [GalleryTransitionState](#gallerytransitionstate).
 
 - All elements are absolute positioned one on top of another.
-- Use `translateX` and `translateY` style properties to position the items to your particular needs.
+- Use translateX and translateY style properties to position the items to your particular needs.
 
 The base behaviour would look this:
 
@@ -318,76 +394,75 @@ const baseAnimation = (state) => {
   'worklet';
   const { index, vertical, scroll, gallerySize } = state;
 
-  if(vertical) {
-    const translateY = (index * gallerySize.height) - scroll;
-    return {transform: [{ translateY }]};
+  if (vertical) {
+    const translateY = index * gallerySize.height - scroll;
+    return { transform: [{ translateY }] };
   }
 
-  const translateX = (index * gallerySize.width) - scroll;
-  return {transform: [{ translateX }]};
-}
+  const translateX = index * gallerySize.width - scroll;
+  return { transform: [{ translateX }] };
+};
 ```
 
 ## Methods
+
 All methods are accessible through a ref object.
 
-```jsx
+```tsx
 import { useRef } from 'react';
-import { Gallery, type GalleryType } from 'react-native-zoom-toolkit'
+import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
 
 const ref = useRef<GalleryType>(null);
 ref.current?.requestState();
 
-<Gallery ref={ref} />
+<Gallery ref={ref} />;
 ```
 
 ### reset
+
 Reset all transformations to their initial state.
 
 - type definition: `(animate?: boolean) => void`
 - parameter information
 
-| Name      | Type      | Default | Description                               |
-|-----------|-----------|---------|-------------------------------------------|
-| `animate` | `boolean \| undefined` | `true`  | Whether to animate the transition or not .|
-
+| Name      | Type                   | Default | Description                                |
+| --------- | ---------------------- | ------- | ------------------------------------------ |
+| `animate` | `boolean \| undefined` | `true`  | Whether to animate the transition or not . |
 
 ### requestState
+
 Request internal transformation values of the current item at the moment of the calling
 
 - type definition: `() => ResumableZoomState`;
 - return type: [ResumableZoomState](#resumablezoomstate).
 
 ### setIndex
+
 Jump to the item at the given index.
 
 - type definition: `(index: number) => void`
 - parameter information
 
-| Name   | Type     | Description                         |
-|--------|----------|-------------------------------------|
-| index  | `number` | Index of the item to transition to. |
+| Name  | Type     | Description                         |
+| ----- | -------- | ----------------------------------- |
+| index | `number` | Index of the item to transition to. |
 
 ## Type Definitions
-### PinchCenteringMode Enum
-| Property     |  Description |
-|--------------|--------------|
-| `CLAMP`      | Keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the gesture, just like seen on Android galleries. |
-| `INTERACTION` | Keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds position it will animate back to a position within the bondaries of its enclosing container. |
 
-### ResumableZoomState
-| Property     |  Type    | Description                              |
-|--------------|----------|------------------------------------------|
+### CommonZoomState
+
+| Property     | Type     | Description                              |
+| ------------ | -------- | ---------------------------------------- |
 | `width`      | `number` | Width of the current item.               |
 | `height`     | `number` | Height of the current item.              |
 | `translateX` | `number` | Current translateX transformation value. |
 | `translateY` | `number` | Current translateY transformation value. |
 | `scale`      | `number` | Current scale transformation value.      |
 
-
 ### GalleryTransitionState
+
 | Property      | Type                 | Description                                           |
-|---------------|----------------------|-------------------------------------------------------|
+| ------------- | -------------------- | ----------------------------------------------------- |
 | `index`       | `number`             | Index of an item rendered in the gallery.             |
 | `activeIndex` | `number`             | Index of the currently displayed item on the gallery. |
 | `vertical`    | `boolean`            | Whether the gallery is in vertical mode or not.       |

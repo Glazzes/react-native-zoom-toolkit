@@ -16,24 +16,23 @@ import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
+import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
-import {
-  PanMode,
-  PinchCenteringMode,
-  ScaleMode,
-  type BoundsFuction,
-} from '../../commons/types';
+import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
+import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
-  ResumableZoomState,
   ResumableZoomProps,
   ResumableZoomType,
   ResumableZoomAssignableState,
 } from './types';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
+import type {
+  BoundsFuction,
+  CommonZoomState,
+  Vector,
+} from '../../commons/types';
 
 type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
 
@@ -49,12 +48,12 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     pinchEnabled = true,
     minScale = 1,
     maxScale: userMaxScale = 6,
-    panMode = PanMode.CLAMP,
-    scaleMode = ScaleMode.BOUNCE,
-    pinchCenteringMode = PinchCenteringMode.CLAMP,
+    panMode = 'clamp',
+    scaleMode = 'bounce',
+    pinchCenteringMode = 'clamp',
     allowPinchPanning: pinchPanning,
     onTap,
-    onGestureActive,
+    onUpdate,
     onGestureEnd,
     onSwipe,
     onPinchStart: onUserPinchStart,
@@ -66,20 +65,14 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
+  const rootSize = useSizeVector(1, 1);
+  const childSize = useSizeVector(1, 1);
+  const extendedSize = useSizeVector(1, 1);
+
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
   const scale = useSharedValue<number>(minScale);
   const scaleOffset = useSharedValue<number>(minScale);
-
-  const origin = useVector(0, 0);
-  const delta = useVector(0, 0);
-
-  const rootSize = useSizeVector(0, 0);
-  const childSize = useSizeVector(0, 0);
-  const extendedSize = useSizeVector(0, 0);
-
-  const detectorTranslate = useVector(0, 0);
-  const detectorScale = useSharedValue(minScale);
 
   const maxScale = useDerivedValue(() => {
     if (typeof userMaxScale === 'object') {
@@ -102,75 +95,64 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
       : childSize.height.value;
   }, [extendGestures, rootSize, childSize]);
 
-  const boundsFn: BoundsFuction = (scaleValue) => {
+  const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
+    const actualScale = optionalScale ?? scale.value;
     const { width: cWidth, height: cHeight } = childSize;
     const { width: rWidth, height: rHeight } = rootSize;
 
-    const boundX = Math.max(0, cWidth.value * scaleValue - rWidth.value) / 2;
-    const boundY = Math.max(0, cHeight.value * scaleValue - rHeight.value) / 2;
+    const boundX = Math.max(0, cWidth.value * actualScale - rWidth.value) / 2;
+    const boundY = Math.max(0, cHeight.value * actualScale - rHeight.value) / 2;
     return { x: boundX, y: boundY };
   };
 
-  const reset = (
-    toX: number,
-    toY: number,
-    toScale: number,
-    animate: boolean = true
-  ) => {
+  const set = (toX: number, toY: number, toScale: number, animate: boolean) => {
     'worklet';
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.y.value = translate.y.value;
-    detectorScale.value = scale.value;
-
     translate.x.value = animate ? withTiming(toX) : toX;
     translate.y.value = animate ? withTiming(toY) : toY;
     scale.value = animate ? withTiming(toScale) : toScale;
-    detectorTranslate.x.value = animate ? withTiming(toX) : toX;
-    detectorTranslate.y.value = animate ? withTiming(toY) : toY;
-    detectorScale.value = animate ? withTiming(toScale) : toScale;
+    scaleOffset.value = toScale;
   };
 
   useDerivedValue(() => {
-    onGestureActive?.({
+    onUpdate?.({
       width: childSize.width.value,
       height: childSize.height.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [translate, childSize, scale]);
+  }, [childSize, translate, scale]);
 
-  const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
-    usePinchCommons({
-      container: extendGestures ? extendedSize : childSize,
-      detectorTranslate,
-      detectorScale,
-      translate,
-      offset,
-      origin,
-      scale,
-      scaleOffset,
-      minScale,
-      maxScale,
-      delta,
-      allowPinchPanning,
-      scaleMode,
-      pinchCenteringMode,
-      boundFn: boundsFn,
-      userCallbacks: {
-        onGestureEnd,
-        onPinchStart: onUserPinchStart,
-        onPinchEnd: onUserPinchEnd,
-      },
-    });
-
-  const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
-    container: extendGestures ? extendedSize : childSize,
-    detectorTranslate,
+  const {
+    gesturesEnabled,
+    onTouchesMove,
+    onPinchStart,
+    onPinchUpdate,
+    onPinchEnd,
+  } = usePinchCommons({
+    container: extendedSize,
     translate,
     offset,
     scale,
+    scaleOffset,
+    minScale,
+    maxScale,
+    allowPinchPanning,
+    scaleMode,
+    pinchCenteringMode,
+    boundFn: boundsFn,
+    userCallbacks: {
+      onGestureEnd,
+      onPinchStart: onUserPinchStart,
+      onPinchEnd: onUserPinchEnd,
+    },
+  });
+
+  const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
+    container: extendedSize,
+    translate,
+    offset,
     panMode,
     boundFn: boundsFn,
     decay,
@@ -183,8 +165,20 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     },
   });
 
+  const { onDoubleTapEnd } = useDoubleTapCommons({
+    container: extendedSize,
+    translate,
+    scale,
+    minScale,
+    maxScale,
+    scaleOffset,
+    boundsFn: boundsFn,
+    onGestureEnd,
+  });
+
   const pinch = Gesture.Pinch()
     .enabled(pinchEnabled)
+    .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
@@ -201,32 +195,16 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .maxDuration(250)
     .numberOfTaps(1)
     .runOnJS(true)
-    .onEnd((e) => onTap?.(e));
+    .onEnd((e) => {
+      const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
+      onTap?.(event);
+    });
 
   const doubleTap = Gesture.Tap()
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
-    .onEnd((e) => {
-      const originX = e.x - extendedSize.width.value / 2;
-      const originY = e.y - extendedSize.height.value / 2;
-      const toScale =
-        scale.value >= maxScale.value * 0.8 ? minScale : maxScale.value;
-
-      const { x, y } = pinchTransform({
-        toScale: toScale,
-        fromScale: scale.value,
-        origin: { x: originX, y: originY },
-        delta: { x: 0, y: 0 },
-        offset: { x: translate.x.value, y: translate.y.value },
-      });
-
-      const { x: boundX, y: boundY } = boundsFn(toScale);
-      const toX = clamp(x, -1 * boundX, boundX);
-      const toY = clamp(y, -1 * boundY, boundY);
-
-      reset(toX, toY, toScale, true);
-    });
+    .onEnd(onDoubleTapEnd);
 
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;
@@ -238,31 +216,25 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     childSize.height.value = e.nativeEvent.layout.height;
   };
 
-  const childStyle = useAnimatedStyle(
-    () => ({
+  const detectorStyle = useAnimatedStyle(() => {
+    return {
+      width: extendedSize.width.value * scaleOffset.value,
+      height: extendedSize.height.value * scaleOffset.value,
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
-        { scale: scale.value },
-      ],
-    }),
-    [translate, scale]
-  );
-
-  const detectorStyle = useAnimatedStyle(() => {
-    return {
-      width: extendedSize.width.value,
-      height: extendedSize.height.value,
-      position: 'absolute',
-      transform: [
-        { translateX: detectorTranslate.x.value },
-        { translateY: detectorTranslate.y.value },
-        { scale: detectorScale.value },
       ],
     };
-  }, [childSize, rootSize, detectorTranslate, detectorScale]);
+  }, [extendedSize, scaleOffset, translate]);
 
-  const requestState = (): ResumableZoomState => {
+  const childStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ scale: scale.value }],
+    }),
+    [scale]
+  );
+
+  const requestState = (): CommonZoomState<number> => {
     return {
       width: childSize.width.value,
       height: childSize.height.value,
@@ -278,13 +250,44 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     const toX = clamp(state.translateX, -1 * boundX, boundX);
     const toY = clamp(state.translateY, -1 * boundY, boundY);
 
-    reset(toX, toY, toScale, animate);
+    set(toX, toY, toScale, animate);
+  };
+
+  const zoom = (multiplier: number, xy?: Vector<number>) => {
+    let originX = -1 * (translate.x.value / scale.value);
+    let originY = -1 * (translate.y.value / scale.value);
+    const toScale = clamp(scale.value * multiplier, minScale, maxScale.value);
+
+    if (xy !== undefined) {
+      const diffX = xy.x / childSize.width.value;
+      const diffY = xy.y / childSize.height.value;
+      const actualX = extendGestures ? diffX * extendedSize.width.value : xy.x;
+      const actualY = extendGestures ? diffY * extendedSize.height.value : xy.y;
+
+      originX = actualX - extendedSize.width.value / 2;
+      originY = actualY - extendedSize.height.value / 2;
+    }
+
+    const { x, y } = pinchTransform({
+      toScale,
+      fromScale: scale.value,
+      origin: { x: originX, y: originY },
+      offset: { x: translate.x.value, y: translate.y.value },
+      delta: { x: 0, y: 0 },
+    });
+
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(x, -1 * boundX, boundX);
+    const toY = clamp(y, -1 * boundY, boundY);
+
+    set(toX, toY, toScale, true);
   };
 
   useImperativeHandle(ref, () => ({
-    reset: (animate) => reset(0, 0, minScale, animate),
+    reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
+    zoom: zoom,
   }));
 
   const composedTap = Gesture.Exclusive(doubleTap, tap);
@@ -292,12 +295,12 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 
   return (
     <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
-      <Animated.View style={childStyle} onLayout={measureChild}>
-        {children}
-      </Animated.View>
-
       <GestureDetector gesture={composedGesture}>
-        <Animated.View style={detectorStyle} />
+        <Animated.View style={[detectorStyle, styles.center]}>
+          <Animated.View style={childStyle} onLayout={measureChild}>
+            {children}
+          </Animated.View>
+        </Animated.View>
       </GestureDetector>
     </GestureHandlerRootView>
   );
@@ -306,6 +309,10 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  center: {
     justifyContent: 'center',
     alignItems: 'center',
   },

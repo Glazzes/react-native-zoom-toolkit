@@ -14,22 +14,22 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { clamp } from '../../commons/utils/clamp';
-import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { useVector } from '../../commons/hooks/useVector';
 import { snapPoint } from '../../commons/utils/snapPoint';
-import { crop } from '../../commons/utils/crop';
+import { getVisibleRect } from '../../commons/utils/getVisibleRect';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
+import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 
-import { GalleryContext } from './context';
-import { type GalleryProps } from './types';
-import {
+import type {
   PinchCenteringMode,
   ScaleMode,
   SwipeDirection,
-  type BoundsFuction,
-  type PanGestureEvent,
+  BoundsFuction,
+  PanGestureEvent,
 } from '../../commons/types';
+import { GalleryContext } from './context';
+import { type GalleryProps } from './types';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
@@ -41,6 +41,8 @@ type ReflectionProps = {
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
+  zoomEnabled: boolean;
+  scaleMode: ScaleMode;
   pinchCenteringMode: PinchCenteringMode;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
@@ -49,6 +51,7 @@ type ReflectionProps = {
   onPinchEnd?: GalleryProps['onPinchEnd'];
   onSwipe?: GalleryProps['onSwipe'];
   onVerticalPull?: GalleryProps['onVerticalPull'];
+  onGestureEnd?: GalleryProps['onGestureEnd'];
 };
 
 /*
@@ -62,6 +65,8 @@ const Reflection = ({
   itemSize,
   vertical,
   tapOnEdgeToItem,
+  zoomEnabled,
+  scaleMode,
   allowPinchPanning,
   pinchCenteringMode,
   onTap,
@@ -71,6 +76,7 @@ const Reflection = ({
   onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
   onVerticalPull,
+  onGestureEnd,
 }: ReflectionProps) => {
   const {
     activeIndex,
@@ -85,22 +91,18 @@ const Reflection = ({
   } = useContext(GalleryContext);
 
   const offset = useVector(0, 0);
-  const origin = useVector(0, 0);
-  const delta = useVector(0, 0);
   const scaleOffset = useSharedValue<number>(1);
-
-  const detectorTranslate = useVector(0, 0);
-  const detectorScale = useSharedValue<number>(1);
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
-
+  const gestureEnd = useSharedValue<number>(0);
   const isPullingVertical = useSharedValue<boolean>(false);
   const pullReleased = useSharedValue<boolean>(false);
 
-  const boundsFn: BoundsFuction = (scaleValue) => {
+  const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
 
+    const scaleValue = optionalScale ?? scale.value;
     const { width: cWidth, height: cHeight } = rootChildSize;
     const { width: rWidth, height: rHeight } = rootSize;
 
@@ -116,17 +118,14 @@ const Reflection = ({
     animate: boolean = true
   ) => {
     'worklet';
-
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.y.value = translate.y.value;
-    detectorScale.value = scale.value;
+    cancelAnimation(translate.x);
+    cancelAnimation(translate.y);
+    cancelAnimation(scale);
 
     translate.x.value = animate ? withTiming(toX) : toX;
     translate.y.value = animate ? withTiming(toY) : toY;
     scale.value = animate ? withTiming(toScale) : toScale;
-    detectorTranslate.x.value = animate ? withTiming(toX) : toX;
-    detectorTranslate.y.value = animate ? withTiming(toY) : toY;
-    detectorScale.value = animate ? withTiming(toScale) : toScale;
+    scaleOffset.value = toScale;
   };
 
   const snapToScrollPosition = (e: PanGestureEvent) => {
@@ -153,10 +152,10 @@ const Reflection = ({
     'worklet';
 
     let toIndex = activeIndex.value;
-    if (direction === SwipeDirection.UP && vertical) toIndex += 1;
-    if (direction === SwipeDirection.DOWN && vertical) toIndex -= 1;
-    if (direction === SwipeDirection.LEFT && !vertical) toIndex += 1;
-    if (direction === SwipeDirection.RIGHT && !vertical) toIndex -= 1;
+    if (direction === 'up' && vertical) toIndex += 1;
+    if (direction === 'down' && vertical) toIndex -= 1;
+    if (direction === 'left' && !vertical) toIndex += 1;
+    if (direction === 'right' && !vertical) toIndex -= 1;
 
     toIndex = clamp(toIndex, 0, length - 1);
     if (toIndex === activeIndex.value) return;
@@ -172,15 +171,13 @@ const Reflection = ({
   useAnimatedReaction(
     () => ({
       translate: translate.y.value,
-      scale: scale.value,
       isPulling: isPullingVertical.value,
       released: pullReleased.value,
     }),
     (val) => {
-      const shouldPull = !vertical && val.scale === 1 && val.isPulling;
-      shouldPull && onVerticalPull?.(val.translate, val.released);
+      val.isPulling && onVerticalPull?.(val.translate, val.released);
     },
-    [translate, scale, isPullingVertical, pullReleased]
+    [translate, isPullingVertical, pullReleased]
   );
 
   useAnimatedReaction(
@@ -192,30 +189,45 @@ const Reflection = ({
     [rootSize]
   );
 
-  const { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd } =
-    usePinchCommons({
-      container: rootSize,
-      detectorTranslate,
-      detectorScale,
-      translate,
-      offset,
-      origin,
-      scale,
-      scaleOffset,
-      minScale,
-      maxScale,
-      delta,
-      allowPinchPanning,
-      scaleMode: ScaleMode.BOUNCE,
-      pinchCenteringMode,
-      boundFn: boundsFn,
-      userCallbacks: {
-        onPinchStart: onUserPinchStart,
-        onPinchEnd: onUserPinchEnd,
-      },
-    });
+  const {
+    gesturesEnabled,
+    onTouchesMove,
+    onPinchStart,
+    onPinchUpdate,
+    onPinchEnd,
+  } = usePinchCommons({
+    container: rootSize,
+    translate,
+    offset,
+    scale,
+    scaleOffset,
+    minScale,
+    maxScale,
+    scaleMode,
+    allowPinchPanning,
+    pinchCenteringMode,
+    boundFn: boundsFn,
+    userCallbacks: {
+      onPinchStart: onUserPinchStart,
+      onPinchEnd: onUserPinchEnd,
+      onGestureEnd,
+    },
+  });
+
+  const { onDoubleTapEnd } = useDoubleTapCommons({
+    container: rootSize,
+    translate,
+    scale,
+    minScale,
+    maxScale,
+    scaleOffset,
+    boundsFn,
+    onGestureEnd,
+  });
 
   const pinch = Gesture.Pinch()
+    .enabled(zoomEnabled)
+    .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
@@ -227,8 +239,6 @@ const Reflection = ({
       onPanStart && runOnJS(onPanStart)(e);
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
-      cancelAnimation(detectorTranslate.x);
-      cancelAnimation(detectorTranslate.y);
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
@@ -257,16 +267,11 @@ const Reflection = ({
 
       const scrollX = -1 * Math.sign(toX) * exceedX;
       const scrollY = -1 * Math.sign(toY) * exceedY;
-      scroll.value = clamp(
-        scrollOffset.value + (vertical ? scrollY : scrollX),
-        0,
-        (length - 1) * itemSize.value
-      );
+      const to = scrollOffset.value + (vertical ? scrollY : scrollX);
+      scroll.value = clamp(to, 0, (length - 1) * itemSize.value);
 
       translate.x.value = clamp(toX, -1 * boundX, boundX);
       translate.y.value = clamp(toY, -1 * boundY, boundY);
-      detectorTranslate.x.value = clamp(toX, -1 * boundX, boundX);
-      detectorTranslate.y.value = clamp(toY, -1 * boundY, boundY);
     })
     .onEnd((e) => {
       const bounds = boundsFn(scale.value);
@@ -293,25 +298,27 @@ const Reflection = ({
         return;
       }
 
-      const isSwipingH =
-        direction === SwipeDirection.LEFT || direction === SwipeDirection.RIGHT;
-
-      const isSwipingV =
-        direction === SwipeDirection.UP || direction === SwipeDirection.DOWN;
-
+      const isSwipingH = direction === 'left' || direction === 'right';
+      const isSwipingV = direction === 'up' || direction === 'down';
       const snapV = vertical && (direction === undefined || isSwipingH);
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
-      onPanEnd && runOnJS(onPanEnd)(e);
       (snapV || snapH) && snapToScrollPosition(e);
+      direction === undefined && onPanEnd && runOnJS(onPanEnd)(e);
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
       const configY = { velocity: e.velocityY, clamp: [-bounds.y, bounds.y] };
 
+      const restX = Math.abs(Math.abs(translate.x.value) - bounds.x);
+      const restY = Math.abs(Math.abs(translate.y.value) - bounds.y);
+      const finalConfig = restX > restY ? configX : configY;
+      gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
+      gestureEnd.value = withDecay(finalConfig as WithDecayConfig, () => {
+        onGestureEnd && runOnJS(onGestureEnd)();
+      });
+
       translate.x.value = withDecay(configX as WithDecayConfig);
       translate.y.value = withDecay(configY as WithDecayConfig);
-      detectorTranslate.x.value = withDecay(configX as WithDecayConfig);
-      detectorTranslate.y.value = withDecay(configY as WithDecayConfig);
     });
 
   const tap = Gesture.Tap()
@@ -319,35 +326,32 @@ const Reflection = ({
     .numberOfTaps(1)
     .maxDuration(250)
     .onEnd((e) => {
+      const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
+
       const gallerySize = {
         width: rootSize.width.value,
         height: rootSize.height.value,
       };
 
-      const { crop: result } = crop({
+      const { x, width } = getVisibleRect({
         scale: scale.value,
-        context: {
-          flipHorizontal: false,
-          flipVertical: false,
-          rotationAngle: 0,
-        },
-        canvas: gallerySize,
-        cropSize: gallerySize,
-        resolution: gallerySize,
-        position: { x: translate.x.value, y: translate.y.value },
+        visibleSize: gallerySize,
+        canvasSize: gallerySize,
+        elementSize: gallerySize,
+        offset: { x: translate.x.value, y: translate.y.value },
       });
 
       const tapEdge = 44 / scale.value;
-      const leftEdge = result.originX + tapEdge;
-      const rightEdge = result.originX + result.width - tapEdge;
+      const leftEdge = x + tapEdge;
+      const rightEdge = x + width - tapEdge;
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
-      if (e.x <= leftEdge && canGoToItem) toIndex -= 1;
-      if (e.x >= rightEdge && canGoToItem) toIndex += 1;
+      if (event.x <= leftEdge && canGoToItem) toIndex -= 1;
+      if (event.x >= rightEdge && canGoToItem) toIndex += 1;
 
-      if (toIndex === activeIndex.value && onTap) {
-        runOnJS(onTap)(e, activeIndex.value);
+      if (toIndex === activeIndex.value) {
+        onTap && runOnJS(onTap)(event, activeIndex.value);
         return;
       }
 
@@ -360,40 +364,26 @@ const Reflection = ({
     });
 
   const doubleTap = Gesture.Tap()
-    .enabled(gesturesEnabled)
+    .enabled(gesturesEnabled && zoomEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
-    .onEnd((e) => {
-      const originX = e.x - rootSize.width.value / 2;
-      const originY = e.y - rootSize.height.value / 2;
-      const toScale =
-        scale.value >= maxScale.value * 0.8 ? minScale : maxScale.value;
+    .onEnd(onDoubleTapEnd);
 
-      const { x, y } = pinchTransform({
-        toScale: toScale,
-        fromScale: scale.value,
-        origin: { x: originX, y: originY },
-        delta: { x: 0, y: 0 },
-        offset: { x: translate.x.value, y: translate.y.value },
-      });
+  const detectorStyle = useAnimatedStyle(() => {
+    const width = Math.max(rootSize.width.value, rootChildSize.width.value);
+    const height = Math.max(rootSize.height.value, rootChildSize.height.value);
 
-      const { x: boundX, y: boundY } = boundsFn(toScale);
-      const toX = clamp(x, -1 * boundX, boundX);
-      const toY = clamp(y, -1 * boundY, boundY);
-      reset(toX, toY, toScale);
-    });
-
-  const detectorStyle = useAnimatedStyle(() => ({
-    width: Math.max(rootSize.width.value, rootChildSize.width.value),
-    height: Math.max(rootSize.height.value, rootChildSize.height.value),
-    position: 'absolute',
-    zIndex: Number.MAX_SAFE_INTEGER,
-    transform: [
-      { translateX: detectorTranslate.x.value },
-      { translateY: detectorTranslate.y.value },
-      { scale: detectorScale.value },
-    ],
-  }));
+    return {
+      width: width * scaleOffset.value,
+      height: height * scaleOffset.value,
+      position: 'absolute',
+      zIndex: Number.MAX_SAFE_INTEGER,
+      transform: [
+        { translateX: translate.x.value },
+        { translateY: translate.y.value },
+      ],
+    };
+  }, [rootSize, rootChildSize, translate, scaleOffset]);
 
   const composed = Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap));
 
@@ -415,6 +405,8 @@ export default React.memo(Reflection, (prev, next) => {
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
+    prev.zoomEnabled === next.zoomEnabled &&
+    prev.scaleMode === next.scaleMode &&
     prev.allowPinchPanning === next.allowPinchPanning &&
     prev.pinchCenteringMode === next.pinchCenteringMode &&
     prev.onVerticalPull === next.onVerticalPull

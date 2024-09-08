@@ -15,7 +15,6 @@ import {
 import {
   stackTransition,
   Gallery,
-  PinchCenteringMode,
   type GalleryType,
 } from 'react-native-zoom-toolkit';
 
@@ -40,7 +39,7 @@ const GalleryExample = () => {
   const isSeeking = useSharedValue<boolean>(false);
 
   const renderItem = useCallback(
-    (item: Asset, index: number) => {
+    (item: Asset, index: number): React.ReactElement => {
       if (item.mediaType === MediaType.video) {
         return (
           <GalleryVideo
@@ -130,7 +129,7 @@ const GalleryExample = () => {
           activeIndex.value = idx;
         }}
         onTap={onTap}
-        pinchCenteringMode={PinchCenteringMode.INTERACTION}
+        pinchCenteringMode={'sync'}
         onVerticalPull={onVerticalPulling}
         customTransition={customTransition}
       />

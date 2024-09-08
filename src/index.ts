@@ -10,7 +10,7 @@ export * from './components/crop/types';
 export { default as Gallery } from './components/gallery/GalleryProvider';
 export * from './components/gallery/types';
 
-export {
+export type {
   PanMode,
   ScaleMode,
   PinchCenteringMode,
@@ -18,6 +18,7 @@ export {
 } from './commons/types';
 
 export type {
+  CommonZoomState,
   Vector,
   SizeVector,
   PanGestureEvent,
@@ -33,6 +34,8 @@ export {
   type FetchImageResolutionResult,
   type Source,
 } from './hooks/useImageResolution';
+
+export { useTransformationState } from './hooks/useTransformationState';
 
 export { getAspectRatioSize } from './utils/getAspectRatioSize';
 export { stackTransition } from './commons/misc/stacktransition';

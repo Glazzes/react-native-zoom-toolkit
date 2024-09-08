@@ -8,7 +8,6 @@ import {
 } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { PinchCenteringMode } from '../../commons/types';
 import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
@@ -22,7 +21,7 @@ type GalleryPropsWithRef<T> = GalleryProps<T> & {
   reference?: React.ForwardedRef<GalleryType>;
 };
 
-const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
+const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   const {
     reference,
     data,
@@ -33,12 +32,15 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     maxScale: userMaxScale = 6,
     vertical = false,
     tapOnEdgeToItem = true,
-    pinchCenteringMode = PinchCenteringMode.CLAMP,
+    zoomEnabled = true,
+    scaleMode = 'bounce',
+    pinchCenteringMode = 'clamp',
     allowPinchPanning: pinchPanning,
     customTransition,
     onIndexChange,
     onScroll,
     onTap,
+    onUpdate,
     onPanStart,
     onPanEnd,
     onPinchStart,
@@ -47,6 +49,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     onZoomBegin,
     onZoomEnd,
     onVerticalPull,
+    onGestureEnd,
   } = props;
 
   const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
@@ -97,6 +100,18 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
     () => ({ scroll: scroll.value, itemSize: itemSize.value }),
     (value) => onScroll?.(value.scroll, (data.length - 1) * value.itemSize),
     [scroll, itemSize]
+  );
+
+  useAnimatedReaction(
+    () => ({
+      width: rootChildSize.width.value,
+      height: rootChildSize.height.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    }),
+    (state) => onUpdate && onUpdate(state),
+    [rootChildSize, translate, scale]
   );
 
   useAnimatedReaction(
@@ -193,6 +208,8 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
         length={data.length}
         vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
+        zoomEnabled={zoomEnabled}
+        scaleMode={scaleMode}
         allowPinchPanning={allowPinchPanning}
         pinchCenteringMode={pinchCenteringMode}
         onTap={onTap}
@@ -202,6 +219,7 @@ const Gallery = <T extends unknown>(props: GalleryPropsWithRef<T>) => {
         onPinchEnd={onPinchEnd}
         onSwipe={onSwipe}
         onVerticalPull={onVerticalPull}
+        onGestureEnd={onGestureEnd}
       />
     </GestureHandlerRootView>
   );

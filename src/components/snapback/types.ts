@@ -1,9 +1,22 @@
 import type {
-  CommonZoomProps,
+  EasingFunction,
+  EasingFunctionFactory,
+  ReduceMotion,
+} from 'react-native-reanimated';
+import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
+
+import type {
+  CommonZoomState,
   PinchGestureCallbacks,
   SizeVector,
   TapGestureCallbacks,
 } from '../../commons/types';
+
+export type TimingConfig = Partial<{
+  duration: number;
+  easing: EasingFunction | EasingFunctionFactory;
+  reduceMotion: ReduceMotion;
+}>;
 
 export type ResizeConfig = {
   size: SizeVector<number>;
@@ -11,23 +24,22 @@ export type ResizeConfig = {
   scale: number;
 };
 
-export type SnapbackZoomState = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  resizedWidth: number | undefined;
-  resizedHeight: number | undefined;
-  translateX: number;
-  translateY: number;
-  scale: number;
-};
+export type SnapbackZoomState<T> = {
+  x: T;
+  y: T;
+  resizedWidth: T | undefined;
+  resizedHeight: T | undefined;
+} & CommonZoomState<T>;
 
-export type SnapBackZoomProps = React.PropsWithChildren<{
-  resizeConfig?: ResizeConfig;
-  gesturesEnabled?: boolean;
-  onGestureActive?: (e: SnapbackZoomState) => void;
-}> &
+export type SnapBackZoomProps = React.PropsWithChildren<
+  Partial<{
+    resizeConfig: ResizeConfig;
+    gesturesEnabled: boolean;
+    onGestureEnd: () => void;
+    onUpdate: (e: SnapbackZoomState<number>) => void;
+    hitSlop: HitSlop;
+    timingConfig: TimingConfig;
+  }>
+> &
   PinchGestureCallbacks &
-  TapGestureCallbacks &
-  CommonZoomProps;
+  TapGestureCallbacks;

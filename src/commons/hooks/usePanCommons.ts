@@ -13,26 +13,25 @@ import type {
 } from 'react-native-gesture-handler';
 
 import { clamp } from '../utils/clamp';
+import { useVector } from './useVector';
 import { friction } from '../utils/friction';
-import {
+import { getSwipeDirection } from '../utils/getSwipeDirection';
+
+import type {
   PanMode,
-  type BoundsFuction,
-  type Vector,
-  type SizeVector,
-  type PanGestureEventCallback,
-  type PanGestureEvent,
+  BoundsFuction,
+  Vector,
+  SizeVector,
+  PanGestureEventCallback,
+  PanGestureEvent,
   SwipeDirection,
 } from '../types';
-import { useVector } from './useVector';
-import { getSwipeDirection } from '../utils/getSwipeDirection';
 
 type PanCommmonOptions = {
   container: SizeVector<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
-  detectorTranslate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
-  scale: SharedValue<number>;
   decay?: boolean;
   boundFn: BoundsFuction;
   userCallbacks: Partial<{
@@ -48,20 +47,18 @@ type PanGestureUpdadeEvent = GestureUpdateEvent<
   PanGestureHandlerEventPayload & PanGestureChangeEventPayload
 >;
 
-const DECELERATION = 0.9955;
-
 export const usePanCommons = (options: PanCommmonOptions) => {
   const {
     container,
-    detectorTranslate,
     translate,
     offset,
     panMode,
-    scale,
     decay,
     boundFn,
     userCallbacks,
   } = options;
+
+  const { onSwipe, onGestureEnd, onOverPanning } = userCallbacks;
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
@@ -75,8 +72,6 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     userCallbacks.onPanStart && runOnJS(userCallbacks.onPanStart)(e);
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
-    cancelAnimation(detectorTranslate.x);
-    cancelAnimation(detectorTranslate.y);
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
@@ -92,25 +87,24 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     const toX = e.translationX + offset.x.value;
     const toY = e.translationY + offset.y.value;
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    const { x: boundX, y: boundY } = boundFn();
     const exceedX = Math.max(0, Math.abs(toX) - boundX);
     const exceedY = Math.max(0, Math.abs(toY) - boundY);
     isWithinBoundX.value = exceedX === 0;
     isWithinBoundY.value = exceedY === 0;
 
-    if ((exceedX > 0 || exceedY > 0) && userCallbacks.onOverPanning) {
+    if ((exceedX > 0 || exceedY > 0) && onOverPanning) {
       const ex = Math.sign(toX) * exceedX;
       const ey = Math.sign(toY) * exceedY;
-      userCallbacks.onOverPanning(ex, ey);
+      onOverPanning(ex, ey);
     }
 
     // Simplify both free and clamp pan modes in one condition due to their similarity
-    if (panMode !== PanMode.FRICTION) {
-      const isFree = panMode === PanMode.FREE;
+    if (panMode !== 'friction') {
+      const isFree = panMode === 'free';
       translate.x.value = isFree ? toX : clamp(toX, -1 * boundX, boundX);
       translate.y.value = isFree ? toY : clamp(toY, -1 * boundY, boundY);
-      detectorTranslate.x.value = translate.x.value;
-      detectorTranslate.y.value = translate.y.value;
+
       return;
     }
 
@@ -137,8 +131,8 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const onPanEnd = (e: PanGestureEvent) => {
     'worklet';
 
-    if (panMode === PanMode.CLAMP && userCallbacks.onSwipe) {
-      const boundaries = boundFn(scale.value);
+    if (panMode === 'clamp' && onSwipe) {
+      const boundaries = boundFn();
       const direction = getSwipeDirection(e, {
         boundaries,
         time: time.value,
@@ -147,14 +141,14 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       });
 
       if (direction !== undefined) {
-        runOnJS(userCallbacks.onSwipe)(direction);
+        runOnJS(onSwipe)(direction);
         return;
       }
     }
 
     userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
 
-    const { x: boundX, y: boundY } = boundFn(scale.value);
+    const { x: boundX, y: boundY } = boundFn();
     const clampX: [number, number] = [-1 * boundX, boundX];
     const clampY: [number, number] = [-1 * boundY, boundY];
 
@@ -163,49 +157,25 @@ export const usePanCommons = (options: PanCommmonOptions) => {
 
     const decayX = decay && isWithinBoundX.value;
     const decayY = decay && isWithinBoundY.value;
-    const decayConfigX = {
-      velocity: e.velocityX,
-      clamp: clampX,
-      deceleration: DECELERATION,
-    };
-
-    const decayConfigY = {
-      velocity: e.velocityY,
-      clamp: clampY,
-      deceleration: DECELERATION,
-    };
-
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.x.value = decayX
-      ? withDecay(decayConfigX)
-      : withTiming(toX);
+    const decayConfigX = { velocity: e.velocityX, clamp: clampX };
+    const decayConfigY = { velocity: e.velocityY, clamp: clampY };
 
     translate.x.value = decayX ? withDecay(decayConfigX) : withTiming(toX);
-
-    detectorTranslate.y.value = translate.y.value;
-    detectorTranslate.y.value = decayY
-      ? withDecay(decayConfigY)
-      : withTiming(toY);
-
     translate.y.value = decayY ? withDecay(decayConfigY) : withTiming(toY);
 
-    const restX = Math.max(0, Math.abs(translate.x.value) - boundX);
-    const restY = Math.max(0, Math.abs(translate.y.value) - boundY);
+    const restX = Math.abs(Math.abs(translate.x.value) - boundX);
+    const restY = Math.abs(Math.abs(translate.y.value) - boundY);
     gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
 
-    if (decayX && decayY) {
+    if (decayX || decayY) {
       const config = restX > restY ? decayConfigX : decayConfigY;
       gestureEnd.value = withDecay(config, (finished) => {
-        if (finished && userCallbacks.onGestureEnd) {
-          runOnJS(userCallbacks.onGestureEnd)();
-        }
+        finished && onGestureEnd && runOnJS(onGestureEnd)();
       });
     } else {
       const toValue = restX > restY ? toX : toY;
       gestureEnd.value = withTiming(toValue, undefined, (finished) => {
-        if (finished && userCallbacks.onGestureEnd) {
-          runOnJS(userCallbacks.onGestureEnd)();
-        }
+        finished && onGestureEnd && runOnJS(onGestureEnd)();
       });
     }
   };

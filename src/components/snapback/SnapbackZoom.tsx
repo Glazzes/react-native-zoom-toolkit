@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import React from 'react';
 import Animated, {
   measure,
   runOnJS,
@@ -30,13 +29,10 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   onDoubleTap,
   onPinchStart,
   onPinchEnd,
-  onGestureActive,
+  onUpdate,
   onGestureEnd,
 }) => {
-  const [internalGesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
-  const switchGestureStatus = (enabled: boolean) => {
-    setGesturesEnabled(enabled);
-  };
+  const containerRef = useAnimatedRef();
 
   const position = useVector(0, 0);
   const translate = useVector(0, 0);
@@ -57,23 +53,10 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     });
   }, [resizeConfig, scale, containerSize]);
 
-  const containerRef = useAnimatedRef();
-  const measurePinchContainer = () => {
-    'worklet';
-
-    const measuremet = measure(containerRef);
-    if (measuremet !== null) {
-      containerSize.width.value = measuremet.width;
-      containerSize.height.value = measuremet.height;
-      position.x.value = measuremet.pageX;
-      position.y.value = measuremet.pageY;
-    }
-  };
-
   useDerivedValue(() => {
     const { width, height } = childrenSize.value;
 
-    onGestureActive?.({
+    onUpdate?.({
       x: position.x.value,
       y: position.y.value,
       width: containerSize.width.value,
@@ -88,11 +71,16 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
   const pinch = Gesture.Pinch()
     .hitSlop(hitSlop)
-    .enabled(gesturesEnabled && internalGesturesEnabled)
+    .enabled(gesturesEnabled)
     .onStart((e) => {
       onPinchStart && runOnJS(onPinchStart)(e);
 
-      measurePinchContainer();
+      const measuremet = measure(containerRef)!;
+      containerSize.width.value = measuremet.width;
+      containerSize.height.value = measuremet.height;
+      position.x.value = measuremet.pageX;
+      position.y.value = measuremet.pageY;
+
       origin.x.value = e.focalX - containerSize.width.value / 2;
       origin.y.value = e.focalY - containerSize.height.value / 2;
     })
@@ -108,26 +96,24 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       scale.value = e.scale;
     })
     .onEnd((e) => {
-      runOnJS(switchGestureStatus)(false);
       onPinchEnd && runOnJS(onPinchEnd)(e);
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        runOnJS(switchGestureStatus)(true);
         onGestureEnd && runOnJS(onGestureEnd)();
       });
     });
 
   const tap = Gesture.Tap()
-    .enabled(gesturesEnabled && internalGesturesEnabled)
+    .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
     .runOnJS(true)
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
-    .enabled(gesturesEnabled && internalGesturesEnabled)
+    .enabled(gesturesEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
     .runOnJS(true)
@@ -140,10 +126,12 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     return {
       width: width === 0 ? undefined : width,
       height: height === 0 ? undefined : height,
+      justifyContent: 'center',
+      alignItems: 'center',
     };
   }, [containerSize]);
 
-  const childrenStyle = useAnimatedStyle(() => {
+  const childStyle = useAnimatedStyle(() => {
     const { width, height, deltaX, deltaY } = childrenSize.value;
 
     return {
@@ -160,32 +148,14 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 
   return (
-    <Animated.View style={[containerStyle, styles.center]}>
-      <Animated.View ref={containerRef} style={childrenStyle}>
-        {children}
+    <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
+      <Animated.View style={containerStyle}>
+        <Animated.View ref={containerRef} style={childStyle}>
+          {children}
+        </Animated.View>
       </Animated.View>
-
-      <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
-        <Animated.View
-          collapsable={false}
-          pointerEvents={gesturesEnabled ? undefined : 'none'}
-          style={styles.absolute}
-        />
-      </GestureDetector>
-    </Animated.View>
+    </GestureDetector>
   );
 };
-
-const styles = StyleSheet.create({
-  center: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  absolute: {
-    height: '100%',
-    width: '100%',
-    position: 'absolute',
-  },
-});
 
 export default withSnapbackValidation(SnapbackZoom);

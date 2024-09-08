@@ -4,18 +4,6 @@ import type {
   TapGestureHandlerEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
-import type {
-  EasingFunction,
-  EasingFunctionFactory,
-  ReduceMotion,
-} from 'react-native-reanimated';
-import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
-
-export type TimingConfig = Partial<{
-  duration: number;
-  easing: EasingFunction | EasingFunctionFactory;
-  reduceMotion: ReduceMotion;
-}>;
 
 export type Vector<T> = {
   x: T;
@@ -27,64 +15,18 @@ export type SizeVector<T> = {
   height: T;
 };
 
-export type BoundsFuction = (scale: number) => Vector<number>;
+export type SwipeDirection = 'up' | 'down' | 'left' | 'right';
+export type PanMode = 'clamp' | 'free' | 'friction';
+export type ScaleMode = 'clamp' | 'bounce';
+export type PinchCenteringMode = 'clamp' | 'sync';
 
-export enum SwipeDirection {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
-}
-
-/**
- * @description Determine how your component must behave when it reaches the specified boundaries
- * by its enclosing container.
- */
-export enum PanMode {
-  /** @description Prevents the user from dragging the component out of the specified boundaries. */
-  CLAMP,
-
-  /**
-   * @description Lets the user drag the component around freely, when the pan gesture ends
-   * the component will return to a position within the specified boundaries.
-   */
-  FREE,
-
-  /**
-   * @description Lets the user drag the component around freely applying friction to the pan gesture
-   * up to a point where it's stopped completely, when the pan gesture ends the component will return
-   * to a position within the specified boundaries.
-   */
-  FRICTION,
-}
-
-/**
- * @description Determine how your component must behave when the pinch gesture's scale value
- * exceeds the specified boundaries by minScale and maxScale properties.
- */
-export enum ScaleMode {
-  /**
-   * @description Prevents the user from exceeding the scale boundaries.
-   */
-  CLAMP,
-
-  /**
-   * @description Lets the user scale above and below the scale boundary values, when the pinch
-   * gesture ends the scale value returns to minScale or maxScale respectively.
-   */
-  BOUNCE,
-}
-
-export enum PinchCenteringMode {
-  CLAMP,
-  INTERACTION,
-}
-
-export type CommonZoomProps = Partial<{
-  hitSlop: HitSlop;
-  timingConfig: TimingConfig;
-  onGestureEnd: () => void;
-}>;
+export type CommonZoomState<T> = {
+  width: T;
+  height: T;
+  translateX: T;
+  translateY: T;
+  scale: T;
+};
 
 export type CommonResumableProps = Partial<{
   minScale: number;
@@ -92,6 +34,7 @@ export type CommonResumableProps = Partial<{
   panMode: PanMode;
   scaleMode: ScaleMode;
   allowPinchPanning: boolean;
+  onGestureEnd: () => void;
 }>;
 
 export type TapGestureEvent =
@@ -126,3 +69,5 @@ export type ZoomEventCallbacks = Partial<{
   onZoomBegin: (index: number) => void;
   onZoomEnd: (index: number) => void;
 }>;
+
+export type BoundsFuction = (scale?: number) => Vector<number>;

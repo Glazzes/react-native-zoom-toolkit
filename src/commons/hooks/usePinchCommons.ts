@@ -6,31 +6,30 @@ import {
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated';
-import {
-  type GestureUpdateEvent,
-  type PinchGestureHandlerEventPayload,
+import type {
+  GestureTouchEvent,
+  GestureUpdateEvent,
+  PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
 import { clamp } from '../utils/clamp';
+import { useVector } from './useVector';
 import { pinchTransform } from '../utils/pinchTransform';
-import {
+
+import type {
+  BoundsFuction,
+  SizeVector,
+  Vector,
+  PinchGestureEventCallback,
+  PinchGestureEvent,
   ScaleMode,
   PinchCenteringMode,
-  type BoundsFuction,
-  type SizeVector,
-  type Vector,
-  type PinchGestureEventCallback,
-  type PinchGestureEvent,
 } from '../types';
 
 type PinchOptions = {
   container: SizeVector<SharedValue<number>>;
-  detectorTranslate: Vector<SharedValue<number>>;
-  detectorScale: SharedValue<number>;
   translate: Vector<SharedValue<number>>;
-  origin: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
-  delta: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
   scaleOffset: SharedValue<number>;
   scaleMode: ScaleMode;
@@ -52,11 +51,8 @@ type PinchGestueUpdateEvent =
 export const usePinchCommons = (options: PinchOptions) => {
   const {
     container,
-    detectorTranslate,
-    detectorScale,
     translate,
     offset,
-    delta,
     scale,
     scaleOffset,
     minScale,
@@ -64,21 +60,34 @@ export const usePinchCommons = (options: PinchOptions) => {
     scaleMode,
     pinchCenteringMode,
     allowPinchPanning,
-    origin,
     boundFn,
     userCallbacks,
   } = options;
 
-  const pinchClamp = pinchCenteringMode === PinchCenteringMode.CLAMP;
-  const scaleClamp = scaleMode === ScaleMode.CLAMP;
+  const pinchClamp = pinchCenteringMode === 'clamp';
+  const scaleClamp = scaleMode === 'clamp';
+
+  const initialFocal = useVector(0, 0);
+  const currentFocal = useVector(0, 0);
+  const origin = useVector(0, 0);
 
   // This value is used to trigger the onGestureEnd callback as a gimmick to avoid unneccesary calculations.
   const gestureEnd = useSharedValue<number>(0);
 
   const [gesturesEnabled, setGesturesEnabled] = useState<boolean>(true);
   const switchGesturesState = (value: boolean) => {
-    if (scaleMode !== ScaleMode.BOUNCE) return;
+    if (scaleMode !== 'bounce') return;
     setGesturesEnabled(value);
+  };
+
+  const onTouchesMove = (e: GestureTouchEvent) => {
+    'worklet';
+    if (e.numberOfTouches !== 2) return;
+    const touchOne = e.allTouches[0]!;
+    const touchTwo = e.allTouches[1]!;
+
+    currentFocal.x.value = (touchOne.absoluteX + touchTwo.absoluteX) / 2;
+    currentFocal.y.value = (touchOne.absoluteY + touchTwo.absoluteY) / 2;
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
@@ -88,13 +97,13 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
-    cancelAnimation(detectorTranslate.x);
-    cancelAnimation(detectorTranslate.y);
     cancelAnimation(scale);
-    cancelAnimation(detectorScale);
 
-    origin.x.value = e.focalX - container.width.value / 2;
-    origin.y.value = e.focalY - container.height.value / 2;
+    initialFocal.x.value = currentFocal.x.value;
+    initialFocal.y.value = currentFocal.y.value;
+
+    origin.x.value = e.focalX / scale.value - container.width.value / 2;
+    origin.y.value = e.focalY / scale.value - container.height.value / 2;
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
@@ -107,8 +116,8 @@ export const usePinchCommons = (options: PinchOptions) => {
     let toScale = e.scale * scaleOffset.value;
     if (scaleClamp) toScale = clamp(toScale, minScale, maxScale.value);
 
-    delta.x.value = e.focalX - container.width.value / 2 - origin.x.value;
-    delta.y.value = e.focalY - container.height.value / 2 - origin.y.value;
+    const deltaX = currentFocal.x.value - initialFocal.x.value;
+    const deltaY = currentFocal.y.value - initialFocal.y.value;
 
     const { x: toX, y: toY } = pinchTransform({
       toScale: toScale,
@@ -116,8 +125,8 @@ export const usePinchCommons = (options: PinchOptions) => {
       origin: { x: origin.x.value, y: origin.y.value },
       offset: { x: offset.x.value, y: offset.y.value },
       delta: {
-        x: allowPinchPanning ? delta.x.value * scaleOffset.value : 0,
-        y: allowPinchPanning ? delta.y.value * scaleOffset.value : 0,
+        x: allowPinchPanning ? deltaX : 0,
+        y: allowPinchPanning ? deltaY : 0,
       },
     });
 
@@ -137,13 +146,6 @@ export const usePinchCommons = (options: PinchOptions) => {
     cancelAnimation(translate.y);
     cancelAnimation(scale);
 
-    detectorTranslate.x.value = translate.x.value;
-    detectorTranslate.y.value = translate.y.value;
-    detectorScale.value = scale.value;
-    detectorTranslate.x.value = withTiming(toX);
-    detectorTranslate.y.value = withTiming(toY);
-    detectorScale.value = withTiming(toScale);
-
     const areTXNotEqual = translate.x.value !== toX;
     const areTYNotEqual = translate.y.value !== toY;
     const areScalesNotEqual = scale.value !== toScale;
@@ -152,6 +154,7 @@ export const usePinchCommons = (options: PinchOptions) => {
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
     scale.value = withTiming(toScale, undefined, (finished) => {
+      scaleOffset.value = scale.value;
       finished && runOnJS(switchGesturesState)(true);
     });
 
@@ -169,9 +172,9 @@ export const usePinchCommons = (options: PinchOptions) => {
     userCallbacks.onPinchEnd && runOnJS(userCallbacks.onPinchEnd)(e);
 
     const toScale = clamp(scale.value, minScale, maxScale.value);
-    const scaleDiff =
-      scaleMode === ScaleMode.BOUNCE && scale.value > maxScale.value
-        ? Math.max(0, scaleOffset.value - (scale.value - scaleOffset.value) / 2)
+    const deltaY =
+      !scaleClamp && allowPinchPanning && scale.value > maxScale.value
+        ? (currentFocal.y.value - initialFocal.y.value) / 2
         : 0;
 
     const { x, y } = pinchTransform({
@@ -179,7 +182,7 @@ export const usePinchCommons = (options: PinchOptions) => {
       fromScale: scale.value,
       origin: { x: origin.x.value, y: origin.y.value },
       offset: { x: translate.x.value, y: translate.y.value },
-      delta: { x: 0, y: allowPinchPanning ? -delta.y.value * scaleDiff : 0 },
+      delta: { x: 0, y: deltaY },
     });
 
     const { x: boundX, y: boundY } = boundFn(toScale);
@@ -189,5 +192,11 @@ export const usePinchCommons = (options: PinchOptions) => {
     reset(toX, toY, toScale);
   };
 
-  return { gesturesEnabled, onPinchStart, onPinchUpdate, onPinchEnd };
+  return {
+    gesturesEnabled,
+    onTouchesMove,
+    onPinchStart,
+    onPinchUpdate,
+    onPinchEnd,
+  };
 };

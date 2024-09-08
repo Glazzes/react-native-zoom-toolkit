@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import type { ResumableZoomProps } from '../../components/resumable/types';
-import { forwardRef } from 'react';
-import { getInvalidChildrenMessage } from '../utils/messages';
 
 export default function withResumableValidation<
   T,
@@ -10,16 +8,9 @@ export default function withResumableValidation<
   return forwardRef<T, P>((props, ref) => {
     const { minScale, maxScale, children } = props;
 
-    const expectedChildren = 1;
     const childrenCount = React.Children.count(children);
-
-    if (childrenCount !== expectedChildren) {
-      const message = getInvalidChildrenMessage({
-        name: 'ResumableZoom',
-        expected: expectedChildren,
-        actual: childrenCount,
-      });
-
+    if (childrenCount !== 1) {
+      const message = `ResumableZoom expected one child but received ${childrenCount} children`;
       throw new Error(message);
     }
 
@@ -28,19 +19,14 @@ export default function withResumableValidation<
     }
 
     const isMaxScaleNumber = typeof maxScale === 'number';
-    if (maxScale !== undefined && isMaxScaleNumber && maxScale < 1) {
+    if (isMaxScaleNumber && maxScale < 1) {
       throw new Error(
-        'maxScale must be greater than one, or a size vector object in order to infer the max scale'
+        'maxScale must be greater than one, or a SizeVector object in order to infer the max scale'
       );
     }
 
-    if (
-      minScale !== undefined &&
-      maxScale !== undefined &&
-      isMaxScaleNumber &&
-      minScale > maxScale
-    ) {
-      throw new Error('minScale must not be greater than or equals maxScale');
+    if (minScale && isMaxScaleNumber && minScale > maxScale) {
+      throw new Error('minScale must not be greater maxScale');
     }
 
     return <Component {...props} reference={ref} />;
