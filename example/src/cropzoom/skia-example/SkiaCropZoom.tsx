@@ -60,7 +60,7 @@ const SkiaCropZoom = () => {
   };
 
   if (image === null) {
-    return;
+    return null;
   }
 
   const resolution = { width: image.width(), height: image.height() };
