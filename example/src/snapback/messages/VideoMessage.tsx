@@ -4,12 +4,12 @@ import Animated, {
   Easing,
   useSharedValue,
   withTiming,
-  type SharedValue,
-  type WithTimingConfig,
   useAnimatedRef,
   useAnimatedStyle,
   runOnUI,
   measure,
+  type SharedValue,
+  type WithTimingConfig,
 } from 'react-native-reanimated';
 import { ResizeMode, Video } from 'expo-av';
 

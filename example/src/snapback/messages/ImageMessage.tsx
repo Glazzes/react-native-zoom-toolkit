@@ -1,12 +1,5 @@
 import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
-import { maxDimension, theme } from '../../constants';
-import {
-  SnapbackZoom,
-  useImageResolution,
-  getAspectRatioSize,
-  type ResizeConfig,
-} from 'react-native-zoom-toolkit';
 import Animated, {
   measure,
   runOnUI,
@@ -15,6 +8,14 @@ import Animated, {
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated';
+
+import {
+  SnapbackZoom,
+  useImageResolution,
+  getAspectRatioSize,
+  type ResizeConfig,
+} from 'react-native-zoom-toolkit';
+import { maxDimension, theme } from '../../constants';
 import { ReflectionContext } from '../reflection/ReflectionContext';
 
 type ImageMessageProps = {

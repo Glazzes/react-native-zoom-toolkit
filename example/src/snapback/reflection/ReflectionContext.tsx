@@ -14,9 +14,9 @@ export type Context = {
 export const ReflectionContext = createContext<Context>({} as Context);
 
 export const ReflectionProvider: React.FC = ({ children }) => {
-  const position = useVector(-1 * maxDimension);
-  const width = useSharedValue(0);
-  const height = useSharedValue(0);
+  const position = useVector(-1 * maxDimension, -1 * maxDimension);
+  const width = useSharedValue<number>(0);
+  const height = useSharedValue<number>(0);
   const backgroundColor = useSharedValue<string>(theme.colors.userMessage);
 
   const context: Context = {
