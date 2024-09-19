@@ -14,7 +14,7 @@ This component will be subject to some level of stuttering, unless you install a
 For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
 :::
 
-The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example)
+The next video footage represents a complex use case, this one is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example)
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/snapbackzoom.mp4" controls />
@@ -24,9 +24,12 @@ The next video footage is taken from the [Example app](https://github.com/Glazze
 
 Its usage is pretty straight forward, just wrap a component of your choice with it.
 
-::: tip Remember
-Do not use `position: "absolute"` style in the wrapped component by `SnapbackZoom` as it messes up with
-pinch gesture's measurement.
+::: tip Child Componenet Guidelines
+SnapbackZoom's child component must be measurable, therefore avoid the following:
+
+- Do not use relative size units like `{width: '100%'}`, use absolute values instead, for instance
+  `{width: 200, height: 200}`.
+- Do not use `{position: 'absolute'}` style, wrap SnapbackZoom in an absolute positioned view if you need to.
 :::
 
 ```jsx
@@ -176,8 +179,8 @@ const resizeConfig = {
 ```
 
 ::: tip Important
-SnapbackZoom resizes its own dimensions not your component's ones, therefore your component must have the
-following styles `{width: '100%', height: '100%'}`.
+Contrary to the child components guidelines mentioned at the start of this page when using `resizeConfig` property
+your component must have the following styles `{width: '100%', height: '100%'}`.
 :::
 
 At a scale of one your image is a tile of 200x200 pixel size, in other words a square, but at a scale two it resizes to 340x200 pixel size becoming a rectangle matching with the image's aspect ratio.

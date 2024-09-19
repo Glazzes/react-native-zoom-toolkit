@@ -189,9 +189,12 @@ Modifies the orientation of the component to vertical mode.
 
 Maximum scale value allowed by the pinch gesture for all elements, expects values bigger than or equals one.
 
-Alternatively you can pass an array with the resolution of your images/videos, for instance `[{ width: 1920, height: 1080 }]`; this will instruct the component to calculate `maxScale` in such a way it's a value just before images and videos start getting pixelated for each element, the resolutions array must be as big as the `data` property array.
+You can also pass an array as big as the `data` property array containing the resolution of your images/videos,
+for instance `[{width: 1920, height: 1080}, {width: 1000, height: 1000}]`; maxScale is infered in such a way
+it's a value just before your content starts to pixelate.
 
 ### zoomEnabled
+
 | Type      | Default |
 | --------- | ------- |
 | `boolean` | `true`  |
@@ -242,7 +245,7 @@ Lets the user drag the current item around as they pinch, it also provides a mor
 
 | Type                | Default   |
 | ------------------- | --------- |
-| `'clamp' \| 'free'` | `'clamp'` |
+| `'clamp' \| 'sync'` | `'clamp'` |
 
 ::: tip Tip
 This property is meant to be used when `allowPinchPanning` property is set to `true`.
@@ -253,7 +256,7 @@ possible values are:
 
 - `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
   gesture, just like seen on Android galleries.
-- `free` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+- `sync` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
   position it will animate back to a position within the bondaries of its enclosing container.
 
 ### onIndexChange
@@ -290,14 +293,9 @@ This property is useful for instance to animate the background color based on th
 
 ### onSwipe
 
-| Type                                  | Default     |
-| ------------------------------------- | ----------- |
+| Type                                                       | Default     |
+| ---------------------------------------------------------- | ----------- |
 | `(direction: 'up' \| 'down' \| 'left' \| 'right') => void` | `undefined` |
-
-::: tip Trigger Conditions
-
-- Edges of the current item must be in contact with the edges of `Gallery` component.
-  :::
 
 Callback triggered when the user swipes up, down, left or right.
 

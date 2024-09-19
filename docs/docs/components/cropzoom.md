@@ -115,9 +115,9 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 | -------- | ----------- | -------- |
 | `number` | `undefined` | `No`     |
 
-Maximum scale value allowed by the pinch gesture, leaving this property as `undefined` will instruct the component
-to infer the maximum scale value based on `cropSize` and `resolution` properties in a such way `maxScale` is
-a value just before images and videos start getting pixelated.
+Maximum scale value allowed by the pinch gesture, if the value is `undefined` maxScale value will be infered
+based on `cropSize` and `resolution` properties in a such way maxScale is a value just before your content
+starts to pixelate.
 
 ### panMode
 

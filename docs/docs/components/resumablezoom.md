@@ -26,7 +26,7 @@ Its usage is pretty straight forward, just wrap a component of your choice with 
 
 ::: tip Remember
 
-- This component uses `flex: 1` therefore it will attempt to take all available space.
+- This component uses `flex: 1` style therefore it will attempt to take all available space.
 - This component is best utilized when at least one of the two dimensions of the wrapped component is bigger than equals the space it's occupying in the screen, for instance if it's a full screen image detail screen, your image should be as wide or as tall as the size of your screen.
   :::
 
@@ -81,7 +81,7 @@ All properties for this component are optional.
 
 By default the gesture detection area is the same size as the width and height of the wrapped component,
 by setting this property to `true` the detection area is increased to the size `ResumableZoom` is taking
-on screen, see [this picture](../assets/extendgestures.jpg) for a visual reference.
+on screen, see [this picture](/extendgestures.jpg) for a visual reference.
 
 ### minScale
 
@@ -99,7 +99,9 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 
 Maximum scale value allowed by the pinch gesture, expects values bigger than or equals one.
 
-Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`; this will instruct the component to calculate `maxScale` in such a way it's a value just before images and videos start getting pixelated.
+Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`;
+this will instruct the component to calculate `maxScale` in such a way it's a value just before your content
+starts to pixelate.
 
 ### panMode
 
@@ -112,8 +114,8 @@ enclosing it, possible values are:
 
 - `clamp` prevents the user from dragging the component out of its enclosing container boundaries.
 - `free` lets the user drag the component around freely, if the pan gesture ends in an out of bounds position
-  it will animate back to a position with the boundaries of its enclosing container.
-- `friction` is the same as `free`mode, however it just adds some amount of friction as you pan.
+  it will animate back to a position within the boundaries of its enclosing container.
+- `friction` is the same as `free`mode, however it adds some amount of friction as you pan.
 
 ### scaleMode
 
@@ -149,8 +151,8 @@ to user interaction. Panning as you pinch will not trigger any pan gesture relat
 | ------------------- | --------- |
 | `'clamp' \| 'sync'` | `'clamp'` |
 
-::: tip Tip
-This property is meant to be used when `allowPinchPanning` property is set to `true`.
+::: tip Requirements
+Requires `allowPinchPanning` property is set to `true`.
 :::
 
 Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
@@ -207,11 +209,9 @@ Callback triggered when the user taps the wrapped component once.
 | ---------------------------------------------------------- | ----------- |
 | `(direction: 'up' \| 'down' \| 'left' \| 'right') => void` | `undefined` |
 
-::: tip Trigger Conditions
-
-- `panMode` must be set to `'clamp'` (default value).
-- Edges of the wrapped component must be in contact with the edges of `ResumableZoom`.
-  :::
+::: tip Requirements
+Requires `panMode` property is set to `'clamp'`.
+:::
 
 Callback triggered when the user swipes up, down, left or right.
 
