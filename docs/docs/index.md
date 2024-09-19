@@ -17,15 +17,15 @@ hero:
 
 features:
   - title: SnapbackZoom
-    details: An ideal component for "pinch to zoom" preview handling.
+    details: An ideal component for zoomable preview handling.
     link: /components/snapbackzoom
 
   - title: ResumableZoom
-    details: Pick up where you left! A handy component for detail and gallery screens.
+    details: Pick up where you left! A handy component for detail screens.
     link: /components/resumablezoom
 
   - title: CropZoom
-    details: An ideal and unopinionated component for image and video cropping needs.
+    details: An unopinionated component for image and video cropping needs.
     link: /components/cropzoom
 
   - title: Gallery
