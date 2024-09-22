@@ -136,12 +136,6 @@ defined by `minScale` and `maxScale` properties, possible values are:
 | --------- | ------- |
 | `boolean` | `true`  |
 
-::: warning Beware iOS users
-This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
-
-For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
-:::
-
 Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
 to user interaction. Panning as you pinch will not trigger any pan gesture related callbacks.
 
@@ -274,7 +268,7 @@ values to some other component as it updates, see [CommonZoomState](#commonzooms
 | `() => void` | `undefined` |
 
 Callback triggered when a pan, pinch or double tap gesture ends, if an animation started at the end of one
-of the gestures this callback's execution will be delayed until the animation has finished.
+of the gestures the execution of this callback will be delayed until such animation finishes.
 
 ## Methods
 
@@ -290,7 +284,9 @@ import {
 const ref = useRef<ResumableZoomType>(null);
 ref.current?.reset(false);
 
-<ResumableZoom ref={ref}>// some component here</ResumableZoom>;
+<ResumableZoom ref={ref}>
+  <SomeComponent />
+</ResumableZoom>;
 ```
 
 ### reset

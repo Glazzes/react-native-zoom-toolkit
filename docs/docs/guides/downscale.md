@@ -11,7 +11,7 @@ current zoom scale, something like a map marker for instance, so let's take a lo
 ## How to
 
 All elements within a zoom component will be scaled equally, so what you need is to perform the inverse process
-in such a way the zoom scale from the parent component is cancelled out by our downscale process, let's set up
+in such a way the zoom scale from the parent component is "cancelled out" by our downscale process, let's set up
 our custom downscale component.
 
 ```tsx{9,15}
@@ -104,6 +104,9 @@ const { onUpdate, state } = useTransformationState('resumable');
 ```
 
 :::
+
+In case you're not trying to mirror the current zoom component's state, I'd always recommend going with the
+manual approach.
 
 This is pretty much it, you can expand this basic setup to your particular requirements.
 

@@ -4,6 +4,7 @@ outline: deep
 ---
 
 # Installation
+
 Install `react-native-zoom-toolkit` in your project
 
 ::: code-group
@@ -19,13 +20,14 @@ yarn add react-native-zoom-toolkit
 :::
 
 ### Dependencies
-This library relies on both Reanimated and Gesture Handler being part of your project, if you do not have them installed already please refer to [Reanimated](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/) and [Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation) installation guides.
 
-::: warning Beware iOS users
-Dragging the components around as you pinch is disabled by default for iOS users unless you install a version of Gesture Handler greater than equals `2.16.0`.
+This library relies on both Reanimated and Gesture Handler making part of your project, if you do not have them installed already please refer to [Reanimated](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/) and [Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation) installation guides.
 
-For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
-:::
+::: tip Recommended Versions
+
+- Recommended versions for react-native-gesture-handler are `2.16.0` and above, previous versions
+  may or may not work.
+  :::
 
 ::: code-group
 
@@ -44,4 +46,5 @@ npx expo install react-native-gesture-handler react-native-reanimated
 :::
 
 ### Additional Setup
+
 No additional setup is required.
