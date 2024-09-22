@@ -1,3 +1,4 @@
+import { Dimensions } from 'react-native';
 import {
   useDerivedValue,
   useSharedValue,
@@ -18,27 +19,52 @@ type StateSelection<T extends ComponentSelection, S> = T extends 'snapback'
   ? CropZoomState<S>
   : CommonZoomState<S>;
 
-type TransformNames =
-  | 'translateX'
-  | 'translateY'
-  | 'scale'
-  | 'rotate'
-  | 'rotateX'
-  | 'rotateY';
+type TransformNames = 'matrix' | 'translateX' | 'translateY';
 
-type Transformations = { [Name in TransformNames]: number };
+type Matrix4x4 = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+];
+
+type Transformations = {
+  [Name in TransformNames]: Name extends 'matrix' ? Matrix4x4 : number;
+};
+
 type Transforms3d =
+  | Pick<Transformations, 'matrix'>
   | Pick<Transformations, 'translateX'>
-  | Pick<Transformations, 'translateY'>
-  | Pick<Transformations, 'scale'>
-  | Pick<Transformations, 'rotate'>
-  | Pick<Transformations, 'rotateX'>
-  | Pick<Transformations, 'rotateY'>;
+  | Pick<Transformations, 'translateY'>;
 
 type TransformationState<T extends ComponentSelection> = {
   onUpdate: (state: StateSelection<T, number>) => void;
   state: StateSelection<T, SharedValue<number>>;
   transform: Readonly<SharedValue<Transforms3d[]>>;
+};
+
+const { width, height } = Dimensions.get('window');
+const initialPosition = -1 * Math.max(width, height);
+
+const createIdentity = () => {
+  return [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+  ].flat(1) as unknown as Matrix4x4;
 };
 
 export const useTransformationState = <T extends ComponentSelection>(
@@ -48,20 +74,39 @@ export const useTransformationState = <T extends ComponentSelection>(
   const translate = useVector(0, 0);
   const scale = useSharedValue<number>(1);
 
-  const xy = useVector(0, 0);
+  const xy = useVector(initialPosition, initialPosition);
   const resize = useSizeVector(0, 0);
 
   const rotate = useVector(0, 0);
   const rotation = useSharedValue<number>(0);
 
+  const base = createIdentity();
+  const rotateX = createIdentity();
+  const rotateY = createIdentity();
+
+  // Matrices taken from https://stackoverflow.com/questions/77616182/x-rotation-looks-weird
   const transform = useDerivedValue<Transforms3d[]>(() => {
+    base[0] = scale.value * Math.cos(rotation.value);
+    base[1] = -1 * Math.sin(rotation.value);
+    base[4] = Math.sin(rotation.value);
+    base[5] = scale.value * Math.cos(rotation.value);
+
+    rotateY[0] = Math.cos(rotate.y.value);
+    rotateY[2] = Math.sin(rotate.y.value);
+    rotateY[8] = -1 * Math.sin(rotate.y.value);
+    rotateY[10] = Math.cos(rotate.y.value);
+
+    rotateX[5] = Math.cos(rotate.x.value);
+    rotateX[6] = -1 * Math.sin(rotate.x.value);
+    rotateX[9] = Math.sin(rotate.x.value);
+    rotateX[10] = Math.cos(rotate.x.value);
+
     return [
       { translateX: translate.x.value },
       { translateY: translate.y.value },
-      { scale: scale.value },
-      { rotate: rotation.value },
-      { rotateX: rotate.x.value },
-      { rotateY: rotate.y.value },
+      { matrix: base },
+      { matrix: rotateY },
+      { matrix: rotateX },
     ];
   }, [translate, scale, rotation, rotate]);
 
