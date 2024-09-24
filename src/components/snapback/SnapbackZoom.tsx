@@ -73,6 +73,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   }, [childrenSize, position, containerSize, resizeConfig, translate, scale]);
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled)
     .onTouchesMove((e) => {
@@ -87,11 +88,13 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onStart((e) => {
       onPinchStart && runOnJS(onPinchStart)(e);
 
-      const measuremet = measure(containerRef)!;
-      containerSize.width.value = measuremet.width;
-      containerSize.height.value = measuremet.height;
-      position.x.value = measuremet.pageX;
-      position.y.value = measuremet.pageY;
+      const measuremet = measure(containerRef);
+      if (measuremet !== null) {
+        containerSize.width.value = measuremet.width;
+        containerSize.height.value = measuremet.height;
+        position.x.value = measuremet.pageX;
+        position.y.value = measuremet.pageY;
+      }
 
       initialFocal.x.value = currentFocal.x.value;
       initialFocal.y.value = currentFocal.y.value;
@@ -121,6 +124,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     });
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
@@ -128,6 +132,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
+    .withTestId('doubleTap')
     .enabled(gesturesEnabled)
     .numberOfTaps(2)
     .maxDuration(250)

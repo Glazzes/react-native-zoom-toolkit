@@ -20,7 +20,6 @@ import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 import type { BoundsFuction } from '../../commons/types';
 
@@ -50,7 +49,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale,
     scaleMode = 'bounce',
     panMode = 'free',
-    allowPinchPanning: pinchPanning,
+    allowPinchPanning = true,
     onUpdate,
     onGestureEnd,
     OverlayComponent,
@@ -60,8 +59,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onTap,
   } = props;
-
-  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
@@ -168,12 +165,14 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .withTestId('pan')
     .enabled(gesturesEnabled)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -181,6 +180,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)

@@ -20,7 +20,6 @@ import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
@@ -51,7 +50,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     panMode = 'clamp',
     scaleMode = 'bounce',
     pinchCenteringMode = 'clamp',
-    allowPinchPanning: pinchPanning,
+    allowPinchPanning = true,
     onTap,
     onUpdate,
     onGestureEnd,
@@ -62,8 +61,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onPanEnd: onUserPanEnd,
     onOverPanning,
   } = props;
-
-  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
   const rootSize = useSizeVector(1, 1);
   const childSize = useSizeVector(1, 1);
@@ -177,6 +174,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .enabled(pinchEnabled)
     .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
@@ -184,6 +182,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .withTestId('pan')
     .enabled(panEnabled && gesturesEnabled)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -191,6 +190,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
@@ -201,6 +201,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     });
 
   const doubleTap = Gesture.Tap()
+    .withTestId('doubleTap')
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
@@ -296,8 +297,12 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   return (
     <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
       <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[detectorStyle, styles.center]}>
-          <Animated.View style={childStyle} onLayout={measureChild}>
+        <Animated.View testID={'root'} style={[detectorStyle, styles.center]}>
+          <Animated.View
+            testID={'child'}
+            style={childStyle}
+            onLayout={measureChild}
+          >
             {children}
           </Animated.View>
         </Animated.View>
