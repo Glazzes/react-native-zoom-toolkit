@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
+  Dimensions,
   View,
   StyleSheet,
   Image,
@@ -31,8 +32,12 @@ const ResumableZoomExample: React.FC = ({}) => {
   const translateY = useSharedValue<number>(0);
 
   useEffect(() => {
-    ref.current?.reset(false);
-  }, [width, height]);
+    const sub = Dimensions.addEventListener('change', () => {
+      ref.current?.reset(false);
+    });
+
+    return () => sub.remove();
+  }, [ref]);
 
   if (isFetching || resolution === undefined) {
     return null;
@@ -43,7 +48,7 @@ const ResumableZoomExample: React.FC = ({}) => {
   const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
     aspectRatio: resolution.width / resolution.height,
     width: isPortrait ? width : undefined,
-    height: isPortrait ? undefined : height,
+    height: !isPortrait ? height : undefined,
   });
 
   const onTap = () => {

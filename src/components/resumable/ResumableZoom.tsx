@@ -23,23 +23,25 @@ import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
-  ResumableZoomProps,
-  ResumableZoomType,
-  ResumableZoomAssignableState,
-} from './types';
-import type {
   BoundsFuction,
   CommonZoomState,
   Vector,
 } from '../../commons/types';
+import type {
+  ResumableZoomProps,
+  ResumableZoomType,
+  ResumableZoomAssignableState,
+} from './types';
 
-type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
+type ResumableZoomPropsWithRef = ResumableZoomProps & {
+  reference?: React.ForwardedRef<ResumableZoomType>;
+};
 
-const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
-  const ref = (props as any).reference as ResumableReference;
-
+const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
   const {
+    reference,
     children,
+    style,
     extendGestures = false,
     decay = true,
     tapsEnabled = true,
@@ -284,7 +286,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     set(toX, toY, toScale, true);
   };
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle(reference, () => ({
     reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
@@ -295,7 +297,10 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const composedGesture = Gesture.Race(pinch, pan, composedTap);
 
   return (
-    <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
+    <GestureHandlerRootView
+      style={[style ?? styles.flex, styles.center]}
+      onLayout={measureRoot}
+    >
       <GestureDetector gesture={composedGesture}>
         <Animated.View testID={'root'} style={[detectorStyle, styles.center]}>
           <Animated.View
@@ -312,10 +317,8 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
-  root: {
+  flex: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   center: {
     justifyContent: 'center',

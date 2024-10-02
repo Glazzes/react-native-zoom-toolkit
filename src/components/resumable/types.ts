@@ -1,4 +1,6 @@
 import type React from 'react';
+import type { ViewStyle } from 'react-native';
+
 import type {
   CommonResumableProps,
   CommonZoomState,
@@ -17,6 +19,7 @@ export type ResumableZoomAssignableState = Omit<
 >;
 
 export type ResumableZoomProps = Partial<{
+  style: ViewStyle;
   decay: boolean;
   extendGestures: boolean;
   tapsEnabled: boolean;
