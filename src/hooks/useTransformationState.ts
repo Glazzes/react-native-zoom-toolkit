@@ -58,15 +58,6 @@ type TransformationState<T extends ComponentSelection> = {
 const { width, height } = Dimensions.get('window');
 const initialPosition = -1 * Math.max(width, height);
 
-const createIdentity = () => {
-  return [
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-  ].flat(1) as unknown as Matrix4x4;
-};
-
 export const useTransformationState = <T extends ComponentSelection>(
   param: T
 ): TransformationState<T> => {
@@ -80,33 +71,47 @@ export const useTransformationState = <T extends ComponentSelection>(
   const rotate = useVector(0, 0);
   const rotation = useSharedValue<number>(0);
 
-  const base = createIdentity();
-  const rotateX = createIdentity();
-  const rotateY = createIdentity();
-
   // Matrices taken from https://stackoverflow.com/questions/77616182/x-rotation-looks-weird
   const transform = useDerivedValue<Transforms3d[]>(() => {
-    base[0] = scale.value * Math.cos(rotation.value);
-    base[1] = -1 * Math.sin(rotation.value);
-    base[4] = Math.sin(rotation.value);
-    base[5] = scale.value * Math.cos(rotation.value);
+    const r = rotation.value;
+    const rx = rotate.x.value;
+    const ry = rotate.y.value;
+    const sc = scale.value;
 
-    rotateY[0] = Math.cos(rotate.y.value);
-    rotateY[2] = Math.sin(rotate.y.value);
-    rotateY[8] = -1 * Math.sin(rotate.y.value);
-    rotateY[10] = Math.cos(rotate.y.value);
+    // Precalculated matrix for scale, rotate, rotateX and rotateY transformations.
+    const matrix = [] as unknown as Matrix4x4;
+    matrix[0] = sc * Math.cos(ry) * Math.cos(r);
+    matrix[1] =
+      sc * Math.sin(ry) * Math.sin(rx) * Math.cos(r) -
+      sc * Math.cos(rx) * Math.sin(r);
+    matrix[2] =
+      sc * Math.sin(rx) * Math.sin(r) +
+      sc * Math.sin(ry) * Math.cos(rx) * Math.cos(r);
+    matrix[3] = 0;
 
-    rotateX[5] = Math.cos(rotate.x.value);
-    rotateX[6] = -1 * Math.sin(rotate.x.value);
-    rotateX[9] = Math.sin(rotate.x.value);
-    rotateX[10] = Math.cos(rotate.x.value);
+    matrix[4] = sc * Math.cos(ry) * Math.sin(r);
+    matrix[5] =
+      sc * Math.cos(rx) * Math.cos(r) +
+      sc * Math.sin(ry) * Math.sin(rx) * Math.sin(r);
+    matrix[6] =
+      sc * Math.sin(ry) * Math.cos(rx) * Math.sin(r) -
+      sc * Math.sin(rx) * Math.cos(r);
+    matrix[7] = 0;
+
+    matrix[8] = -1 * Math.sin(ry);
+    matrix[9] = Math.cos(ry) * Math.sin(rx);
+    matrix[10] = Math.cos(ry) * Math.cos(rx);
+    matrix[11] = 0;
+
+    matrix[12] = 0;
+    matrix[13] = 0;
+    matrix[14] = 0;
+    matrix[15] = 1;
 
     return [
       { translateX: translate.x.value },
       { translateY: translate.y.value },
-      { matrix: base },
-      { matrix: rotateY },
-      { matrix: rotateX },
+      { matrix },
     ];
   }, [translate, scale, rotation, rotate]);
 
