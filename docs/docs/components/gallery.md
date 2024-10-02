@@ -190,8 +190,8 @@ Modifies the orientation of the component to vertical mode.
 Maximum scale value allowed by the pinch gesture for all elements, expects values bigger than or equals one.
 
 You can also pass an array as big as the `data` property array containing the resolution of your images/videos,
-for instance `[{width: 1920, height: 1080}, {width: 1000, height: 1000}]`; maxScale is infered in such a way
-it's a value just before your content starts to pixelate.
+for instance `[{width: 1920, height: 1080}, {width: 1000, height: 1000}]`; maxScale will be infered for each
+element in such a way it's a value just before your content starts to pixelate.
 
 ### zoomEnabled
 
@@ -207,12 +207,26 @@ Enables or disables both pinch and double tap gestures.
 | --------- | ------- |
 | `boolean` | `true`  |
 
-::: tip Condition
+Allow the user to go to the next or previous item by tapping the horizontal edges of the gallery, this property
+only works in horizontal mode.
 
-- This property only works in horizontal mode.
+### allowOverflow
+
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `false` |
+
+::: tip Tip
+This property's usage is intended for creating a carousel with zoomable previews, if that's your goal do
+the following:
+
+- Set this property to true.
+- Set `pinchCenetingMode` property to sync.
+- Set `scaleMode` property to bounce.
+- Set `maxScale` property to 1.
   :::
 
-Allow the user to go to the next or previous item by tapping the horizontal edges of the gallery.
+Allow the items of gallery to overflow the container during a pinch gesture.
 
 ### scaleMode
 
@@ -221,23 +235,17 @@ Allow the user to go to the next or previous item by tapping the horizontal edge
 | `'clamp' \| 'bounce'` | `'bounce'` |
 
 Determine how your component must behave when the pinch gesture's scale value exceeds boundaries
-defined by `minScale` and `maxScale` properties, possible values are:
+defined by the minimum scale (1) and `maxScale` property, possible values are:
 
 - `clamp` keeps the scale whithin the already mentioned scale boundaries.
 - `bounce` lets the user scale above and below the scale boundary values, at the end of the pinch gesture
-  the scale value animates back to `minScale` or `maxScale` respectively.
+  the scale value animates back to 1 or `maxScale` respectively.
 
 ### allowPinchPanning
 
 | Type      | Default |
 | --------- | ------- |
 | `boolean` | `true`  |
-
-::: warning Beware iOS users
-This feature is disabled by default for iOS users when a version of React Native Gesture Handler prior to `2.16.0` is installed, installing a version greater than equals `2.16.0` will set the value of this property to `true` by default.
-
-For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
-:::
 
 Lets the user drag the current item around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
@@ -248,7 +256,7 @@ Lets the user drag the current item around as they pinch, it also provides a mor
 | `'clamp' \| 'sync'` | `'clamp'` |
 
 ::: tip Tip
-This property is meant to be used when `allowPinchPanning` property is set to `true`.
+This property does nothing unless `allowPinchPanning` property is set to `true`.
 :::
 
 Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
@@ -281,7 +289,7 @@ Callback triggered when the user taps the current item once, provides additional
 | ------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
 | `(translateY: number, released: boolean) => void` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-::: tip Conditions
+::: tip Trigger Conditions
 
 - Gallery must be on horizontal mode
 - The current item must be at a scale of one.
@@ -356,7 +364,7 @@ values to some other component as it updates, see [CommonZoomState](#commonzooms
 | `() => void` | `undefined` |
 
 Callback triggered when a pan, pinch or double tap gesture ends, if an animation started at the end of one
-of the gestures this callback's execution will be delayed until the animation has finished.
+of the gestures the execution of this callback will be delayed until such animation finishes.
 
 ### onZoomBegin
 
@@ -380,12 +388,13 @@ Callback triggered when component returns back to its original state (scale valu
 | ---------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
 | `(state: GalleryTransitionState) => ViewStyle` | `undefined` | see [worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/worklets/) |
 
-Worklet callback used to modify the scroll animation used by the gallery, keep in mind the following when building a custom transition, see [GalleryTransitionState](#gallerytransitionstate).
+Worklet callback used to modify the scroll animation used by the gallery, keep in mind the following when
+building a custom transition:
 
 - All elements are absolute positioned one on top of another.
-- Use translateX and translateY style properties to position the items to your particular needs.
+- Use `translateX` and `translateY` style properties to position the items to your particular needs.
 
-The base behaviour would look this:
+The base scroll behaviour looks like this:
 
 ```js
 const baseAnimation = (state) => {
@@ -423,16 +432,16 @@ Reset all transformations to their initial state.
 - type definition: `(animate?: boolean) => void`
 - parameter information
 
-| Name      | Type                   | Default | Description                                |
-| --------- | ---------------------- | ------- | ------------------------------------------ |
-| `animate` | `boolean \| undefined` | `true`  | Whether to animate the transition or not . |
+| Name      | Type                   | Description                                                   |
+| --------- | ---------------------- | ------------------------------------------------------------- |
+| `animate` | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
 
 ### requestState
 
 Request internal transformation values of the current item at the moment of the calling
 
-- type definition: `() => ResumableZoomState`;
-- return type: [ResumableZoomState](#resumablezoomstate).
+- type definition: `() => CommonZoomState<number>`;
+- return type: [CommonZoomState](#commonzoomstate).
 
 ### setIndex
 
@@ -464,6 +473,6 @@ Jump to the item at the given index.
 | `index`       | `number`             | Index of an item rendered in the gallery.             |
 | `activeIndex` | `number`             | Index of the currently displayed item on the gallery. |
 | `vertical`    | `boolean`            | Whether the gallery is in vertical mode or not.       |
-| `isScrolling` | `boolean`            | Whether the gallery is being scrolled or not.         |
-| `scroll`      | `number`             | How much the gallery has been scrolled.               |
+| `isScrolling` | `boolean`            | Whether the gallery is actively being scrolled.       |
+| `scroll`      | `number`             | Current scroll value.                                 |
 | `gallerySize` | `SizeVector<number>` | Width and height of the gallery.                      |

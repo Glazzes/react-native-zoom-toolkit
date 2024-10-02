@@ -1,16 +1,12 @@
 import React, { useImperativeHandle } from 'react';
-import { StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
@@ -20,27 +16,28 @@ import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
-import type {
-  ResumableZoomProps,
-  ResumableZoomType,
-  ResumableZoomAssignableState,
-} from './types';
 import type {
   BoundsFuction,
   CommonZoomState,
   Vector,
 } from '../../commons/types';
+import type {
+  ResumableZoomProps,
+  ResumableZoomType,
+  ResumableZoomAssignableState,
+} from './types';
 
-type ResumableReference = React.ForwardedRef<ResumableZoomType> | undefined;
+type ResumableZoomPropsWithRef = ResumableZoomProps & {
+  reference?: React.ForwardedRef<ResumableZoomType>;
+};
 
-const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
-  const ref = (props as any).reference as ResumableReference;
-
+const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
   const {
+    reference,
     children,
+    style,
     extendGestures = false,
     decay = true,
     tapsEnabled = true,
@@ -51,7 +48,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     panMode = 'clamp',
     scaleMode = 'bounce',
     pinchCenteringMode = 'clamp',
-    allowPinchPanning: pinchPanning,
+    allowPinchPanning = true,
     onTap,
     onUpdate,
     onGestureEnd,
@@ -62,8 +59,6 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     onPanEnd: onUserPanEnd,
     onOverPanning,
   } = props;
-
-  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
   const rootSize = useSizeVector(1, 1);
   const childSize = useSizeVector(1, 1);
@@ -177,6 +172,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .enabled(pinchEnabled)
     .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
@@ -184,6 +180,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .withTestId('pan')
     .enabled(panEnabled && gesturesEnabled)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -191,6 +188,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
@@ -201,6 +199,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     });
 
   const doubleTap = Gesture.Tap()
+    .withTestId('doubleTap')
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
@@ -283,7 +282,7 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
     set(toX, toY, toScale, true);
   };
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle(reference, () => ({
     reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
@@ -294,23 +293,25 @@ const ResumableZoom: React.FC<ResumableZoomProps> = (props) => {
   const composedGesture = Gesture.Race(pinch, pan, composedTap);
 
   return (
-    <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
+    <View style={[style ?? styles.flex, styles.center]} onLayout={measureRoot}>
       <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[detectorStyle, styles.center]}>
-          <Animated.View style={childStyle} onLayout={measureChild}>
+        <Animated.View testID={'root'} style={[detectorStyle, styles.center]}>
+          <Animated.View
+            testID={'child'}
+            style={childStyle}
+            onLayout={measureChild}
+          >
             {children}
           </Animated.View>
         </Animated.View>
       </GestureDetector>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  root: {
+  flex: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   center: {
     justifyContent: 'center',

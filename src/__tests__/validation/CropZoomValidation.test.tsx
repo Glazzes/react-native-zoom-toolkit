@@ -8,7 +8,7 @@ import type { SizeVector } from '../../commons/types';
 const cropSize: SizeVector<number> = { width: 100, height: 100 };
 const resolution: SizeVector<number> = { width: 100, height: 200 };
 
-describe('CropZoom Property Tests', () => {
+describe('CropZoom Validation Tests', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });

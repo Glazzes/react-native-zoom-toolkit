@@ -20,7 +20,6 @@ import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 import type { BoundsFuction } from '../../commons/types';
 
@@ -35,14 +34,16 @@ import type {
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
 
+const TAU = Math.PI * 2;
 const RAD2DEG = 180 / Math.PI;
 
-type Reference = React.ForwardedRef<CropZoomType> | undefined;
+type CropZoomPropsWithRef = CropZoomProps & {
+  reference?: React.ForwardedRef<CropZoomType>;
+};
 
-const CropZoom: React.FC<CropZoomProps> = (props) => {
-  const reference = (props as any).reference as Reference;
-
+const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   const {
+    reference,
     children,
     cropSize,
     resolution,
@@ -50,7 +51,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     maxScale: userMaxScale,
     scaleMode = 'bounce',
     panMode = 'free',
-    allowPinchPanning: pinchPanning,
+    allowPinchPanning = true,
     onUpdate,
     onGestureEnd,
     OverlayComponent,
@@ -60,8 +61,6 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onTap,
   } = props;
-
-  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
 
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
@@ -168,12 +167,14 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   });
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .onTouchesMove(onTouchesMove)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .withTestId('pan')
     .enabled(gesturesEnabled)
     .maxPointers(1)
     .onStart(onPanStart)
@@ -181,6 +182,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     .onEnd(onPanEnd);
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
@@ -218,7 +220,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
   const resetTo = (st: CropAssignableState, animate: boolean = true) => {
     translate.x.value = animate ? withTiming(st.translateX) : st.translateX;
     translate.y.value = animate ? withTiming(st.translateY) : st.translateY;
-    scale.value = st.scale;
+    scale.value = animate ? withTiming(st.scale) : st.scale;
     scaleOffset.value = st.scale;
 
     rotate.x.value = animate ? withTiming(st.rotateX) : st.rotateX;
@@ -226,9 +228,9 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     rotation.value = animate
       ? withTiming(st.rotate, undefined, () => {
           canRotate.value = true;
-          rotation.value = rotation.value % (Math.PI * 2);
+          rotation.value = rotation.value % TAU;
         })
-      : st.rotate % (Math.PI * 2);
+      : st.rotate % TAU;
   };
 
   const canRotate = useSharedValue<boolean>(true);
@@ -244,7 +246,7 @@ const CropZoom: React.FC<CropZoomProps> = (props) => {
     const direction = clockwise ? 1 : -1;
     const toAngle = rotation.value + direction * (Math.PI / 2);
     sizeAngle.value = toAngle;
-    cb?.(toAngle % (Math.PI * 2));
+    cb?.(toAngle % TAU);
 
     resetTo(
       {

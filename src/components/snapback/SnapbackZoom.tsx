@@ -34,10 +34,13 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 }) => {
   const containerRef = useAnimatedRef();
 
-  const position = useVector(0, 0);
   const translate = useVector(0, 0);
-  const origin = useVector(0, 0);
   const scale = useSharedValue<number>(1);
+
+  const position = useVector(0, 0);
+  const origin = useVector(0, 0);
+  const initialFocal = useVector(0, 0);
+  const currentFocal = useVector(0, 0);
 
   const containerSize = useSizeVector(
     resizeConfig?.size.width ?? 0,
@@ -51,7 +54,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       height: containerSize.height.value,
       scale: scale.value,
     });
-  }, [resizeConfig, scale, containerSize]);
+  }, [resizeConfig, containerSize, scale]);
 
   useDerivedValue(() => {
     const { width, height } = childrenSize.value;
@@ -67,26 +70,41 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [position, translate, scale, containerSize, childrenSize]);
+  }, [childrenSize, position, containerSize, resizeConfig, translate, scale]);
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .hitSlop(hitSlop)
     .enabled(gesturesEnabled)
+    .onTouchesMove((e) => {
+      if (e.numberOfTouches !== 2) return;
+
+      const one = e.allTouches[0]!;
+      const two = e.allTouches[1]!;
+
+      currentFocal.x.value = (one.absoluteX + two.absoluteX) / 2;
+      currentFocal.y.value = (one.absoluteY + two.absoluteY) / 2;
+    })
     .onStart((e) => {
       onPinchStart && runOnJS(onPinchStart)(e);
 
-      const measuremet = measure(containerRef)!;
-      containerSize.width.value = measuremet.width;
-      containerSize.height.value = measuremet.height;
-      position.x.value = measuremet.pageX;
-      position.y.value = measuremet.pageY;
+      const measuremet = measure(containerRef);
+      if (measuremet !== null) {
+        containerSize.width.value = measuremet.width;
+        containerSize.height.value = measuremet.height;
+        position.x.value = measuremet.pageX;
+        position.y.value = measuremet.pageY;
+      }
+
+      initialFocal.x.value = currentFocal.x.value;
+      initialFocal.y.value = currentFocal.y.value;
 
       origin.x.value = e.focalX - containerSize.width.value / 2;
       origin.y.value = e.focalY - containerSize.height.value / 2;
     })
     .onUpdate((e) => {
-      const deltaX = e.focalX - containerSize.width.value / 2 - origin.x.value;
-      const deltaY = e.focalY - containerSize.height.value / 2 - origin.y.value;
+      const deltaX = currentFocal.x.value - initialFocal.x.value;
+      const deltaY = currentFocal.y.value - initialFocal.y.value;
 
       const toX = -1 * (origin.x.value * e.scale - origin.x.value) + deltaX;
       const toY = -1 * (origin.y.value * e.scale - origin.y.value) + deltaY;
@@ -106,6 +124,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     });
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(1)
@@ -113,6 +132,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
+    .withTestId('doubleTap')
     .enabled(gesturesEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
@@ -143,7 +163,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
         { scale: scale.value },
       ],
     };
-  }, [resizeConfig, containerSize, childrenSize, translate, scale]);
+  }, [childrenSize, translate, scale]);
 
   const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
 

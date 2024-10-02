@@ -1,3 +1,4 @@
+import type React from 'react';
 import type {
   EasingFunction,
   EasingFunctionFactory,
@@ -31,15 +32,13 @@ export type SnapbackZoomState<T> = {
   resizedHeight: T | undefined;
 } & CommonZoomState<T>;
 
-export type SnapBackZoomProps = React.PropsWithChildren<
-  Partial<{
-    resizeConfig: ResizeConfig;
-    gesturesEnabled: boolean;
-    onGestureEnd: () => void;
-    onUpdate: (e: SnapbackZoomState<number>) => void;
-    hitSlop: HitSlop;
-    timingConfig: TimingConfig;
-  }>
-> &
+export type SnapBackZoomProps = { children: React.ReactNode } & Partial<{
+  resizeConfig: ResizeConfig;
+  gesturesEnabled: boolean;
+  onGestureEnd: () => void;
+  onUpdate: (e: SnapbackZoomState<number>) => void;
+  hitSlop: HitSlop;
+  timingConfig: TimingConfig;
+}> &
   PinchGestureCallbacks &
   TapGestureCallbacks;

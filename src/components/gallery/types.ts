@@ -32,6 +32,7 @@ export type GalleryProps<T = unknown> = {
   initialIndex?: number;
   windowSize?: number;
   vertical?: boolean;
+  allowOverflow?: boolean;
   tapOnEdgeToItem?: boolean;
   zoomEnabled?: boolean;
   scaleMode?: ScaleMode;

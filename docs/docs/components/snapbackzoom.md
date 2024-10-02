@@ -8,13 +8,15 @@ outline: deep
 
 An ideal component for preview handling, as its name suggests it returns to its original position after the pinch gesture ends, you can see this feature being implemented in Telegram's messages containing images and/or videos or Instragram's posts.
 
-::: warning Beware iOS users
-This component will be subject to some level of stuttering, unless you install a version of React Native Gesture Handler greater than equals `2.16.0`.
+The next video footage is a complex use case, this one is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
 
-For more information see this [Gesture Handler's issue](https://github.com/software-mansion/react-native-gesture-handler/issues/2833) and [this issue](https://github.com/Glazzes/react-native-zoom-toolkit/issues/10).
+::: warning What this component is not
+
+This component turns its child component into a zoomable one, that's all, this component nor any component has the
+ability to bypass zIndex and overflow style's restrictions, it's ability to go over other elements relies
+completely on you and how you structured your layout to handle such use case.
+
 :::
-
-The next video footage represents a complex use case, this one is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example)
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/snapbackzoom.mp4" controls />
@@ -24,24 +26,25 @@ The next video footage represents a complex use case, this one is taken from the
 
 Its usage is pretty straight forward, just wrap a component of your choice with it.
 
-::: tip Child Componenet Guidelines
+::: tip Child Component Guidelines
 SnapbackZoom's child component must be measurable, therefore avoid the following:
 
 - Do not use relative size units like `{width: '100%'}`, use absolute values instead, for instance
   `{width: 200, height: 200}`.
 - Do not use `{position: 'absolute'}` style, wrap SnapbackZoom in an absolute positioned view if you need to.
-:::
+  :::
 
 ```jsx
 import { SnapbackZoom } from "react-native-zoom-toolkit"
 
 // Simple use case
 <SnapbackZoom>
-  <Image // <= This could be an Expo image or a Video
+  <Image
     source={{ uri: IMAGE }}
     style={{ width: 200, height: 200 }}
-    resizeMethod={"scale"} // <= Very important for images in Android do not forget it
-    resizeMode={"cover"}/>
+    resizeMethod={"scale"}
+    resizeMode={"cover"}
+  />
 </SnapbackZoom>
 
 // Complex use case
@@ -56,12 +59,14 @@ import { SnapbackZoom } from "react-native-zoom-toolkit"
     'worklet';
      console.log(e);
   }}
-  onGestureEnd={() => console.log('animation finished!')}>
-    <Image // <= This could be an Expo image or a Video
+  onGestureEnd={() => console.log('animation finished!')}
+>
+    <Image
       source={{ uri: IMAGE }}
       style={{ width: 200, height: 200 }}
-      resizeMethod={"scale"} // <= Very important for images in Android do not forget it
-      resizeMode={"cover"}/>
+      resizeMethod={"scale"}
+      resizeMode={"cover"}
+    />
 </SnapbackZoom>
 ```
 

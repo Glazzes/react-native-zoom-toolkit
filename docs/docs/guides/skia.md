@@ -87,7 +87,7 @@ const App = () => {
             Center of transformation must match the center of
             the image, by default the tranformation center is
             located at the top left corner of the image, x and y
-            properties to be exact.
+            properties to be precise.
           */}
           origin={vec(centerX, centerY)}
         />
@@ -158,7 +158,7 @@ const App = () => {
           extendGestures={true}
           onUpdate={onUpdate}
         >
-          {/* Nested child is the same as the Skia image */}
+          {/* Nested child is the same size as the Skia image */}
           <View style={{ width: imageSize.width, height: imageSize.height }} />
         </ResumableZoom>
       </View>

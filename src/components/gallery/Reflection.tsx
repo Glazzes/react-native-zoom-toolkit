@@ -41,6 +41,7 @@ type ReflectionProps = {
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
+  allowOverflow: boolean;
   zoomEnabled: boolean;
   scaleMode: ScaleMode;
   pinchCenteringMode: PinchCenteringMode;
@@ -67,6 +68,7 @@ const Reflection = ({
   tapOnEdgeToItem,
   zoomEnabled,
   scaleMode,
+  allowOverflow,
   allowPinchPanning,
   pinchCenteringMode,
   onTap,
@@ -88,6 +90,8 @@ const Reflection = ({
     rootChildSize,
     translate,
     scale,
+    overflow,
+    hideAdjacentItems,
   } = useContext(GalleryContext);
 
   const offset = useVector(0, 0);
@@ -189,6 +193,12 @@ const Reflection = ({
     [rootSize]
   );
 
+  const onGestueEndWrapper = () => {
+    overflow.value = 'hidden';
+    hideAdjacentItems.value = false;
+    onGestureEnd?.();
+  };
+
   const {
     gesturesEnabled,
     onTouchesMove,
@@ -210,7 +220,7 @@ const Reflection = ({
     userCallbacks: {
       onPinchStart: onUserPinchStart,
       onPinchEnd: onUserPinchEnd,
-      onGestureEnd,
+      onGestureEnd: onGestueEndWrapper,
     },
   });
 
@@ -226,13 +236,22 @@ const Reflection = ({
   });
 
   const pinch = Gesture.Pinch()
+    .withTestId('pinch')
     .enabled(zoomEnabled)
     .onTouchesMove(onTouchesMove)
-    .onStart(onPinchStart)
+    .onStart((e) => {
+      if (allowOverflow) {
+        overflow.value = 'visible';
+        hideAdjacentItems.value = true;
+      }
+
+      onPinchStart(e);
+    })
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
   const pan = Gesture.Pan()
+    .withTestId('pan')
     .maxPointers(1)
     .enabled(gesturesEnabled)
     .onStart((e) => {
@@ -322,6 +341,7 @@ const Reflection = ({
     });
 
   const tap = Gesture.Tap()
+    .withTestId('tap')
     .enabled(gesturesEnabled)
     .numberOfTaps(1)
     .maxDuration(250)
@@ -364,6 +384,7 @@ const Reflection = ({
     });
 
   const doubleTap = Gesture.Tap()
+    .withTestId('doubleTap')
     .enabled(gesturesEnabled && zoomEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
@@ -408,6 +429,7 @@ export default React.memo(Reflection, (prev, next) => {
     prev.zoomEnabled === next.zoomEnabled &&
     prev.scaleMode === next.scaleMode &&
     prev.allowPinchPanning === next.allowPinchPanning &&
+    prev.allowOverflow === next.allowOverflow &&
     prev.pinchCenteringMode === next.pinchCenteringMode &&
     prev.onVerticalPull === next.onVerticalPull
   );
