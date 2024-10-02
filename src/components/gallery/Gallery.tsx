@@ -1,16 +1,15 @@
 import React, { useContext, useImperativeHandle, useState } from 'react';
-import { StyleSheet, type LayoutChangeEvent } from 'react-native';
-import {
+import { type LayoutChangeEvent } from 'react-native';
+import Animated, {
   runOnJS,
   useAnimatedReaction,
+  useAnimatedStyle,
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
-import { getPinchPanningStatus } from '../../commons/utils/getPinchPanningStatus';
 
 import Reflection from './Reflection';
 import GalleryItem from './GalleryItem';
@@ -31,11 +30,12 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     windowSize = 5,
     maxScale: userMaxScale = 6,
     vertical = false,
+    allowOverflow = false,
     tapOnEdgeToItem = true,
     zoomEnabled = true,
     scaleMode = 'bounce',
     pinchCenteringMode = 'clamp',
-    allowPinchPanning: pinchPanning,
+    allowPinchPanning = true,
     customTransition,
     onIndexChange,
     onScroll,
@@ -52,10 +52,6 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     onGestureEnd,
   } = props;
 
-  const allowPinchPanning = pinchPanning ?? getPinchPanningStatus();
-  const nextItems = Math.floor(windowSize / 2);
-
-  const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);
   const {
     activeIndex,
     fetchIndex,
@@ -65,7 +61,11 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     translate,
     scale,
     hasZoomed,
+    overflow,
   } = useContext(GalleryContext);
+
+  const nextItems = Math.floor(windowSize / 2);
+  const [scrollIndex, setScrollIndex] = useState<number>(initialIndex);
 
   const itemSize = useDerivedValue(() => {
     return vertical ? rootSize.height.value : rootSize.width.value;
@@ -95,6 +95,16 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     const direction = vertical ? height : width;
     scroll.value = activeIndex.value * direction;
   };
+
+  const animatedStyles = useAnimatedStyle(
+    () => ({
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: overflow.value,
+    }),
+    [overflow]
+  );
 
   useAnimatedReaction(
     () => ({ scroll: scroll.value, itemSize: itemSize.value }),
@@ -181,7 +191,11 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   }));
 
   return (
-    <GestureHandlerRootView style={styles.root} onLayout={measureRoot}>
+    <Animated.View
+      testID={'root'}
+      style={animatedStyles}
+      onLayout={measureRoot}
+    >
       {data.map((item, index) => {
         const inLowerHalf = index < scrollIndex - nextItems;
         const inUpperHalf = index > scrollIndex + nextItems;
@@ -210,6 +224,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         tapOnEdgeToItem={tapOnEdgeToItem}
         zoomEnabled={zoomEnabled}
         scaleMode={scaleMode}
+        allowOverflow={allowOverflow}
         allowPinchPanning={allowPinchPanning}
         pinchCenteringMode={pinchCenteringMode}
         onTap={onTap}
@@ -221,17 +236,8 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         onVerticalPull={onVerticalPull}
         onGestureEnd={onGestureEnd}
       />
-    </GestureHandlerRootView>
+    </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-});
 
 export default Gallery;

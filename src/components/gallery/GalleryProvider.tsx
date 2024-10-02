@@ -5,14 +5,13 @@ import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 
-import type { GalleryProps, GalleryType } from './types';
-
 import Gallery from './Gallery';
 import { GalleryContext, type GalleryContextType } from './context';
+import type { GalleryProps, GalleryType } from './types';
 
 const GalleryProvider = <T extends unknown>(
   props: GalleryProps<T>,
-  ref: React.ForwardedRef<GalleryType>
+  ref?: React.ForwardedRef<GalleryType>
 ) => {
   const startIndex = clamp(props.initialIndex ?? 0, 0, props.data.length - 1);
   const activeIndex = useSharedValue<number>(startIndex);
@@ -29,6 +28,8 @@ const GalleryProvider = <T extends unknown>(
   const isScrolling = useSharedValue<boolean>(false);
 
   const hasZoomed = useSharedValue<boolean>(false);
+  const overflow = useSharedValue<'hidden' | 'visible'>('hidden');
+  const hideAdjacentItems = useSharedValue<boolean>(false);
 
   const context: GalleryContextType = {
     rootSize,
@@ -41,6 +42,8 @@ const GalleryProvider = <T extends unknown>(
     isScrolling,
     scale,
     hasZoomed,
+    overflow,
+    hideAdjacentItems,
   };
 
   return (
@@ -51,7 +54,7 @@ const GalleryProvider = <T extends unknown>(
 };
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
-  ref: React.ForwardedRef<GalleryType>;
+  ref?: React.ForwardedRef<GalleryType>;
 };
 
 export default forwardRef(GalleryProvider) as <T>(

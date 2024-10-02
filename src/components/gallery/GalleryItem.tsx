@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, type LayoutChangeEvent } from 'react-native';
+import { type LayoutChangeEvent } from 'react-native';
 import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
@@ -36,6 +36,8 @@ const GalleryItem = ({
     isScrolling,
     translate,
     scale,
+    overflow,
+    hideAdjacentItems,
   } = useContext(GalleryContext);
 
   const innerSize = useSizeVector(0, 0);
@@ -61,6 +63,19 @@ const GalleryItem = ({
       ],
     };
   }, [innerTranslate, innerScale]);
+
+  const animatedRootStyles = useAnimatedStyle(
+    () => ({
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'absolute',
+      overflow: overflow.value,
+      opacity: activeIndex.value !== index && hideAdjacentItems.value ? 0 : 1,
+    }),
+    [overflow, activeIndex, index, hideAdjacentItems]
+  );
 
   const transitionStyle = useAnimatedStyle(() => {
     if (customTransition !== undefined) {
@@ -121,24 +136,16 @@ const GalleryItem = ({
   );
 
   return (
-    <Animated.View style={[styles.root, transitionStyle, { zIndex }]}>
+    <Animated.View
+      testID={`child-${index}`}
+      style={[animatedRootStyles, transitionStyle, { zIndex }]}
+    >
       <Animated.View style={childStyle} onLayout={measureChild}>
         {renderItem(item, index)}
       </Animated.View>
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    overflow: 'hidden',
-  },
-});
 
 export default React.memo(GalleryItem, (prev, next) => {
   return (

@@ -13,6 +13,8 @@ export type GalleryContextType = {
   fetchIndex: SharedValue<number>;
   isScrolling: SharedValue<boolean>;
   hasZoomed: SharedValue<boolean>;
+  overflow: SharedValue<'hidden' | 'visible'>;
+  hideAdjacentItems: SharedValue<boolean>;
 };
 
 export const GalleryContext = React.createContext<GalleryContextType>(
