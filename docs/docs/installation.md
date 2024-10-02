@@ -25,8 +25,8 @@ This library relies on both Reanimated and Gesture Handler making part of your p
 
 ::: tip Recommended Versions
 
-- Recommended versions for react-native-gesture-handler are `2.16.0` and above, previous versions
-  may or may not work.
+- Recommended versions for react-native-gesture-handler are `2.16.0` and above, previous versions should work
+  well but it's not guaranteed.
   :::
 
 ::: code-group

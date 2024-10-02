@@ -210,6 +210,24 @@ Enables or disables both pinch and double tap gestures.
 Allow the user to go to the next or previous item by tapping the horizontal edges of the gallery, this property
 only works in horizontal mode.
 
+### allowOverflow
+
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `false` |
+
+::: tip Tip
+This property's usage is intended for creating a carousel with zoomable previews, if that's your goal do
+the following:
+
+- Set this property to true.
+- Set `pinchCenetingMode` property to sync.
+- Set `scaleMode` property to bounce.
+- Set `maxScale` property to 1.
+  :::
+
+Allow the items of gallery to overflow the container during a pinch gesture.
+
 ### scaleMode
 
 | Type                  | Default    |

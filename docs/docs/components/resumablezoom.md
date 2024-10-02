@@ -78,9 +78,8 @@ All properties for this component are optional.
 | ----------- | ------------- |
 | `ViewStyle` | `{ flex: 1 }` |
 
-Styles used by the container enclosing your component.
-
-- Enforced styles are `{ justifyContent: 'center', alignItems: 'center' }`, you can not change these ones.
+Styles used by the container enclosing your component. The following styles are enforced by the library and
+can not be modified: `{ justifyContent: 'center', alignItems: 'center' }`.
 
 ### extendGestures
 
