@@ -253,6 +253,7 @@ const Reflection = ({
   const pan = Gesture.Pan()
     .withTestId('pan')
     .maxPointers(1)
+    .minVelocity(100)
     .enabled(gesturesEnabled)
     .onStart((e) => {
       onPanStart && runOnJS(onPanStart)(e);
