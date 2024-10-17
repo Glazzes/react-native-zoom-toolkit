@@ -31,7 +31,7 @@ This component is best utilized when at least one of the two dimensions of the w
 
 ```jsx
 import React from 'react';
-import { Image, View, useWindowDimensions } from 'react-native';
+import { Image, useWindowDimensions } from 'react-native';
 import {
   ResumableZoom,
   getAspectRatioSize,
@@ -57,11 +57,9 @@ const App = () => {
   });
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ResumableZoom maxScale={resolution}>
-        <Image source={{ uri }} style={imageSize} resizeMethod={'scale'} />
-      </ResumableZoom>
-    </View>
+    <ResumableZoom maxScale={resolution}>
+      <Image source={{ uri }} style={{ ...imageSize }} resizeMethod={'scale'} />
+    </ResumableZoom>
   );
 };
 
