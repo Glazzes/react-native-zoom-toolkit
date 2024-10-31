@@ -3,14 +3,12 @@ import {
   View,
   useWindowDimensions,
   StyleSheet,
-  type CellRendererProps,
   type ListRenderItemInfo,
 } from 'react-native';
 import ImageMessage from '../messages/ImageMessage';
 import Appbar from './Appbar';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlashList } from '@shopify/flash-list';
 import { theme } from '../../constants';
-import CellRenderer from '../messages/CellRenderer';
 import Animated, {
   useSharedValue,
   type SharedValue,
@@ -49,7 +47,6 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
     transform: [{ translateY: keyboardTranslateY.value }],
   }));
 
-  // I just add the appbar and text area into a single component for simplicity
   const renderAppbar = useCallback(() => {
     return (
       <View>
@@ -62,34 +59,20 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
         </View>
       </View>
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [height]);
-
-  const cellRenderer = useCallback(
-    (cell: CellRendererProps<string>) => {
-      return (
-        <CellRenderer
-          index={cell.index}
-          activeIndex={activeIndex}
-          children={cell.children}
-        />
-      );
-    },
-    [activeIndex]
-  );
+  }, [height, animatedStyle]);
 
   const renderItem = useCallback(
-    (info: ListRenderItemInfo<string>) => {
-      if (info.index === 1) {
-        return <VideoMessage index={info.index} activeIndex={activeIndex} />;
+    ({ item, index }: ListRenderItemInfo<string>) => {
+      if (index === 1) {
+        return <VideoMessage index={index} activeIndex={activeIndex} />;
       }
 
       return (
         <ImageMessage
-          uri={info.item}
-          index={info.index}
+          uri={item}
+          index={index}
           activeIndex={activeIndex}
-          useResizeConfig={info.index === 2}
+          useResizeConfig={index === 2}
         />
       );
     },
@@ -97,18 +80,15 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
   );
 
   return (
-    <View style={[styles.root]}>
-      <FlatList
+    <View style={styles.root}>
+      <FlashList
         data={images}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        stickyHeaderIndices={[0]}
-        contentContainerStyle={styles.content}
-        automaticallyAdjustKeyboardInsets={true}
-        showsVerticalScrollIndicator={true}
-        ItemSeparatorComponent={seperator}
+        estimatedItemSize={300}
         ListHeaderComponent={renderAppbar}
-        CellRendererComponent={cellRenderer}
+        ItemSeparatorComponent={seperator}
+        contentContainerStyle={styles.content}
       />
     </View>
   );
@@ -122,7 +102,6 @@ const styles = StyleSheet.create({
     height: theme.spacing.m,
   },
   content: {
-    zIndex: 1000,
     paddingBottom: theme.spacing.m + barHeight,
   },
   textArea: {

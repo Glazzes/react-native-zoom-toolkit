@@ -17,6 +17,7 @@ import {
 } from 'react-native-zoom-toolkit';
 import { maxDimension, theme } from '../../constants';
 import { ReflectionContext } from '../reflection/ReflectionContext';
+import CellRenderer from './CellRenderer';
 
 type ImageMessageProps = {
   uri: string;
@@ -64,15 +65,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     padding: theme.spacing.xs / 2,
   }));
 
-  /*
-   * Updates the values seen in Reflection context based on the current dimensions and position
-   * of our message.
-   *
-   * Updates the active index for CellRenderer component to grant a higer zIndex value.
-   *
-   * Makes the current background transparent so it can no be seen, then the reflection takes
-   * its place.
-   */
   const onPinchStart = () => {
     activeIndex.value = index;
 
@@ -91,11 +83,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
     })();
   };
 
-  /*
-   * Sends the reflection out of the screen.
-   * Updates the active index to a negative value so no message's index matches.
-   * changes the background color of this component back to the one it started with.
-   */
   const onGestureEnd = () => {
     backgroundColor.value = theme.colors.userMessage;
     activeIndex.value = -1;
@@ -110,23 +97,25 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <Animated.View ref={animatedRef} style={animatedStyle}>
-        <SnapbackZoom
-          hitSlop={{ vertical: 20, horizontal: 20 }}
-          resizeConfig={useResizeConfig ? resizeConfig : undefined}
-          onPinchStart={onPinchStart}
-          onGestureEnd={onGestureEnd}
-        >
-          <Image
-            source={{ uri }}
-            style={useResizeConfig ? styles.flex : imageStyle}
-            resizeMode="cover"
-            resizeMethod="scale"
-          />
-        </SnapbackZoom>
-      </Animated.View>
-    </View>
+    <CellRenderer index={index} activeIndex={activeIndex}>
+      <View style={styles.container}>
+        <Animated.View ref={animatedRef} style={animatedStyle}>
+          <SnapbackZoom
+            hitSlop={{ vertical: 20, horizontal: 20 }}
+            resizeConfig={useResizeConfig ? resizeConfig : undefined}
+            onPinchStart={onPinchStart}
+            onGestureEnd={onGestureEnd}
+          >
+            <Image
+              source={{ uri }}
+              style={useResizeConfig ? styles.flex : imageStyle}
+              resizeMode="cover"
+              resizeMethod="scale"
+            />
+          </SnapbackZoom>
+        </Animated.View>
+      </View>
+    </CellRenderer>
   );
 };
 
