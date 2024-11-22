@@ -37,5 +37,5 @@ export {
 
 export { useTransformationState } from './hooks/useTransformationState';
 
-export { getAspectRatioSize } from './utils/getAspectRatioSize';
+export { fitContainer } from './utils/fitContainer';
 export { stackTransition } from './commons/misc/stacktransition';
