@@ -4,6 +4,7 @@ import type {
   EasingFunctionFactory,
   ReduceMotion,
 } from 'react-native-reanimated';
+import type { GestureType } from 'react-native-gesture-handler';
 import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 
 import type {
@@ -12,6 +13,11 @@ import type {
   SizeVector,
   TapGestureCallbacks,
 } from '../../commons/types';
+
+export type BlocksGesture =
+  | GestureType
+  | React.RefObject<GestureType | undefined>
+  | React.RefObject<React.ComponentType<{}> | undefined>;
 
 export type TimingConfig = Partial<{
   duration: number;
@@ -39,6 +45,7 @@ export type SnapBackZoomProps = { children: React.ReactNode } & Partial<{
   onUpdate: (e: SnapbackZoomState<number>) => void;
   hitSlop: HitSlop;
   timingConfig: TimingConfig;
+  scrollRef: BlocksGesture;
 }> &
   PinchGestureCallbacks &
   TapGestureCallbacks;
