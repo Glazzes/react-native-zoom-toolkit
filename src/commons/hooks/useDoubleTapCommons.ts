@@ -31,10 +31,9 @@ export const useDoubleTapCommons = ({
   boundsFn,
   onGestureEnd,
 }: DoubleTapOptions) => {
-  const onDoubleTapEnd = (e: TapGestureEvent) => {
+  const onDoubleTapEnd = (event: TapGestureEvent) => {
     'worklet';
 
-    const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
     const originX = event.x - container.width.value / 2;
     const originY = event.y - container.height.value / 2;
     const toScale =

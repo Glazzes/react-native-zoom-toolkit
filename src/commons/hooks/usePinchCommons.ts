@@ -102,8 +102,8 @@ export const usePinchCommons = (options: PinchOptions) => {
     initialFocal.x.value = currentFocal.x.value;
     initialFocal.y.value = currentFocal.y.value;
 
-    origin.x.value = e.focalX / scale.value - container.width.value / 2;
-    origin.y.value = e.focalY / scale.value - container.height.value / 2;
+    origin.x.value = e.focalX - container.width.value / 2;
+    origin.y.value = e.focalY - container.height.value / 2;
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
