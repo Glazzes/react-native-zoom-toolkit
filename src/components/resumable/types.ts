@@ -7,6 +7,7 @@ import type {
   PanGestureCallbacks,
   PinchCenteringMode,
   PinchGestureCallbacks,
+  Rect,
   SizeVector,
   SwipeDirection,
   TapGestureCallbacks,
@@ -40,4 +41,5 @@ export type ResumableZoomType = {
   requestState: () => CommonZoomState<number>;
   assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
   zoom: (accScale: number, xy?: Vector<number>) => void;
+  getVisibleRect: () => Rect;
 };
