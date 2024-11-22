@@ -33,8 +33,8 @@ This component is best utilized when at least one of the two dimensions of the w
 import React from 'react';
 import { Image, useWindowDimensions } from 'react-native';
 import {
+  fitContainer,
   ResumableZoom,
-  getAspectRatioSize,
   useImageResolution,
 } from 'react-native-zoom-toolkit';
 
@@ -42,23 +42,20 @@ const uri =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const App = () => {
-  const { width } = useWindowDimensions();
-
-  // Gets the resolution of your image
+  const { width, height } = useWindowDimensions();
   const { isFetching, resolution } = useImageResolution({ uri });
   if (isFetching || resolution === undefined) {
     return null;
   }
 
-  // An utility function to get the size without compromising the aspect ratio
-  const imageSize = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: width,
+  const size = fitContainer(resolution.width / resolution.height, {
+    width,
+    height,
   });
 
   return (
     <ResumableZoom maxScale={resolution}>
-      <Image source={{ uri }} style={{ ...imageSize }} resizeMethod={'scale'} />
+      <Image source={{ uri }} style={{ ...size }} resizeMethod={'scale'} />
     </ResumableZoom>
   );
 };
@@ -318,12 +315,19 @@ Programmatically zoom in or out to a xy position within the child component.
 | multiplier | `number`                      | Value to multiply the current scale for, values greater than one zoom in and values less than one zoom out.                                                                                                                      |
 | xy         | `Vector<number> \| undefined` | Position of the point to zoom in or out starting from the top left corner of your component, leaving this value as undefined will be infered as zooming in or out from the center of the child component's current visible area. |
 
+### getVisibleRect
+
+Get the coordinates of the current visible rectangle within ResumableZoom's frame.
+
+- type definition: `() => Rect`
+- return type: `{x: number, y: number, width: number, height: number}`
+
 ### requestState
 
 Request internal transformation values of this component at the moment of the calling.
 
 - type definition: `() => CommonZoomState<number>`
-- return type: [CommonZoomState](#commonzoomstate)
+- return type: [CommonZoomState\<number\>](#commonzoomstate)
 
 ### assignState
 

@@ -46,12 +46,12 @@ export default defineConfig({
         text: 'Utilities',
         collapsed: true,
         items: [
+          { text: 'fitContainer', link: '/utilities/fitContainer' },
           { text: 'useImageResolution', link: '/utilities/useimageresolution' },
           {
             text: 'useTransformationState',
             link: '/utilities/usetransformationstate',
           },
-          { text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize' },
         ],
       },
       {
