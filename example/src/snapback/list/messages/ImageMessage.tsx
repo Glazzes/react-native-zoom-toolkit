@@ -2,21 +2,20 @@ import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
 import Animated, {
   measure,
-  runOnUI,
   useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated';
-
 import {
   SnapbackZoom,
   useImageResolution,
-  getAspectRatioSize,
   type ResizeConfig,
+  type SizeVector,
 } from 'react-native-zoom-toolkit';
-import { maxDimension, theme } from '../../constants';
-import { ReflectionContext } from '../reflection/ReflectionContext';
+
+import { maxDimension, theme } from '../../../constants';
+import { ReflectionContext } from '../../context';
 
 type ImageMessageProps = {
   uri: string;
@@ -33,22 +32,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
 }) => {
   const animatedRef = useAnimatedRef();
 
-  const { isFetching, resolution } = useImageResolution({ uri });
-  const aspectRatio = isFetching
-    ? 1
-    : (resolution?.width ?? 1) / (resolution?.height ?? 1);
-
-  const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
-    aspectRatio,
-    width: 250,
-  });
-
-  const resizeConfig: ResizeConfig = {
-    size: { width: 200, height: 200 },
-    aspectRatio,
-    scale: 1.75,
-  };
-
   const {
     width,
     height,
@@ -60,9 +43,26 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
 
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: backgroundColor.value,
-    borderRadius: theme.spacing.s,
+    // borderRadius: theme.spacing.s,
     padding: theme.spacing.xs / 2,
   }));
+
+  const { isFetching, resolution } = useImageResolution({ uri });
+  if (isFetching || resolution === undefined) {
+    return null;
+  }
+
+  const aspectRatio = resolution.width / resolution.height;
+  const size: SizeVector<number> = {
+    width: 250,
+    height: 250 / aspectRatio,
+  };
+
+  const resizeConfig: ResizeConfig = {
+    size: { width: 200, height: 200 },
+    aspectRatio,
+    scale: 1.75,
+  };
 
   /*
    * Updates the values seen in Reflection context based on the current dimensions and position
@@ -74,21 +74,20 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
    * its place.
    */
   const onPinchStart = () => {
+    'worklet';
     activeIndex.value = index;
 
     reflectionColor.value = backgroundColor.value;
-    runOnUI(() => {
-      'worklet';
-      const measurement = measure(animatedRef);
-      if (measurement) {
-        width.value = measurement.width;
-        height.value = measurement.height;
-        x.value = measurement.pageX;
-        y.value = measurement.pageY;
-      }
 
-      backgroundColor.value = 'transparent';
-    })();
+    const measurement = measure(animatedRef);
+    if (measurement) {
+      width.value = measurement.width;
+      height.value = measurement.height;
+      x.value = measurement.pageX;
+      y.value = measurement.pageY;
+    }
+
+    backgroundColor.value = 'transparent';
   };
 
   /*
@@ -104,9 +103,9 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   };
 
   const imageStyle: ImageStyle = {
-    width: imageWidth,
-    height: imageHeight,
-    borderRadius: theme.spacing.s,
+    width: size.width,
+    height: size.height,
+    // borderRadius: theme.spacing.s,
   };
 
   return (

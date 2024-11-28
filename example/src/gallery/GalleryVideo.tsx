@@ -4,13 +4,13 @@ import { type SharedValue } from 'react-native-reanimated';
 import { ResizeMode, Video, type AVPlaybackStatus } from 'expo-av';
 import type { Asset } from 'expo-media-library';
 
-import { calculateItemSize } from './utils/utils';
 import {
   listenToPauseVideoEvent,
   listenToPlayVideoEvent,
   listenToSeekVideoEvent,
   listenToStopVideoEvent,
 } from './utils/emitter';
+import { fitContainer } from '../../../src/utils/fitContainer';
 
 type GalleryVideoProps = {
   asset: Asset;
@@ -29,13 +29,7 @@ const GalleryVideo: React.FC<GalleryVideoProps> = ({
 }) => {
   const videoRef = useRef<Video>(null);
   const { width, height } = useWindowDimensions();
-
-  const phoneAspectRatio = width / height;
-  const size = calculateItemSize(
-    { width: asset.width, height: asset.height },
-    { width, height },
-    phoneAspectRatio
-  );
+  const size = fitContainer(asset.width / asset.height, { width, height });
 
   const playback = (status: AVPlaybackStatus) => {
     if (status.isLoaded && !isSeeking.value) {

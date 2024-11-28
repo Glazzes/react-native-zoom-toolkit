@@ -1,5 +1,5 @@
 import React from 'react';
-import { SnapbackZoomExample } from '../src/snapback';
+import SnapbackZoomExample from '../src/snapback';
 
 const snapback = () => {
   return <SnapbackZoomExample />;

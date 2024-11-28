@@ -37,7 +37,7 @@ const SVGOverlay: React.FC<SVGOverlayProps> = ({ cropSize }) => {
 
   return (
     <Canvas style={style}>
-      <Path path={path} color={'rgba(0, 0, 0, 0.4)'} />
+      <Path path={path} color={'rgba(0, 0, 0, 0.4)'} fillType={'evenOdd'} />
     </Canvas>
   );
 };

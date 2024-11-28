@@ -1,7 +1,7 @@
 import React, { createContext } from 'react';
-import { useVector } from '../../../../src/commons/hooks/useVector';
+import { useVector } from '../../../src/commons/hooks/useVector';
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
-import { maxDimension, theme } from '../../constants';
+import { maxDimension, theme } from '../constants';
 
 export type Context = {
   width: SharedValue<number>;

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../../constants';
 
 import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { useRouter } from 'expo-router';
+
+import { theme } from '../../../constants';
 
 const barHeight = Constants.statusBarHeight;
 const pictureSize = barHeight * 2 * 0.8;
@@ -36,7 +37,7 @@ const Appbar: React.FC = () => {
 
       <View style={styles.userContainer}>
         <Image
-          source={require('../../../assets/avatar.png')}
+          source={require('../../../../assets/avatar.png')}
           style={styles.profilePicture}
         />
         <View>

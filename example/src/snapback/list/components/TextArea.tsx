@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 
 import Constants from 'expo-constants';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { theme } from '../../constants';
+import { theme } from '../../../constants';
 import Animated from 'react-native-reanimated';
 
 const barHeight = Constants.statusBarHeight;
