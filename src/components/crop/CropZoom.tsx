@@ -7,11 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { crop } from '../../commons/utils/crop';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
@@ -191,15 +187,16 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
 
   const detectorStyle = useAnimatedStyle(() => {
     return {
-      width: detector.width.value * scaleOffset.value,
-      height: detector.height.value * scaleOffset.value,
+      width: detector.width.value,
+      height: detector.height.value,
       position: 'absolute',
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
+        { scale: scale.value },
       ],
     };
-  }, [detector, scaleOffset, translate]);
+  }, [detector, translate, scale]);
 
   const childStyle = useAnimatedStyle(() => {
     return {
@@ -274,19 +271,30 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   };
 
   const handleCrop = (fixedWidth?: number): CropContextResult => {
-    return crop({
+    const context: CropContextResult['context'] = {
+      rotationAngle: rotation.value * RAD2DEG,
+      flipHorizontal: rotate.y.value === Math.PI,
+      flipVertical: rotate.x.value === Math.PI,
+    };
+
+    const result = crop({
+      scale: scale.value,
       cropSize: cropSize,
       resolution: resolution,
-      canvas: { width: container.width.value, height: container.height.value },
-      offset: { x: translate.x.value, y: translate.y.value },
-      scale: scale.value,
-      context: {
-        rotationAngle: rotation.value * RAD2DEG,
-        flipHorizontal: rotate.y.value === Math.PI,
-        flipVertical: rotate.x.value === Math.PI,
+      itemSize: {
+        width: container.width.value,
+        height: container.height.value,
       },
+      translation: { x: translate.x.value, y: translate.y.value },
+      isRotated: context.rotationAngle % 180 !== 0,
       fixedWidth,
     });
+
+    return {
+      crop: result.crop,
+      resize: result.resize,
+      context,
+    };
   };
 
   const handleRequestState = (): CropZoomState<number> => ({
@@ -351,22 +359,15 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     minHeight: cropSize.height,
   };
 
-  const cropStyle: ViewStyle = {
-    width: cropSize.width,
-    height: cropSize.height,
-  };
-
   return (
-    <GestureHandlerRootView style={[rootStyle, styles.root, styles.center]}>
-      <View style={[cropStyle, styles.center]}>
-        <Animated.View style={childStyle}>{children}</Animated.View>
-        <View style={styles.absolute}>{OverlayComponent?.()}</View>
-      </View>
+    <View style={[rootStyle, styles.root, styles.center]}>
+      <Animated.View style={childStyle}>{children}</Animated.View>
+      <View style={styles.absolute}>{OverlayComponent?.()}</View>
 
       <GestureDetector gesture={Gesture.Race(pinch, pan, tap)}>
         <Animated.View style={detectorStyle} />
       </GestureDetector>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 

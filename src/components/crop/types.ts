@@ -67,7 +67,7 @@ export type CropZoomProps = React.PropsWithChildren<{
   onUpdate?: CropGestureEventCallBack;
   OverlayComponent?: () => React.ReactElement<any>;
 }> &
+  CommonResumableProps &
   PanGestureCallbacks &
   PinchGestureCallbacks &
-  Omit<TapGestureCallbacks, 'onDoubleTap'> &
-  CommonResumableProps;
+  Omit<TapGestureCallbacks, 'onDoubleTap'>;
