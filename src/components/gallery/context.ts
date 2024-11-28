@@ -10,7 +10,6 @@ export type GalleryContextType = {
   scroll: SharedValue<number>;
   scrollOffset: SharedValue<number>;
   activeIndex: SharedValue<number>;
-  fetchIndex: SharedValue<number>;
   isScrolling: SharedValue<boolean>;
   hasZoomed: SharedValue<boolean>;
   overflow: SharedValue<'hidden' | 'visible'>;

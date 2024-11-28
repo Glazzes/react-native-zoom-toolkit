@@ -22,20 +22,22 @@ import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 
 import type {
-  PinchCenteringMode,
-  ScaleMode,
   SwipeDirection,
   BoundsFuction,
   PanGestureEvent,
+  ScaleMode,
+  PinchCenteringMode,
 } from '../../commons/types';
 import { GalleryContext } from './context';
 import { type GalleryProps } from './types';
+import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
 
 type ReflectionProps = {
   length: number;
+  gap: number;
   maxScale: SharedValue<number>;
   itemSize: Readonly<SharedValue<number>>;
   vertical: boolean;
@@ -62,6 +64,7 @@ type ReflectionProps = {
  */
 const Reflection = ({
   length,
+  gap,
   maxScale,
   itemSize,
   vertical,
@@ -82,7 +85,6 @@ const Reflection = ({
 }: ReflectionProps) => {
   const {
     activeIndex,
-    fetchIndex,
     scroll,
     scrollOffset,
     isScrolling,
@@ -134,19 +136,34 @@ const Reflection = ({
 
   const snapToScrollPosition = (e: PanGestureEvent) => {
     'worklet';
-    const index = activeIndex.value;
-    const prev = itemSize.value * clamp(index - 1, 0, length - 1);
-    const current = itemSize.value * index;
-    const next = itemSize.value * clamp(index + 1, 0, length - 1);
+
+    cancelAnimation(scroll);
+
+    const prev = getScrollPosition({
+      index: clamp(activeIndex.value - 1, 0, length - 1),
+      itemSize: itemSize.value,
+      gap,
+    });
+    const current = getScrollPosition({
+      index: activeIndex.value,
+      itemSize: itemSize.value,
+      gap,
+    });
+    const next = getScrollPosition({
+      index: clamp(activeIndex.value + 1, 0, length - 1),
+      itemSize: itemSize.value,
+      gap,
+    });
 
     const velocity = vertical ? e.velocityY : e.velocityX;
     const toScroll = snapPoint(scroll.value, velocity, [prev, current, next]);
 
-    if (toScroll !== current)
-      fetchIndex.value = index + (toScroll === next ? 1 : -1);
+    scroll.value = withTiming(toScroll, config, (finished) => {
+      if (!finished) return;
+      if (toScroll !== current) {
+        activeIndex.value += toScroll === next ? 1 : -1;
+      }
 
-    scroll.value = withTiming(toScroll, config, () => {
-      activeIndex.value = fetchIndex.value;
       isScrolling.value = false;
       toScroll !== current && reset(0, 0, minScale, false);
     });
@@ -155,6 +172,8 @@ const Reflection = ({
   const onSwipe = (direction: SwipeDirection) => {
     'worklet';
 
+    cancelAnimation(scroll);
+
     let toIndex = activeIndex.value;
     if (direction === 'up' && vertical) toIndex += 1;
     if (direction === 'down' && vertical) toIndex -= 1;
@@ -162,10 +181,19 @@ const Reflection = ({
     if (direction === 'right' && !vertical) toIndex -= 1;
 
     toIndex = clamp(toIndex, 0, length - 1);
-    if (toIndex === activeIndex.value) return;
+    if (toIndex === activeIndex.value) {
+      return;
+    }
 
-    fetchIndex.value = toIndex;
-    scroll.value = withTiming(toIndex * itemSize.value, config, () => {
+    const newScrollPosition = getScrollPosition({
+      index: toIndex,
+      itemSize: itemSize.value,
+      gap,
+    });
+
+    scroll.value = withTiming(newScrollPosition, config, (finished) => {
+      if (!finished) return;
+
       activeIndex.value = toIndex;
       isScrolling.value = false;
       reset(0, 0, minScale, false);
@@ -193,7 +221,7 @@ const Reflection = ({
     [rootSize]
   );
 
-  const onGestueEndWrapper = () => {
+  const onGestureEndWrapper = () => {
     overflow.value = 'hidden';
     hideAdjacentItems.value = false;
     onGestureEnd?.();
@@ -220,7 +248,7 @@ const Reflection = ({
     userCallbacks: {
       onPinchStart: onUserPinchStart,
       onPinchEnd: onUserPinchEnd,
-      onGestureEnd: onGestueEndWrapper,
+      onGestureEnd: onGestureEndWrapper,
     },
   });
 
@@ -253,11 +281,13 @@ const Reflection = ({
   const pan = Gesture.Pan()
     .withTestId('pan')
     .maxPointers(1)
+    .minVelocity(100)
     .enabled(gesturesEnabled)
     .onStart((e) => {
       onPanStart && runOnJS(onPanStart)(e);
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
+      cancelAnimation(scroll);
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
@@ -287,7 +317,9 @@ const Reflection = ({
       const scrollX = -1 * Math.sign(toX) * exceedX;
       const scrollY = -1 * Math.sign(toY) * exceedY;
       const to = scrollOffset.value + (vertical ? scrollY : scrollX);
-      scroll.value = clamp(to, 0, (length - 1) * itemSize.value);
+
+      const items = length - 1;
+      scroll.value = clamp(to, 0, items * itemSize.value + items * gap);
 
       translate.x.value = clamp(toX, -1 * boundX, boundX);
       translate.y.value = clamp(toY, -1 * boundY, boundY);
@@ -345,9 +377,7 @@ const Reflection = ({
     .enabled(gesturesEnabled)
     .numberOfTaps(1)
     .maxDuration(250)
-    .onEnd((e) => {
-      const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
-
+    .onEnd((event) => {
       const gallerySize = {
         width: rootSize.width.value,
         height: rootSize.height.value,
@@ -355,10 +385,9 @@ const Reflection = ({
 
       const { x, width } = getVisibleRect({
         scale: scale.value,
-        visibleSize: gallerySize,
-        canvasSize: gallerySize,
-        elementSize: gallerySize,
-        offset: { x: translate.x.value, y: translate.y.value },
+        containerSize: gallerySize,
+        itemSize: gallerySize,
+        translation: { x: translate.x.value, y: translate.y.value },
       });
 
       const tapEdge = 44 / scale.value;
@@ -370,15 +399,20 @@ const Reflection = ({
       if (event.x <= leftEdge && canGoToItem) toIndex -= 1;
       if (event.x >= rightEdge && canGoToItem) toIndex += 1;
 
+      toIndex = clamp(toIndex, 0, length - 1);
       if (toIndex === activeIndex.value) {
         onTap && runOnJS(onTap)(event, activeIndex.value);
         return;
       }
 
-      toIndex = clamp(toIndex, 0, length - 1);
-      scroll.value = toIndex * itemSize.value;
+      const toScroll = getScrollPosition({
+        index: toIndex,
+        itemSize: itemSize.value,
+        gap,
+      });
+
+      scroll.value = toScroll;
       activeIndex.value = toIndex;
-      fetchIndex.value = toIndex;
 
       reset(0, 0, minScale, false);
     });
@@ -395,16 +429,17 @@ const Reflection = ({
     const height = Math.max(rootSize.height.value, rootChildSize.height.value);
 
     return {
-      width: width * scaleOffset.value,
-      height: height * scaleOffset.value,
+      width: width,
+      height: height,
       position: 'absolute',
-      zIndex: Number.MAX_SAFE_INTEGER,
+      zIndex: 2_147_483_647,
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
+        { scale: scale.value },
       ],
     };
-  }, [rootSize, rootChildSize, translate, scaleOffset]);
+  }, [rootSize, rootChildSize, translate, scale]);
 
   const composed = Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap));
 

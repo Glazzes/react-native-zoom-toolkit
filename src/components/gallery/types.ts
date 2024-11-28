@@ -14,7 +14,8 @@ import type {
 export type GalleryTransitionState = {
   index: number;
   activeIndex: number;
-  vertical: boolean;
+  gap: number;
+  direction: 'vertical' | 'horizontal';
   isScrolling: boolean;
   scroll: number;
   gallerySize: SizeVector<number>;
@@ -27,26 +28,29 @@ export type GalleryTransitionCallback = (
 export type GalleryProps<T = unknown> = {
   data: T[];
   renderItem: (item: T, index: number) => React.ReactElement;
-  keyExtractor?: (item: T, index: number) => string;
-  maxScale?: number | SizeVector<number>[];
-  initialIndex?: number;
-  windowSize?: number;
-  vertical?: boolean;
-  allowOverflow?: boolean;
-  tapOnEdgeToItem?: boolean;
-  zoomEnabled?: boolean;
-  scaleMode?: ScaleMode;
-  allowPinchPanning?: boolean;
-  pinchCenteringMode?: PinchCenteringMode;
-  customTransition?: GalleryTransitionCallback;
-  onTap?: (e: TapGestureEvent, index: number) => void;
-  onSwipe?: (direction: SwipeDirection) => void;
-  onIndexChange?: (index: number) => void;
-  onScroll?: (scroll: number, contentOffset: number) => void;
-  onUpdate?: (state: CommonZoomState<number>) => void;
-  onVerticalPull?: (translateY: number, released: boolean) => void;
-  onGestureEnd?: () => void;
-} & PinchGestureCallbacks &
+} & Partial<{
+  keyExtractor: (item: T, index: number) => string;
+  maxScale: number | SizeVector<number>[];
+  initialIndex: number;
+  windowSize: number;
+  gap: number;
+  vertical: boolean;
+  allowOverflow: boolean;
+  tapOnEdgeToItem: boolean;
+  zoomEnabled: boolean;
+  scaleMode: ScaleMode;
+  allowPinchPanning: boolean;
+  pinchCenteringMode: PinchCenteringMode;
+  customTransition: GalleryTransitionCallback;
+  onTap: (e: TapGestureEvent, index: number) => void;
+  onSwipe: (direction: SwipeDirection) => void;
+  onIndexChange: (index: number) => void;
+  onScroll: (scroll: number, contentOffset: number) => void;
+  onUpdate: (state: CommonZoomState<number>) => void;
+  onVerticalPull: (translateY: number, released: boolean) => void;
+  onGestureEnd: () => void;
+}> &
+  PinchGestureCallbacks &
   PanGestureCallbacks &
   ZoomEventCallbacks;
 

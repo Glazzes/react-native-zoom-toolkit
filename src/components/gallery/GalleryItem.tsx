@@ -6,14 +6,16 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { useVector } from '../../commons/hooks/useVector';
+import { useSizeVector } from '../../commons/hooks/useSizeVector';
+
 import { GalleryContext } from './context';
 import type { GalleryTransitionCallback } from './types';
 
 type GalleryItemProps = {
   item: any;
   index: number;
+  gap: number;
   zIndex: number;
   vertical: boolean;
   renderItem: (item: any, index: number) => React.ReactElement;
@@ -22,6 +24,7 @@ type GalleryItemProps = {
 
 const GalleryItem = ({
   index,
+  gap,
   zIndex,
   item,
   vertical,
@@ -77,13 +80,15 @@ const GalleryItem = ({
     [overflow, activeIndex, index, hideAdjacentItems]
   );
 
+  // @ts-ignore
   const transitionStyle = useAnimatedStyle(() => {
     if (customTransition !== undefined) {
       return customTransition({
         index,
+        gap,
         activeIndex: activeIndex.value,
         isScrolling: isScrolling.value,
-        vertical,
+        direction: vertical ? 'vertical' : 'horizontal',
         scroll: scroll.value,
         gallerySize: {
           width: rootSize.width.value,
@@ -92,16 +97,18 @@ const GalleryItem = ({
       });
     }
 
-    const sizeNotDefined =
+    const currentScroll = -1 * scroll.value + index * gap;
+
+    const isSizeNotDefined =
       rootSize.width.value === 0 && rootSize.height.value === 0;
-    const opacity = sizeNotDefined && index !== activeIndex.value ? 0 : 1;
+    const opacity = isSizeNotDefined && index !== activeIndex.value ? 0 : 1;
 
     if (vertical) {
-      const translateY = index * rootSize.height.value - scroll.value;
+      const translateY = index * rootSize.height.value + currentScroll;
       return { transform: [{ translateY }], opacity };
     }
 
-    const translateX = index * rootSize.width.value - scroll.value;
+    const translateX = index * rootSize.width.value + currentScroll;
     return { transform: [{ translateX }], opacity };
   });
 
@@ -138,6 +145,7 @@ const GalleryItem = ({
   return (
     <Animated.View
       testID={`child-${index}`}
+      // @ts-ignore
       style={[animatedRootStyles, transitionStyle, { zIndex }]}
     >
       <Animated.View style={childStyle} onLayout={measureChild}>
@@ -150,6 +158,7 @@ const GalleryItem = ({
 export default React.memo(GalleryItem, (prev, next) => {
   return (
     prev.index === next.index &&
+    prev.gap === next.gap &&
     prev.zIndex === next.zIndex &&
     prev.vertical === next.vertical &&
     prev.customTransition === next.customTransition &&
