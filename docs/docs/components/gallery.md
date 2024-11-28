@@ -14,7 +14,8 @@ A practical gallery component which mimics Telegram's gallery behavior, among it
 - **Tap to Item:** Tap on the edges of an item to go to the previous or next item.
 - **Custom Scroll Transition**: Customize scroll behavior with your own transitions.
 
-The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example).
+The next video footage is taken from the [Example app](https://github.com/Glazzes/react-native-zoom-toolkit/tree/main/example)
+while using a custom transition.
 
 <div style="width: 100%; display: flex; justify-content: center; align-items: center">
   <video src="../assets/gallery.mp4" controls />
@@ -164,6 +165,14 @@ Used to extract a unique key for a given item at the specified index.
 | `number` | `5`     |
 
 Maximum number of items to be rendered at once.
+
+### gap
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `0`     |
+
+Blank space between items.
 
 ### initialIndex
 
@@ -468,11 +477,12 @@ Jump to the item at the given index.
 
 ### GalleryTransitionState
 
-| Property      | Type                 | Description                                           |
-| ------------- | -------------------- | ----------------------------------------------------- |
-| `index`       | `number`             | Index of an item rendered in the gallery.             |
-| `activeIndex` | `number`             | Index of the currently displayed item on the gallery. |
-| `vertical`    | `boolean`            | Whether the gallery is in vertical mode or not.       |
-| `isScrolling` | `boolean`            | Whether the gallery is actively being scrolled.       |
-| `scroll`      | `number`             | Current scroll value.                                 |
-| `gallerySize` | `SizeVector<number>` | Width and height of the gallery.                      |
+| Property      | Type                     | Description                                           |
+| ------------- | ------------------------ | ----------------------------------------------------- |
+| `index`       | `number`                 | Index of an item rendered in the gallery.             |
+| `activeIndex` | `number`                 | Index of the currently displayed item on the gallery. |
+| `gap`         | `number`                 | Blank space between items.                            |
+| `direction`   | `vertical \| horizontal` | Direction of the gallery.                             |
+| `isScrolling` | `boolean`                | Whether the gallery is actively being scrolled.       |
+| `scroll`      | `number`                 | Current scroll value.                                 |
+| `gallerySize` | `SizeVector<number>`     | Width and height of the gallery.                      |

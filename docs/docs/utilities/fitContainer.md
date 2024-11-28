@@ -6,7 +6,8 @@ outline: deep
 
 # fitContainer
 
-Get the width and height for an element based on its aspect ratio and the container it's meant to fit.
+Get the width and height for an element based on its aspect ratio and the container to fit in a such a way the
+aspect ratio of the element is not compromised.
 
 ## Type Definition
 
