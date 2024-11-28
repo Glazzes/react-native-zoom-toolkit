@@ -1,46 +1,49 @@
 import { getVisibleRect } from './getVisibleRect';
 
 import type { SizeVector, Vector } from '../types';
-import type { CropContextResult } from '../../components/crop/types';
 
 type CanvasToSizeOptions = {
-  context: CropContextResult['context'];
-  cropSize: SizeVector<number>;
-  canvas: SizeVector<number>;
-  resolution: SizeVector<number>;
-  offset: Vector<number>;
   scale: number;
+  cropSize: SizeVector<number>;
+  itemSize: SizeVector<number>;
+  resolution: SizeVector<number>;
+  translation: Vector<number>;
+  isRotated: boolean;
   fixedWidth?: number;
 };
 
-const flipVector = (vector: SizeVector<number>): SizeVector<number> => {
-  return {
-    width: vector.height,
-    height: vector.width,
-  };
-};
-
-export const crop = (options: CanvasToSizeOptions): CropContextResult => {
+export const crop = (options: CanvasToSizeOptions) => {
   'worklet';
-  const { cropSize, canvas, resolution, offset, scale, fixedWidth, context } =
-    options;
-
-  const isFlipped = context.rotationAngle % 180 !== 0;
-  const actualCanvasSize = isFlipped ? flipVector(canvas) : canvas;
-  const actualResolution = isFlipped ? flipVector(resolution) : resolution;
-
-  let resize: SizeVector<number> | undefined;
-  const { x, y, width, height } = getVisibleRect({
+  const {
+    cropSize,
+    itemSize,
+    resolution,
+    translation,
     scale,
-    visibleSize: cropSize,
-    canvasSize: actualCanvasSize,
-    elementSize: actualResolution,
-    offset,
+    isRotated,
+    fixedWidth,
+  } = options;
+
+  const rect = getVisibleRect({
+    scale,
+    containerSize: cropSize,
+    itemSize: {
+      width: isRotated ? itemSize.height : itemSize.width,
+      height: isRotated ? itemSize.width : itemSize.height,
+    },
+    translation,
   });
+
+  const relativeScale = resolution.width / itemSize.width;
+  const x = rect.x * relativeScale;
+  const y = rect.y * relativeScale;
+  const width = rect.width * relativeScale;
+  const height = rect.height * relativeScale;
 
   // Make a normal crop, if the fixedWidth is defined just resize everything to meet the ratio
   // between fixedWidth and the width of the crop.
   let sizeModifier = 1;
+  let resize: SizeVector<number> | undefined;
   if (fixedWidth !== undefined) {
     sizeModifier = fixedWidth / width;
     resize = {
@@ -56,7 +59,6 @@ export const crop = (options: CanvasToSizeOptions): CropContextResult => {
       width: Math.round(width * sizeModifier),
       height: Math.round(height * sizeModifier),
     },
-    context,
     resize,
   };
 };

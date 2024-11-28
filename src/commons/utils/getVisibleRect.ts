@@ -1,51 +1,35 @@
-import { interpolate } from 'react-native-reanimated';
-import type { SizeVector, Vector } from '../types';
-
-type Rect = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+import type { SizeVector, Vector, Rect } from '../types';
 
 type Options = {
   scale: number;
-  canvasSize: SizeVector<number>; // Element size on screen
-  visibleSize: SizeVector<number>; // Expected visible area
-  elementSize: SizeVector<number>; // Real dimensions, eg Resolution
-  offset: Vector<number>; // Translation values
+  translation: Vector<number>; // cartesian system values with the y axis flipped
+  itemSize: SizeVector<number>; // Size of the wrapped component
+  containerSize: SizeVector<number>; // Size of zoom component
 };
 
 export const getVisibleRect = (options: Options): Rect => {
   'worklet';
 
-  const { scale, canvasSize, visibleSize, elementSize, offset } = options;
+  const { scale, translation, itemSize, containerSize } = options;
 
-  const boundX = (canvasSize.width * scale - visibleSize.width) / 2;
-  const boundY = (canvasSize.height * scale - visibleSize.height) / 2;
+  const offsetX = (itemSize.width * scale - containerSize.width) / 2;
+  const offsetY = (itemSize.height * scale - containerSize.height) / 2;
+  const clampedX = Math.max(offsetX, 0);
+  const clampedY = Math.max(offsetY, 0);
 
-  const normalizedOffsetX = Math.abs(boundX) + offset.x;
-  const normalizedOffsetY = Math.abs(boundY) + offset.y;
+  const reducerX = (-1 * translation.x + clampedX) / (itemSize.width * scale);
+  const reducerY = (-1 * translation.y + clampedY) / (itemSize.height * scale);
 
-  const relativeWidth = visibleSize.width / (canvasSize.width * scale);
-  const relativeHeight = visibleSize.height / (canvasSize.height * scale);
+  const x = itemSize.width * reducerX;
+  const y = itemSize.height * reducerY;
 
-  const relativeX = interpolate(
-    normalizedOffsetX,
-    [0, 2 * boundX],
-    [1 - relativeWidth, 0]
-  );
+  const width =
+    itemSize.width *
+    Math.min(1, containerSize.width / (itemSize.width * scale));
 
-  const relativeY = interpolate(
-    normalizedOffsetY,
-    [0, 2 * boundY],
-    [1 - relativeHeight, 0]
-  );
-
-  const x = elementSize.width * relativeX;
-  const y = elementSize.height * relativeY;
-  const width = elementSize.width * relativeWidth;
-  const height = elementSize.height * relativeHeight;
+  const height =
+    itemSize.height *
+    Math.min(1, containerSize.height / (itemSize.height * scale));
 
   return { x, y, width, height };
 };

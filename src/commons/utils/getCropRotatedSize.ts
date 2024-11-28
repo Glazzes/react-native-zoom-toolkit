@@ -1,10 +1,28 @@
 import type { SizeVector } from '../types';
-import { getAspectRatioSize } from '../../utils/getAspectRatioSize';
 
 type Options = {
   crop: SizeVector<number>;
   resolution: SizeVector<number>;
   angle: number;
+};
+
+export const getRatioSize = (
+  aspectRatio: number,
+  container: Partial<SizeVector<number>>
+): SizeVector<number> => {
+  'worklet';
+
+  if (container.width !== undefined) {
+    return {
+      width: container.width,
+      height: container.width / aspectRatio,
+    };
+  }
+
+  return {
+    width: container.height! * aspectRatio,
+    height: container.height!,
+  };
 };
 
 export const getCropRotatedSize = (options: Options): SizeVector<number> => {
@@ -17,8 +35,8 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
   const aspectRatio = resolution.width / resolution.height;
   const inverseAspectRatio = resolution.height / resolution.width;
 
-  base = getAspectRatioSize({
-    aspectRatio: flipped ? aspectRatio : inverseAspectRatio,
+  const currentAspectRatio = flipped ? aspectRatio : inverseAspectRatio;
+  base = getRatioSize(currentAspectRatio, {
     width: cropAspectRatio >= 1 ? undefined : crop.width,
     height: cropAspectRatio >= 1 ? crop.height : undefined,
   });
@@ -37,8 +55,7 @@ export const getCropRotatedSize = (options: Options): SizeVector<number> => {
     Math.abs(base.height * Math.cos(angle)) +
     Math.abs(base.width * Math.sin(angle));
 
-  return getAspectRatioSize({
-    aspectRatio: aspectRatio,
+  return getRatioSize(aspectRatio, {
     width: aspectRatio >= 1 ? undefined : maxWidth,
     height: aspectRatio >= 1 ? maxHeight : undefined,
   });
