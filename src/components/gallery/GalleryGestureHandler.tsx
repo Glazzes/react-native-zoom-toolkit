@@ -35,7 +35,7 @@ import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 const minScale = 1;
 const config = { duration: 300, easing: Easing.linear };
 
-type ReflectionProps = {
+type GalleryGestureHandlerProps = {
   length: number;
   gap: number;
   maxScale: SharedValue<number>;
@@ -62,7 +62,7 @@ type ReflectionProps = {
  * only a single pinchable view is shared among all the list items, items listen to this
  * component updates and only update themselves if they are the current item.
  */
-const Reflection = ({
+const GalleryGestureHandler = ({
   length,
   gap,
   maxScale,
@@ -82,7 +82,7 @@ const Reflection = ({
   onSwipe: onUserSwipe,
   onVerticalPull,
   onGestureEnd,
-}: ReflectionProps) => {
+}: GalleryGestureHandlerProps) => {
   const {
     activeIndex,
     scroll,
@@ -229,7 +229,9 @@ const Reflection = ({
 
   const {
     gesturesEnabled,
+    onTouchesDown,
     onTouchesMove,
+    onTouchesUp,
     onPinchStart,
     onPinchUpdate,
     onPinchEnd,
@@ -266,7 +268,10 @@ const Reflection = ({
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
     .enabled(zoomEnabled)
+    .manualActivation(true)
+    .onTouchesDown(onTouchesDown)
     .onTouchesMove(onTouchesMove)
+    .onTouchesUp(onTouchesUp)
     .onStart((e) => {
       if (allowOverflow) {
         overflow.value = 'visible';
@@ -450,7 +455,7 @@ const Reflection = ({
   );
 };
 
-export default React.memo(Reflection, (prev, next) => {
+export default React.memo(GalleryGestureHandler, (prev, next) => {
   return (
     prev.onTap === next.onTap &&
     prev.onPanStart === next.onPanStart &&

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
+
 import type { SizeVector } from '../commons/types';
 
 export type FetchImageResolutionResult = {
@@ -35,18 +36,18 @@ export default function (source: Source | number): FetchImageResolutionResult {
     setIsFetching(false);
   };
 
-  const onFailure = (e: Error) => {
+  const onFailure = (e: Error): void => {
     setError(e);
     setIsFetching(false);
   };
 
   const deps = JSON.stringify(source);
   useEffect(() => {
+    setIsFetching(true);
+
     if (typeof source === 'number') {
       const { width, height } = Image.resolveAssetSource(source);
-      setResolution({ width, height });
-      setIsFetching(false);
-
+      onSuccess(width, height);
       return;
     }
 

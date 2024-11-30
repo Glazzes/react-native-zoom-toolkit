@@ -12,7 +12,7 @@ import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
-import Reflection from './Reflection';
+import GalleryGestureHandler from './GalleryGestureHandler';
 import GalleryItem from './GalleryItem';
 import { GalleryContext } from './context';
 import { type GalleryProps, type GalleryType } from './types';
@@ -226,7 +226,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         );
       })}
 
-      <Reflection
+      <GalleryGestureHandler
         gap={gap}
         maxScale={maxScale}
         itemSize={itemSize}

@@ -123,7 +123,9 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   const {
     gesturesEnabled,
+    onTouchesDown,
     onTouchesMove,
+    onTouchesUp,
     onPinchStart,
     onPinchUpdate,
     onPinchEnd,
@@ -176,7 +178,10 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
     .enabled(pinchEnabled)
+    .manualActivation(true)
+    .onTouchesDown(onTouchesDown)
     .onTouchesMove(onTouchesMove)
+    .onTouchesUp(onTouchesUp)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
