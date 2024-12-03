@@ -200,10 +200,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     .maxDuration(250)
     .numberOfTaps(1)
     .runOnJS(true)
-    .onEnd((e) => {
-      const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
-      onTap?.(event);
-    });
+    .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
     .withTestId('doubleTap')
