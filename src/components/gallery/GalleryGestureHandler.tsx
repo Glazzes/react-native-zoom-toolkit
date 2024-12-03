@@ -388,7 +388,7 @@ const GalleryGestureHandler = ({
         height: rootSize.height.value,
       };
 
-      const { x, width } = getVisibleRect({
+      const rect = getVisibleRect({
         scale: scale.value,
         containerSize: gallerySize,
         itemSize: gallerySize,
@@ -396,8 +396,8 @@ const GalleryGestureHandler = ({
       });
 
       const tapEdge = 44 / scale.value;
-      const leftEdge = x + tapEdge;
-      const rightEdge = x + width - tapEdge;
+      const leftEdge = rect.x + tapEdge;
+      const rightEdge = rect.x + rect.width - tapEdge;
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;

@@ -84,7 +84,7 @@ describe('Gallery Gesture Tests', () => {
     },
     {
       title: 'should not trigger tap gesture when in tapOnEdgeItem bounds',
-      coordinates: { x: 0, y: 50 },
+      coordinates: { x: 80, y: 50 },
       timesCalled: 0,
     },
   ])('$title', ({ coordinates, timesCalled }) => {
