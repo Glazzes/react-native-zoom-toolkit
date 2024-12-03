@@ -19,7 +19,6 @@ import Appbar from './components/Appbar';
 import TextArea from './components/TextArea';
 import ImageMessage from './messages/ImageMessage';
 import CellRenderer from './messages/CellRenderer';
-import VideoMessage from './messages/VideoMessage';
 
 import { theme } from '../../constants';
 
@@ -81,16 +80,19 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
     [activeIndex]
   );
 
-  const renderItem = useCallback((info: ListRenderItemInfo<string>) => {
-    return (
-      <ImageMessage
-        uri={info.item}
-        index={info.index}
-        activeIndex={activeIndex}
-        useResizeConfig={info.index === 2}
-      />
-    );
-  }, []);
+  const renderItem = useCallback(
+    (info: ListRenderItemInfo<string>) => {
+      return (
+        <ImageMessage
+          uri={info.item}
+          index={info.index}
+          activeIndex={activeIndex}
+          useResizeConfig={info.index === 2}
+        />
+      );
+    },
+    [activeIndex]
+  );
 
   return (
     <FlatList
