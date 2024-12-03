@@ -12,12 +12,12 @@ import Animated, {
   type WithTimingConfig,
 } from 'react-native-reanimated';
 import { ResizeMode, Video } from 'expo-av';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { SnapbackZoom } from 'react-native-zoom-toolkit';
 
-import { maxDimension, theme } from '../../constants';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { ReflectionContext } from '../reflection/ReflectionContext';
+import { maxDimension, theme } from '../../../constants';
+import { ReflectionContext } from '../../context';
 
 type VideoMessageProps = {
   index: number;
@@ -102,7 +102,7 @@ const VideoMessage: React.FC<VideoMessageProps> = ({ index, activeIndex }) => {
             <Video
               ref={ref}
               isLooping={true}
-              source={require('../../../assets/video.mp4')}
+              source={require('../../../../assets/video.mp4')}
               resizeMode={ResizeMode.COVER}
               style={styles.video}
             />

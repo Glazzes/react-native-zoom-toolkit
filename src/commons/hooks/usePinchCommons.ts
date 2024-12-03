@@ -7,6 +7,7 @@ import {
   type SharedValue,
 } from 'react-native-reanimated';
 import type {
+  GestureStateManager,
   GestureTouchEvent,
   GestureUpdateEvent,
   PinchGestureHandlerEventPayload,
@@ -80,7 +81,21 @@ export const usePinchCommons = (options: PinchOptions) => {
     setGesturesEnabled(value);
   };
 
-  const onTouchesMove = (e: GestureTouchEvent) => {
+  const onTouchesDown = (e: GestureTouchEvent, state: GestureStateManager) => {
+    'worklet';
+    if (e.numberOfTouches === 2) {
+      state.begin();
+    }
+  };
+
+  const onTouchesUp = (e: GestureTouchEvent, state: GestureStateManager) => {
+    'worklet';
+    if (e.numberOfTouches !== 2) {
+      state.end();
+    }
+  };
+
+  const onTouchesMove = (e: GestureTouchEvent, state: GestureStateManager) => {
     'worklet';
     if (e.numberOfTouches !== 2) return;
     const touchOne = e.allTouches[0]!;
@@ -88,6 +103,7 @@ export const usePinchCommons = (options: PinchOptions) => {
 
     currentFocal.x.value = (touchOne.absoluteX + touchTwo.absoluteX) / 2;
     currentFocal.y.value = (touchOne.absoluteY + touchTwo.absoluteY) / 2;
+    state.activate();
   };
 
   const onPinchStart = (e: PinchGestureEvent) => {
@@ -102,8 +118,8 @@ export const usePinchCommons = (options: PinchOptions) => {
     initialFocal.x.value = currentFocal.x.value;
     initialFocal.y.value = currentFocal.y.value;
 
-    origin.x.value = e.focalX / scale.value - container.width.value / 2;
-    origin.y.value = e.focalY / scale.value - container.height.value / 2;
+    origin.x.value = e.focalX - container.width.value / 2;
+    origin.y.value = e.focalY - container.height.value / 2;
 
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
@@ -194,7 +210,9 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   return {
     gesturesEnabled,
+    onTouchesDown,
     onTouchesMove,
+    onTouchesUp,
     onPinchStart,
     onPinchUpdate,
     onPinchEnd,

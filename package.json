@@ -1,7 +1,7 @@
 {
   "name": "react-native-zoom-toolkit",
   "version": "3.1.0",
-  "description": "Smoothly zoom any image, video or component you want!",
+  "description": "Most complete set of pinch to zoom utilites for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
@@ -36,27 +36,20 @@
     "release": "release-it"
   },
   "keywords": [
-    "react-native",
     "zoom",
-    "toolkit",
-    "react-native-zoomable",
+    "zoomable",
     "zoomable-view",
-    "react-native-image-cropper",
-    "react-native-image-zoom",
-    "react-native-video-zoom",
-    "react-native-zoom-view",
-    "react-native-zoom",
-    "image-zoom",
-    "zoomable-image",
-    "video-zoom",
-    "crop-zoom",
-    "zoom-view",
-    "image-cropper",
-    "gallery",
-    "pinch",
     "pan",
-    "react-native-reanimated",
-    "react-native-gesture-handler"
+    "pinch",
+    "pinch-to-zoom",
+    "double-tap",
+    "gallery",
+    "image-gallery",
+    "image-cropper",
+    "react-native",
+    "react-native-zoomable",
+    "react-native-image-zoom",
+    "react-native-zoomable-view"
   ],
   "repository": {
     "type": "git",
@@ -97,7 +90,7 @@
     "react-native": "0.73.4",
     "react-native-builder-bob": "^0.20.0",
     "react-native-gesture-handler": "^2.20.0",
-    "react-native-reanimated": "^3.15.3",
+    "react-native-reanimated": "^3.16.1",
     "react-test-renderer": "18.2.0",
     "release-it": "^15.11.0",
     "typescript": "^5.0.2"
@@ -108,7 +101,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-gesture-handler": ">= 2.x.x",
+    "react-native-gesture-handler": ">= 2.19.0",
     "react-native-reanimated": ">= 2.x.x"
   },
   "workspaces": [

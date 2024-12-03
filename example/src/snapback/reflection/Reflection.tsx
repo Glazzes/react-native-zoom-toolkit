@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ReflectionContext } from './ReflectionContext';
+import { ReflectionContext } from '../context';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 /*

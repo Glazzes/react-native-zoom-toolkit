@@ -4,10 +4,10 @@ import type { GalleryTransitionCallback } from '../../components/gallery/types';
 export const stackTransition: GalleryTransitionCallback = (options) => {
   'worklet';
 
-  const { index, activeIndex, vertical, gallerySize, scroll, isScrolling } =
+  const { index, activeIndex, direction, gallerySize, scroll, isScrolling } =
     options;
 
-  if (vertical) {
+  if (direction === 'vertical') {
     const translateY = index * gallerySize.height - scroll;
     return { transform: [{ translateY }] };
   }

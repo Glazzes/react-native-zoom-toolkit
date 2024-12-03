@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {
-        text: '3.1.0',
+        text: '4.0.0',
         items: [
           {
             text: 'Releases',
@@ -46,12 +46,12 @@ export default defineConfig({
         text: 'Utilities',
         collapsed: true,
         items: [
+          { text: 'fitContainer', link: '/utilities/fitContainer' },
           { text: 'useImageResolution', link: '/utilities/useimageresolution' },
           {
             text: 'useTransformationState',
             link: '/utilities/usetransformationstate',
           },
-          { text: 'getAspectRatioSize', link: '/utilities/getAspectRatioSize' },
         ],
       },
       {

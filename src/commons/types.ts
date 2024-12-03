@@ -5,6 +5,13 @@ import type {
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
+export type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type Vector<T> = {
   x: T;
   y: T;

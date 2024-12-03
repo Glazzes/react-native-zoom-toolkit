@@ -10,8 +10,9 @@ import Animated, {
 
 import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
+import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
-import Reflection from './Reflection';
+import GalleryGestureHandler from './GalleryGestureHandler';
 import GalleryItem from './GalleryItem';
 import { GalleryContext } from './context';
 import { type GalleryProps, type GalleryType } from './types';
@@ -30,6 +31,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     windowSize = 5,
     maxScale: userMaxScale = 6,
     vertical = false,
+    gap = 0,
     allowOverflow = false,
     tapOnEdgeToItem = true,
     zoomEnabled = true,
@@ -54,7 +56,6 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
 
   const {
     activeIndex,
-    fetchIndex,
     rootSize,
     rootChildSize,
     scroll,
@@ -89,11 +90,15 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
 
   const measureRoot = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
-    rootSize.width.value = width;
-    rootSize.height.value = height;
+    const scrollPosition = getScrollPosition({
+      index: activeIndex.get(),
+      itemSize: vertical ? height : width,
+      gap,
+    });
 
-    const direction = vertical ? height : width;
-    scroll.value = activeIndex.value * direction;
+    rootSize.width.set(width);
+    rootSize.height.set(height);
+    scroll.set(scrollPosition);
   };
 
   const animatedStyles = useAnimatedStyle(
@@ -126,14 +131,11 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
 
   useAnimatedReaction(
     () => activeIndex.value,
-    (value) => onIndexChange && runOnJS(onIndexChange)(value),
+    (value) => {
+      onIndexChange && runOnJS(onIndexChange)(value);
+      runOnJS(setScrollIndex)(value);
+    },
     [activeIndex]
-  );
-
-  useAnimatedReaction(
-    () => fetchIndex.value,
-    (value) => runOnJS(setScrollIndex)(value),
-    [fetchIndex]
   );
 
   useAnimatedReaction(
@@ -142,8 +144,11 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       size: { width: rootSize.width.value, height: rootSize.height.value },
     }),
     (value) => {
-      const direction = value.vertical ? value.size.height : value.size.width;
-      scroll.value = activeIndex.value * direction;
+      scroll.value = getScrollPosition({
+        index: activeIndex.value,
+        itemSize: value.vertical ? value.size.height : value.size.width,
+        gap,
+      });
     },
     [vertical, rootSize]
   );
@@ -166,16 +171,20 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   const setIndex = (index: number) => {
     const clamped = clamp(index, 0, data.length - 1);
     activeIndex.value = clamped;
-    fetchIndex.value = clamped;
-    scroll.value = clamped * itemSize.value;
+
+    scroll.value = getScrollPosition({
+      index: activeIndex.get(),
+      itemSize: itemSize.get(),
+      gap,
+    });
   };
 
   const requestState = () => ({
-    width: rootChildSize.width.value,
-    height: rootChildSize.height.value,
-    translateX: translate.x.value,
-    translateY: translate.y.value,
-    scale: scale.value,
+    width: rootChildSize.width.get(),
+    height: rootChildSize.height.get(),
+    translateX: translate.x.get(),
+    translateY: translate.y.get(),
+    scale: scale.get(),
   });
 
   const reset = (animate = true) => {
@@ -208,6 +217,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
             key={key}
             zIndex={data.length - index}
             index={index}
+            gap={gap}
             item={item}
             vertical={vertical}
             renderItem={renderItem}
@@ -216,7 +226,8 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         );
       })}
 
-      <Reflection
+      <GalleryGestureHandler
+        gap={gap}
         maxScale={maxScale}
         itemSize={itemSize}
         length={data.length}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+
 import { Link } from 'expo-router';
 import Constans from 'expo-constants';
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';

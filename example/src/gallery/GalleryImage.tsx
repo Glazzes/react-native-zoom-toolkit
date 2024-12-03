@@ -8,7 +8,7 @@ import {
 import { Image } from 'expo-image';
 import { type Asset } from 'expo-media-library';
 
-import { calculateItemSize } from './utils/utils';
+import { fitContainer } from 'react-native-zoom-toolkit';
 
 type GalleryImageProps = {
   asset: Asset;
@@ -21,14 +21,10 @@ const GalleryImage: React.FC<GalleryImageProps> = ({
   index,
   activeIndex,
 }) => {
-  const [downScale, setDownScale] = useState<boolean>(true);
   const { width, height } = useWindowDimensions();
+  const size = fitContainer(asset.width / asset.height, { width, height });
 
-  const size = calculateItemSize(
-    { width: asset.width, height: asset.height },
-    { width, height },
-    width / height
-  );
+  const [downScale, setDownScale] = useState<boolean>(true);
 
   const wrapper = (active: number) => {
     if (index === active) setDownScale(false);

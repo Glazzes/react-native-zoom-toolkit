@@ -1,24 +1,27 @@
 import React, { useCallback } from 'react';
 import {
+  FlatList,
   View,
   useWindowDimensions,
   StyleSheet,
   type CellRendererProps,
   type ListRenderItemInfo,
 } from 'react-native';
-import ImageMessage from '../messages/ImageMessage';
-import Appbar from './Appbar';
-import { FlatList } from 'react-native-gesture-handler';
-import { theme } from '../../constants';
-import CellRenderer from '../messages/CellRenderer';
+
 import Animated, {
   useSharedValue,
   type SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import Constants from 'expo-constants';
-import TextArea from './TextArea';
-import VideoMessage from '../messages/VideoMessage';
+
+import Appbar from './components/Appbar';
+import TextArea from './components/TextArea';
+import ImageMessage from './messages/ImageMessage';
+import CellRenderer from './messages/CellRenderer';
+import VideoMessage from './messages/VideoMessage';
+
+import { theme } from '../../constants';
 
 type MessageListProps = {
   keyboardTranslateY: SharedValue<number>;
@@ -78,46 +81,34 @@ const MessageList: React.FC<MessageListProps> = ({ keyboardTranslateY }) => {
     [activeIndex]
   );
 
-  const renderItem = useCallback(
-    (info: ListRenderItemInfo<string>) => {
-      if (info.index === 1) {
-        return <VideoMessage index={info.index} activeIndex={activeIndex} />;
-      }
-
-      return (
-        <ImageMessage
-          uri={info.item}
-          index={info.index}
-          activeIndex={activeIndex}
-          useResizeConfig={info.index === 2}
-        />
-      );
-    },
-    [activeIndex]
-  );
+  const renderItem = useCallback((info: ListRenderItemInfo<string>) => {
+    return (
+      <ImageMessage
+        uri={info.item}
+        index={info.index}
+        activeIndex={activeIndex}
+        useResizeConfig={info.index === 2}
+      />
+    );
+  }, []);
 
   return (
-    <View style={[styles.root]}>
-      <FlatList
-        data={images}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        stickyHeaderIndices={[0]}
-        contentContainerStyle={styles.content}
-        automaticallyAdjustKeyboardInsets={true}
-        showsVerticalScrollIndicator={true}
-        ItemSeparatorComponent={seperator}
-        ListHeaderComponent={renderAppbar}
-        CellRendererComponent={cellRenderer}
-      />
-    </View>
+    <FlatList
+      data={images}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      stickyHeaderIndices={[0]}
+      contentContainerStyle={styles.content}
+      automaticallyAdjustKeyboardInsets={true}
+      showsVerticalScrollIndicator={true}
+      ItemSeparatorComponent={seperator}
+      ListHeaderComponent={renderAppbar}
+      CellRendererComponent={cellRenderer}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
   separator: {
     height: theme.spacing.m,
   },

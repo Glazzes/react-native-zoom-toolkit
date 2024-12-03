@@ -1,5 +1,5 @@
 ---
-title: Snapback Zoom
+title: SnapbackZoom
 description: An ideal zoom component for preview handling
 outline: deep
 ---
@@ -160,6 +160,28 @@ if you need to mirror the current state of the gesture to some other component, 
 | `() => void` | `undefined` |
 
 Callback triggered once the snap back animation has finished.
+
+### scrollRef
+
+| Type                                       | Default     |
+| ------------------------------------------ | ----------- |
+| `React.RefObject<React.ComponentType<{}>>` | `undefined` |
+
+Improve gesture detection when SnapbackZoom is rendered within a vertical ScrollView, see the following example.
+
+```tsx
+const scrollViewRef = useRef<ScrollView>(null);
+
+<ScrollView ref={scrollViewRef}>
+  {images.map((uri) => {
+    return (
+      <SnapbackZoom scrollRef={scrollViewRef}>
+        <Image source={{ uri }} style={styles.image} />
+      </SnapbackZoom>
+    );
+  })}
+</ScrollView>;
+```
 
 ## About resizeConfig Property
 

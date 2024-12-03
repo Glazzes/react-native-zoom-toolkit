@@ -17,10 +17,12 @@ import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
+import { getVisibleRect as getRect } from '../../commons/utils/getVisibleRect';
 
 import type {
   BoundsFuction,
   CommonZoomState,
+  Rect,
   Vector,
 } from '../../commons/types';
 import type {
@@ -121,7 +123,9 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   const {
     gesturesEnabled,
+    onTouchesDown,
     onTouchesMove,
+    onTouchesUp,
     onPinchStart,
     onPinchUpdate,
     onPinchEnd,
@@ -174,7 +178,10 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
     .enabled(pinchEnabled)
+    .manualActivation(true)
+    .onTouchesDown(onTouchesDown)
     .onTouchesMove(onTouchesMove)
+    .onTouchesUp(onTouchesUp)
     .onStart(onPinchStart)
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
@@ -193,10 +200,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     .maxDuration(250)
     .numberOfTaps(1)
     .runOnJS(true)
-    .onEnd((e) => {
-      const event = { ...e, x: e.x / scale.value, y: e.y / scale.value };
-      onTap?.(event);
-    });
+    .onEnd((e) => onTap?.(e));
 
   const doubleTap = Gesture.Tap()
     .withTestId('doubleTap')
@@ -217,21 +221,15 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   const detectorStyle = useAnimatedStyle(() => {
     return {
-      width: extendedSize.width.value * scaleOffset.value,
-      height: extendedSize.height.value * scaleOffset.value,
+      width: extendedSize.width.value,
+      height: extendedSize.height.value,
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
+        { scale: scale.value },
       ],
     };
-  }, [extendedSize, scaleOffset, translate]);
-
-  const childStyle = useAnimatedStyle(
-    () => ({
-      transform: [{ scale: scale.value }],
-    }),
-    [scale]
-  );
+  }, [extendedSize, translate, scale]);
 
   const requestState = (): CommonZoomState<number> => {
     return {
@@ -282,11 +280,27 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     set(toX, toY, toScale, true);
   };
 
+  const getVisibleRect = (): Rect => {
+    return getRect({
+      scale: scale.value,
+      itemSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      translation: { x: translate.x.value, y: translate.y.value },
+    });
+  };
+
   useImperativeHandle(reference, () => ({
     reset: (animate = true) => set(0, 0, minScale, animate),
     requestState: requestState,
     assignState: assignState,
     zoom: zoom,
+    getVisibleRect: getVisibleRect,
   }));
 
   const composedTap = Gesture.Exclusive(doubleTap, tap);
@@ -296,11 +310,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     <View style={[style ?? styles.flex, styles.center]} onLayout={measureRoot}>
       <GestureDetector gesture={composedGesture}>
         <Animated.View testID={'root'} style={[detectorStyle, styles.center]}>
-          <Animated.View
-            testID={'child'}
-            style={childStyle}
-            onLayout={measureChild}
-          >
+          <Animated.View testID={'child'} onLayout={measureChild}>
             {children}
           </Animated.View>
         </Animated.View>

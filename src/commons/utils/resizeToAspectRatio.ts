@@ -51,10 +51,5 @@ export const resizeToAspectRatio = ({
   const deltaX = (finalWidth - width) / 2;
   const deltaY = (finalHeight - height) / 2;
 
-  return {
-    width: finalWidth,
-    height: finalHeight,
-    deltaX,
-    deltaY,
-  };
+  return { width: finalWidth, height: finalHeight, deltaX, deltaY };
 };

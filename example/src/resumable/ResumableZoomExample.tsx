@@ -5,15 +5,14 @@ import {
   StyleSheet,
   Image,
   useWindowDimensions,
-  type ImageStyle,
 } from 'react-native';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { StatusBar, setStatusBarHidden } from 'expo-status-bar';
 
 import {
+  fitContainer,
   ResumableZoom,
-  getAspectRatioSize,
   useImageResolution,
   type ResumableZoomType,
 } from 'react-native-zoom-toolkit';
@@ -43,12 +42,9 @@ const ResumableZoomExample: React.FC = ({}) => {
     return null;
   }
 
-  const isPortrait = height > width;
-
-  const { width: imageWidth, height: imageHeight } = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: isPortrait ? width : undefined,
-    height: !isPortrait ? height : undefined,
+  const size = fitContainer(resolution.width / resolution.height, {
+    width,
+    height,
   });
 
   const onTap = () => {
@@ -57,11 +53,6 @@ const ResumableZoomExample: React.FC = ({}) => {
 
     translateY.value = withTiming(toY);
     setStatusBarHidden(toY !== 0, 'slide');
-  };
-
-  const imageStyle: ImageStyle = {
-    width: imageWidth,
-    height: imageHeight,
   };
 
   return (
@@ -78,7 +69,7 @@ const ResumableZoomExample: React.FC = ({}) => {
       >
         <Image
           source={{ uri: IMAGE }}
-          style={imageStyle}
+          style={{ width: size.width, height: size.height }}
           resizeMethod="scale"
         />
       </ResumableZoom>

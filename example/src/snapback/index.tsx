@@ -7,7 +7,8 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
-import { ReflectionProvider } from './reflection/ReflectionContext';
+
+import { ReflectionProvider } from './context';
 import MessageList from './list/MessageList';
 import Reflection from './reflection/Reflection';
 import Animated, {

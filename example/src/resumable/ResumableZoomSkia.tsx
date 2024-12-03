@@ -2,8 +2,8 @@ import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage, vec } from '@shopify/react-native-skia';
 import {
+  fitContainer,
   ResumableZoom,
-  getAspectRatioSize,
   useTransformationState,
 } from 'react-native-zoom-toolkit';
 
@@ -22,9 +22,9 @@ const App = () => {
   }
 
   const resolution = { width: image.width(), height: image.height() };
-  const imageSize = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: width,
+  const imageSize = fitContainer(resolution.width / resolution.height, {
+    width,
+    height,
   });
 
   const x = 0;

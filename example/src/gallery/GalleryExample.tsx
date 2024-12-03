@@ -12,15 +12,12 @@ import {
   MediaType,
   type Asset,
 } from 'expo-media-library';
-import {
-  stackTransition,
-  Gallery,
-  type GalleryType,
-} from 'react-native-zoom-toolkit';
+import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
 import VideoControls from './controls/VideoControls';
 import GalleryVideo from './GalleryVideo';
+import { StatusBar } from 'expo-status-bar';
 
 type SizeVector = { width: number; height: number };
 
@@ -60,7 +57,6 @@ const GalleryExample = () => {
   );
 
   const keyExtractor = useCallback((item, index) => `${item.uri}-${index}`, []);
-  const customTransition = useCallback(stackTransition, []);
 
   // Toogle video controls opacity if the current item is a video
   const onTap = useCallback(() => {
@@ -96,7 +92,7 @@ const GalleryExample = () => {
       if (granted) {
         const page = await getAssetsAsync({
           first: 100,
-          mediaType: ['photo', 'video'],
+          mediaType: ['photo'],
           sortBy: 'creationTime',
         });
 
@@ -124,6 +120,7 @@ const GalleryExample = () => {
         data={assets}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
+        gap={24}
         maxScale={scales}
         onIndexChange={(idx) => {
           activeIndex.value = idx;
@@ -131,7 +128,6 @@ const GalleryExample = () => {
         onTap={onTap}
         pinchCenteringMode={'sync'}
         onVerticalPull={onVerticalPulling}
-        customTransition={customTransition}
       />
 
       <VideoControls
@@ -141,6 +137,8 @@ const GalleryExample = () => {
         isSeeking={isSeeking}
         opacity={opacityControls}
       />
+
+      <StatusBar style="light" translucent={true} />
     </Animated.View>
   );
 };

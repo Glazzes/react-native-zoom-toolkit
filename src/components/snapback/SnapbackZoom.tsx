@@ -25,6 +25,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   resizeConfig,
   timingConfig,
   gesturesEnabled = true,
+  scrollRef,
   onTap,
   onDoubleTap,
   onPinchStart,
@@ -46,6 +47,18 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     resizeConfig?.size.width ?? 0,
     resizeConfig?.size.height ?? 0
   );
+
+  const measureContainer = () => {
+    'worklet';
+
+    const measuremet = measure(containerRef);
+    if (measuremet !== null) {
+      containerSize.width.value = measuremet.width;
+      containerSize.height.value = measuremet.height;
+      position.x.value = measuremet.pageX;
+      position.y.value = measuremet.pageY;
+    }
+  };
 
   const childrenSize = useDerivedValue(() => {
     return resizeToAspectRatio({
@@ -86,15 +99,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       currentFocal.y.value = (one.absoluteY + two.absoluteY) / 2;
     })
     .onStart((e) => {
-      onPinchStart && runOnJS(onPinchStart)(e);
-
-      const measuremet = measure(containerRef);
-      if (measuremet !== null) {
-        containerSize.width.value = measuremet.width;
-        containerSize.height.value = measuremet.height;
-        position.x.value = measuremet.pageX;
-        position.y.value = measuremet.pageY;
-      }
+      measureContainer();
+      onPinchStart && onPinchStart(e);
 
       initialFocal.x.value = currentFocal.x.value;
       initialFocal.y.value = currentFocal.y.value;
@@ -103,6 +109,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       origin.y.value = e.focalY - containerSize.height.value / 2;
     })
     .onUpdate((e) => {
+      measureContainer();
+
       const deltaX = currentFocal.x.value - initialFocal.x.value;
       const deltaY = currentFocal.y.value - initialFocal.y.value;
 
@@ -123,6 +131,10 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       });
     });
 
+  if (scrollRef !== undefined) {
+    pinch.blocksExternalGesture(scrollRef);
+  }
+
   const tap = Gesture.Tap()
     .withTestId('tap')
     .enabled(gesturesEnabled)
@@ -139,17 +151,15 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .runOnJS(true)
     .onEnd((e) => onDoubleTap?.(e));
 
-  const containerStyle = useAnimatedStyle(() => {
-    const width = containerSize.width.value;
-    const height = containerSize.height.value;
-
-    return {
-      width: width === 0 ? undefined : width,
-      height: height === 0 ? undefined : height,
+  const containerStyle = useAnimatedStyle(
+    () => ({
+      width: resizeConfig?.size.width,
+      height: resizeConfig?.size.height,
       justifyContent: 'center',
       alignItems: 'center',
-    };
-  }, [containerSize]);
+    }),
+    [resizeConfig]
+  );
 
   const childStyle = useAnimatedStyle(() => {
     const { width, height, deltaX, deltaY } = childrenSize.value;
@@ -169,10 +179,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
   return (
     <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>
-      <Animated.View style={containerStyle}>
-        <Animated.View ref={containerRef} style={childStyle}>
-          {children}
-        </Animated.View>
+      <Animated.View style={containerStyle} ref={containerRef}>
+        <Animated.View style={childStyle}>{children}</Animated.View>
       </Animated.View>
     </GestureDetector>
   );

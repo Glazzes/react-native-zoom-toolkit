@@ -1,4 +1,6 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
+
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Orientation from 'expo-screen-orientation';
@@ -6,7 +8,6 @@ import * as Orientation from 'expo-screen-orientation';
 Orientation.lockAsync(Orientation.OrientationLock.PORTRAIT_UP);
 
 import { default as CustomDrawer } from '../src/navigation/Drawer';
-import { StyleSheet } from 'react-native';
 
 const _layout = () => {
   return (

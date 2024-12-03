@@ -15,7 +15,6 @@ const GalleryProvider = <T extends unknown>(
 ) => {
   const startIndex = clamp(props.initialIndex ?? 0, 0, props.data.length - 1);
   const activeIndex = useSharedValue<number>(startIndex);
-  const fetchIndex = useSharedValue<number>(startIndex);
 
   const rootSize = useSizeVector(0, 0);
   const rootChildSize = useSizeVector(0, 0);
@@ -38,7 +37,6 @@ const GalleryProvider = <T extends unknown>(
     scrollOffset,
     translate,
     activeIndex,
-    fetchIndex,
     isScrolling,
     scale,
     hasZoomed,

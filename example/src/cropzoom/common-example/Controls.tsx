@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import { FlipType, type Action, manipulateAsync } from 'expo-image-manipulator';
+
+import { FlipType, SaveFormat, ImageManipulator } from 'expo-image-manipulator';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import type { CropZoomType } from 'react-native-zoom-toolkit';
 
 import { theme } from '../../constants';
 import { activeColor, baseColor } from '../commons/contants';
+import { createAlbumAsync, createAssetAsync } from 'expo-media-library';
 
 type ControlProps = {
   uri: string;
@@ -44,32 +46,34 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
     }
 
     setIsCropping(true);
-    const cropResult = cropRef.current.crop(200);
+    const cropContext = cropRef.current.crop(300);
+    const manipulateContext = ImageManipulator.manipulate(uri);
 
-    const actions: Action[] = [];
-    if (cropResult.resize !== undefined) {
-      actions.push({ resize: cropResult.resize });
-    }
+    if (cropContext.resize !== undefined)
+      manipulateContext.resize(cropContext.resize);
 
-    if (cropResult.context.flipHorizontal) {
-      actions.push({ flip: FlipType.Horizontal });
-    }
+    if (cropContext.context.flipHorizontal)
+      manipulateContext.flip(FlipType.Horizontal);
 
-    if (cropResult.context.flipVertical) {
-      actions.push({ flip: FlipType.Vertical });
-    }
+    if (cropContext.context.flipVertical)
+      manipulateContext.flip(FlipType.Vertical);
 
-    if (cropResult.context.rotationAngle !== 0) {
-      actions.push({ rotate: cropResult.context.rotationAngle });
-    }
+    if (cropContext.context.rotationAngle !== 0)
+      manipulateContext.rotate(cropContext.context.rotationAngle);
 
-    actions.push({ crop: cropResult.crop });
+    manipulateContext.crop(cropContext.crop);
 
-    manipulateAsync(uri, actions)
-      .then((manipulationResult) => {
-        setCrop(manipulationResult.uri);
-      })
-      .finally(() => setIsCropping(false));
+    const imageRef = await manipulateContext.renderAsync();
+    const result = await imageRef.saveAsync({
+      compress: 1,
+      format: SaveFormat.PNG,
+    });
+
+    const asset = await createAssetAsync(result.uri);
+    await createAlbumAsync('cropping', asset);
+
+    setCrop(result.uri);
+    setIsCropping(false);
   };
 
   return (
