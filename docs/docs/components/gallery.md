@@ -87,7 +87,7 @@ export default GalleryExample;
 ```js [GalleryImage.tsx]
 import React, { useState } from 'react';
 import { Image, useWindowDimensions } from 'react-native';
-import { getAspectRatioSize } from 'react-native-zoom-toolkit';
+import { fitContainer } from 'react-native-zoom-toolkit';
 
 type GalleryImageProps = {
   uri: string;
@@ -104,11 +104,7 @@ const GalleryImage: React.FC<GalleryImageProps> = ({ uri, index }) => {
     height: 1,
   });
 
-  const size = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: height > width ? width : undefined,
-    height: height > width ? undefined : height,
-  });
+  const size = fitContainer(resolution.width / resolution.height, { width, height });
 
   return (
     <Image
