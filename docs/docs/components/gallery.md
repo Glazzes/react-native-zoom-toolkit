@@ -104,7 +104,7 @@ const GalleryImage: React.FC<GalleryImageProps> = ({ uri, index }) => {
     height: 1,
   });
 
-  const size = fitContainer(asset.width / asset.height, { width, height });
+  const size = fitContainer(resolution.width / resolution.height, { width, height });
 
   return (
     <Image
