@@ -58,6 +58,12 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     onTap,
   } = props;
 
+  const initialSize = getCropRotatedSize({
+    crop: cropSize,
+    resolution: resolution,
+    angle: 0,
+  });
+
   const translate = useVector(0, 0);
   const offset = useVector(0, 0);
   const scale = useSharedValue<number>(minScale);
@@ -65,8 +71,8 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   const rotation = useSharedValue<number>(0);
   const rotate = useVector(0, 0);
 
-  const container = useSizeVector(1, 1);
-  const detector = useSizeVector(1, 1);
+  const container = useSizeVector(initialSize.width, initialSize.height);
+  const detector = useSizeVector(initialSize.width, initialSize.height);
   const sizeAngle = useSharedValue<number>(0);
 
   const maxScale = useDerivedValue(() => {
@@ -82,19 +88,17 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   useDerivedValue(() => {
     const size = getCropRotatedSize({
       crop: cropSize,
-      resolution: resolution,
+      resolution,
       angle: sizeAngle.value,
     });
 
+    container.width.value = withTiming(size.width);
+    container.height.value = withTiming(size.height);
+
     const isFlipped = rotation.value % Math.PI !== 0;
-    const render1 = container.width.value === 1 && container.height.value === 1;
-
-    container.width.value = render1 ? size.width : withTiming(size.width);
-    container.height.value = render1 ? size.height : withTiming(size.height);
-
     detector.width.value = isFlipped ? size.height : size.width;
     detector.height.value = isFlipped ? size.width : size.height;
-  }, [cropSize, resolution, sizeAngle, rotation, container, detector]);
+  }, [cropSize, resolution, sizeAngle, rotation]);
 
   useDerivedValue(() => {
     onUpdate?.({
@@ -367,7 +371,9 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   return (
     <View style={[rootStyle, styles.root, styles.center]}>
       <Animated.View style={childStyle}>{children}</Animated.View>
-      <View style={styles.absolute}>{OverlayComponent?.()}</View>
+      <View style={styles.absolute} pointerEvents={'none'}>
+        {OverlayComponent?.()}
+      </View>
 
       <GestureDetector gesture={Gesture.Race(pinch, pan, tap)}>
         <Animated.View style={detectorStyle} />
