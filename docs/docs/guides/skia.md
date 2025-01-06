@@ -49,7 +49,7 @@ basic structure with Skia first.
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage } from '@shopify/react-native-skia';
-import { getAspectRatioSize } from 'react-native-zoom-toolkit';
+import { fitContainer } from 'react-native-zoom-toolkit';
 
 const uri =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -62,12 +62,8 @@ const App = () => {
     return null;
   }
 
-  const resolution = { width: image.width(), height: image.height() };
-  // This is the size the image will take on the screen, not its resolution.
-  const imageSize = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: width,
-  });
+  const aspectRatio = image.width() / image.height();
+  const imageSize = fitContainer(aspectRatio, { width, height });
 
   const x = 0;
   const y = (height - imageSize.height) / 2;
@@ -108,11 +104,11 @@ With our basic structure in place, let's address the two missing steps to make t
 
 Let's see how the end result looks like:
 
-```tsx{12,39,43-53}
+```tsx{12,40-48}
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage } from '@shopify/react-native-skia';
-import { getAspectRatioSize, useTransformationState } from 'react-native-zoom-toolkit';
+import { fitContainer, ResumableZoom, useTransformationState } from 'react-native-zoom-toolkit';
 
 const uri =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
@@ -126,11 +122,8 @@ const App = () => {
     return null;
   }
 
-  const resolution = { width: image.width(), height: image.height() };
-  const imageSize = getAspectRatioSize({
-    aspectRatio: resolution.width / resolution.height,
-    width: width,
-  });
+  const aspectRatio = image.width() / image.height();
+  const imageSize = fitContainer(aspectRatio, { width, height });
 
   const x = 0;
   const y = (height - imageSize.height) / 2;
@@ -151,17 +144,15 @@ const App = () => {
         />
       </Canvas>
 
-      {/* Same size and position (0, 0) as the canvas above */}
-      <View style={{ width, height, position: 'absolute' }}>
-        <ResumableZoom
-          maxScale={resolution}
-          extendGestures={true}
-          onUpdate={onUpdate}
-        >
-          {/* Nested child is the same size as the Skia image */}
-          <View style={{ width: imageSize.width, height: imageSize.height }} />
-        </ResumableZoom>
-      </View>
+      <ResumableZoom
+        style={{ width, height, position: 'absolute' }}
+        maxScale={resolution}
+        extendGestures={true}
+        onUpdate={onUpdate}
+      >
+        {/* Nested child is the same size as the Skia image */}
+        <View style={{ width: imageSize.width, height: imageSize.height }} />
+      </ResumableZoom>
     </View>
   );
 };

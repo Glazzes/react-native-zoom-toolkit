@@ -9,8 +9,8 @@ This library relies on both Reanimated and Gesture Handler making part of your p
 
 | React Native Version | React Native Zoom Toolkit Version | Gesture Handler version |
 | -------------------- | --------------------------------- | ----------------------- |
-| `<= 0.76`            | `3.x.x`                           | 2.16.0 and beyond.      |
-| `>= 0.76`            | `4.x.x`                           | 2.19.0 and beyond.      |
+| `<= 0.76`            | `>= 3.0.0`                        | 2.16.0 and beyond.      |
+| `>= 0.76`            | `>= 4.0.0`                        | 2.19.0 and beyond.      |
 
 ::: code-group
 
