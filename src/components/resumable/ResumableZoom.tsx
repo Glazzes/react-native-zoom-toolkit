@@ -12,7 +12,6 @@ import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
-import { pinchTransform } from '../../commons/utils/pinchTransform';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
@@ -250,36 +249,6 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     set(toX, toY, toScale, animate);
   };
 
-  const zoom = (multiplier: number, xy?: Vector<number>) => {
-    let originX = -1 * (translate.x.value / scale.value);
-    let originY = -1 * (translate.y.value / scale.value);
-    const toScale = clamp(scale.value * multiplier, minScale, maxScale.value);
-
-    if (xy !== undefined) {
-      const diffX = xy.x / childSize.width.value;
-      const diffY = xy.y / childSize.height.value;
-      const actualX = extendGestures ? diffX * extendedSize.width.value : xy.x;
-      const actualY = extendGestures ? diffY * extendedSize.height.value : xy.y;
-
-      originX = actualX - extendedSize.width.value / 2;
-      originY = actualY - extendedSize.height.value / 2;
-    }
-
-    const { x, y } = pinchTransform({
-      toScale,
-      fromScale: scale.value,
-      origin: { x: originX, y: originY },
-      offset: { x: translate.x.value, y: translate.y.value },
-      delta: { x: 0, y: 0 },
-    });
-
-    const { x: boundX, y: boundY } = boundsFn(toScale);
-    const toX = clamp(x, -1 * boundX, boundX);
-    const toY = clamp(y, -1 * boundY, boundY);
-
-    set(toX, toY, toScale, true);
-  };
-
   const getVisibleRect = (): Rect => {
     return getRect({
       scale: scale.value,
@@ -293,6 +262,36 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
       },
       translation: { x: translate.x.value, y: translate.y.value },
     });
+  };
+
+  const zoom = (multiplier: number, xy?: Vector<number>) => {
+    const toScale = scale.value * multiplier;
+
+    let focal = xy;
+    if (focal === undefined) {
+      const frame = getVisibleRect();
+      focal = {
+        x: frame.x + frame.width / 2,
+        y: frame.y + frame.height / 2,
+      };
+    }
+
+    const centerX = childSize.width.value / 2;
+    const centerY = childSize.height.value / 2;
+
+    const originX = focal.x - centerX;
+    const originY = focal.y - centerY;
+    const signedDistanceCenterX = centerX - focal.x;
+    const signedDistanceCenterY = centerY - focal.y;
+
+    const translateX = signedDistanceCenterX + (originX - originX * toScale);
+    const translateY = signedDistanceCenterY + (originY - originY * toScale);
+
+    const { x: boundX, y: boundY } = boundsFn(toScale);
+    const toX = clamp(translateX, -1 * boundX, boundX);
+    const toY = clamp(translateY, -1 * boundY, boundY);
+
+    set(toX, toY, toScale, true);
   };
 
   useImperativeHandle(reference, () => ({
