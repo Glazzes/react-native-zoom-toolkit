@@ -45,7 +45,7 @@ however the techniques you will use are also applicable to the other components 
 As an example we'll focus on replicating the example seen in ResumableZoom documentation, let's set up our
 basic structure with Skia first.
 
-```tsx{38-44}
+```tsx{34-40}
 import React from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { Canvas, Image, useImage } from '@shopify/react-native-skia';
