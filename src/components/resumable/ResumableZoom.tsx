@@ -265,10 +265,15 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
   };
 
   const zoom = (multiplier: number, xy?: Vector<number>) => {
-    const toScale = scale.value * multiplier;
+    const toScale = clamp(scale.value * multiplier, minScale, maxScale.value);
 
     let focal = xy;
-    if (focal === undefined) {
+    if (focal !== undefined) {
+      focal = {
+        x: clamp(focal.x, 0, childSize.width.value),
+        y: clamp(focal.y, 0, childSize.height.value),
+      };
+    } else {
       const frame = getVisibleRect();
       focal = {
         x: frame.x + frame.width / 2,
