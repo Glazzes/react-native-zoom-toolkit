@@ -31,12 +31,7 @@
 To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit/
 
 ## Support
-If you have found good usage out of this library, consider supporting its development.
-<p>
-  <a href="https://paypal.me/centurionnightair">
-    <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="paypal">
-  </a>
-</p>
+If you have found good usage out of this library, consider supporting its development. If you've got a paypal account you can donate to this santiagop1@protonmail.com
 
 ## Demo
 The example app comes with five different examples from which you can learn from, see the [Example app](./example/).
