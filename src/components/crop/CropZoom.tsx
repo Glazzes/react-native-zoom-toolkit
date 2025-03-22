@@ -1,5 +1,10 @@
 import React, { useImperativeHandle } from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  type LayoutChangeEvent,
+  type ViewStyle,
+} from 'react-native';
 import Animated, {
   clamp,
   useAnimatedStyle,
@@ -71,19 +76,19 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   const rotation = useSharedValue<number>(0);
   const rotate = useVector(0, 0);
 
-  const container = useSizeVector(initialSize.width, initialSize.height);
-  const detector = useSizeVector(initialSize.width, initialSize.height);
+  const rootSize = useSizeVector(0, 0);
+  const childSize = useSizeVector(initialSize.width, initialSize.height);
+  const gestureSize = useSizeVector(initialSize.width, initialSize.height);
   const sizeAngle = useSharedValue<number>(0);
 
   const maxScale = useDerivedValue(() => {
-    const { width, height } = container;
     const scaleValue = getMaxScale(
-      { width: width.value, height: height.value },
+      { width: childSize.width.value, height: childSize.height.value },
       resolution
     );
 
     return userMaxScale ?? scaleValue;
-  }, [container, userMaxScale, resolution]);
+  }, [childSize, userMaxScale, resolution]);
 
   useDerivedValue(() => {
     const size = getCropRotatedSize({
@@ -92,18 +97,26 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
       angle: sizeAngle.value,
     });
 
-    container.width.value = withTiming(size.width);
-    container.height.value = withTiming(size.height);
+    let finalSize = 0;
+    const max = Math.max(rootSize.width.value, rootSize.height.value);
+    if (childSize.width.value > childSize.height.value) {
+      const sizeOffset = initialSize.width - cropSize.width;
+      finalSize = max + sizeOffset;
+    } else {
+      const sizeOffset = initialSize.height - cropSize.height;
+      finalSize = max + sizeOffset;
+    }
 
-    const isFlipped = rotation.value % Math.PI !== 0;
-    detector.width.value = isFlipped ? size.height : size.width;
-    detector.height.value = isFlipped ? size.width : size.height;
-  }, [cropSize, resolution, sizeAngle, rotation]);
+    gestureSize.width.value = finalSize;
+    gestureSize.height.value = finalSize;
+    childSize.width.value = withTiming(size.width);
+    childSize.height.value = withTiming(size.height);
+  }, [rootSize, cropSize, resolution, childSize, sizeAngle]);
 
   useDerivedValue(() => {
     onUpdate?.({
-      width: container.width.value,
-      height: container.height.value,
+      width: childSize.width.value,
+      height: childSize.height.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
@@ -111,12 +124,12 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
       rotateX: rotate.x.value,
       rotateY: rotate.y.value,
     });
-  }, [container, translate, scale, rotate, rotation]);
+  }, [childSize, translate, scale, rotation, rotate]);
 
   const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
     const scaleVal = optionalScale ?? scale.value;
-    let size = { width: container.width.value, height: container.height.value };
+    let size = { width: childSize.width.value, height: childSize.height.value };
 
     const isInInverseAspectRatio = rotation.value % Math.PI !== 0;
     if (isInInverseAspectRatio) {
@@ -128,6 +141,11 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     return { x: boundX, y: boundY };
   };
 
+  function measureRootContainer(e: LayoutChangeEvent) {
+    rootSize.width.value = e.nativeEvent.layout.width;
+    rootSize.height.value = e.nativeEvent.layout.height;
+  }
+
   const {
     gesturesEnabled,
     onTouchesDown,
@@ -137,7 +155,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     onPinchUpdate,
     onPinchEnd,
   } = usePinchCommons({
-    container: detector,
+    container: gestureSize,
     translate,
     offset,
     scale,
@@ -156,7 +174,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   });
 
   const { onPanStart, onPanChange, onPanEnd } = usePanCommons({
-    container: detector,
+    container: gestureSize,
     translate,
     offset,
     panMode,
@@ -196,8 +214,8 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
 
   const detectorStyle = useAnimatedStyle(() => {
     return {
-      width: detector.width.value,
-      height: detector.height.value,
+      width: gestureSize.width.value,
+      height: gestureSize.height.value,
       position: 'absolute',
       transform: [
         { translateX: translate.x.value },
@@ -205,12 +223,12 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
         { scale: scale.value },
       ],
     };
-  }, [detector, translate, scale]);
+  }, [gestureSize, translate, scale]);
 
   const childStyle = useAnimatedStyle(() => {
     return {
-      width: container.width.value,
-      height: container.height.value,
+      width: childSize.width.value,
+      height: childSize.height.value,
       transform: [
         { translateX: translate.x.value },
         { translateY: translate.y.value },
@@ -220,7 +238,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
         { rotateY: `${rotate.y.value}rad` },
       ],
     };
-  }, [container, translate, scale, rotation, rotate]);
+  }, [childSize, translate, scale, rotation, rotate]);
 
   // Reference handling section
   const resetTo = (st: CropAssignableState, animate: boolean = true) => {
@@ -291,8 +309,8 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
       cropSize: cropSize,
       resolution: resolution,
       itemSize: {
-        width: container.width.value,
-        height: container.height.value,
+        width: childSize.width.value,
+        height: childSize.height.value,
       },
       translation: { x: translate.x.value, y: translate.y.value },
       isRotated: context.rotationAngle % 180 !== 0,
@@ -307,8 +325,8 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   };
 
   const handleRequestState = (): CropZoomState<number> => ({
-    width: container.width.value,
-    height: container.height.value,
+    width: childSize.width.value,
+    height: childSize.height.value,
     translateX: translate.x.value,
     translateY: translate.y.value,
     scale: scale.value,
@@ -369,7 +387,10 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   };
 
   return (
-    <View style={[rootStyle, styles.root, styles.center]}>
+    <View
+      style={[styles.root, rootStyle, styles.center]}
+      onLayout={measureRootContainer}
+    >
       <Animated.View style={childStyle}>{children}</Animated.View>
       <View style={styles.absolute} pointerEvents={'none'}>
         {OverlayComponent?.()}
