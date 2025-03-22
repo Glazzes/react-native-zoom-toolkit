@@ -8,9 +8,7 @@ type CropModalProps = {
   setCrop: (uri: string | undefined) => void;
 };
 
-/*
- * Just a modal that displays the crop result image.
- */
+// Just a modal that displays the crop result image.
 const CropModal: React.FC<CropModalProps> = ({ uri, setCrop }) => {
   const resetCrop = () => {
     setCrop(undefined);
@@ -39,7 +37,7 @@ const CropModal: React.FC<CropModalProps> = ({ uri, setCrop }) => {
 const styles = StyleSheet.create({
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: Number.MAX_SAFE_INTEGER,
+    zIndex: 999,
     justifyContent: 'center',
     alignItems: 'center',
   },
