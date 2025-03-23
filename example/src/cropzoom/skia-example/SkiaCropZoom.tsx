@@ -11,7 +11,6 @@ import {
   useCanvasRef,
 } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
-
 import {
   CropZoom,
   type CropZoomType,
@@ -33,15 +32,16 @@ const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const SkiaCropZoom = () => {
-  const ref = useRef<CropZoomType>(null);
   const canvasRef = useCanvasRef();
+  const ref = useRef<CropZoomType>(null);
 
   const image = useImage(IMAGE);
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { onUpdate, transform, state } = useTransformationState('crop');
 
-  const cropSize = screenWidth * 0.9;
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [cropImage, setCropImage] = useState<string | undefined>(undefined);
+
+  const cropSize = screenWidth * 0.9;
 
   const progress = useSharedValue(0);
   const posX = useDerivedValue(
@@ -55,9 +55,9 @@ const SkiaCropZoom = () => {
     [state, screenHeight]
   );
 
-  const renderOverlay = () => {
+  function renderOverlay() {
     return <SVGOverlay cropSize={{ width: cropSize, height: cropSize }} />;
-  };
+  }
 
   if (image === null) {
     return null;
@@ -96,10 +96,8 @@ const SkiaCropZoom = () => {
       </View>
 
       <Controls
-        cropSize={cropSize}
         progress={progress}
         image={image}
-        canvasRef={canvasRef}
         cropRef={ref}
         setCrop={setCropImage}
       />

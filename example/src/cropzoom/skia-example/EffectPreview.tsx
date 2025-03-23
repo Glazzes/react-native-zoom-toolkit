@@ -33,13 +33,13 @@ const EffectPreview: React.FC<EffectPreviewProps> = ({
   image,
   matrix,
 }) => {
-  const updateActiveIndex = () => {
-    setActiveIndex(index);
-  };
-
   const activeStyle: ViewStyle = {
     borderColor: activeIndex === index ? activeColor : baseColor,
   };
+
+  function updateActiveIndex() {
+    setActiveIndex(index);
+  }
 
   return (
     <Pressable
