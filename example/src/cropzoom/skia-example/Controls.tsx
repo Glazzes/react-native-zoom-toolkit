@@ -1,95 +1,143 @@
 import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  ActivityIndicator,
-  useWindowDimensions,
-} from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import type { CropZoomType } from '../../../../src/components/crop/types';
-import { theme } from '../../constants';
+import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
+import { withTiming, type SharedValue } from 'react-native-reanimated';
 import {
   rect,
-  ImageFormat,
-  type SkiaDomView,
   type SkImage,
+  Skia,
+  FilterMode,
+  MipmapMode,
 } from '@shopify/react-native-skia';
 import { cacheDirectory, writeAsStringAsync } from 'expo-file-system';
-import { withTiming, type SharedValue } from 'react-native-reanimated';
+import type { CropZoomType } from 'react-native-zoom-toolkit';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+
 import {
   baseColor,
   activeColor,
   buttonSize,
   indentity,
   blackAndWhite,
-  CONTROLS_HEIGHT,
 } from '../commons/contants';
 import EffectPreview from './EffectPreview';
+import { theme } from '../../constants';
 
 type EffectIndicatorProps = {
-  cropSize: number;
-  progress: SharedValue<number>;
   image: SkImage;
-  setCrop: (uri: string | undefined) => void;
+  progress: SharedValue<number>;
   cropRef: React.RefObject<CropZoomType>;
-  canvasRef: React.RefObject<SkiaDomView>;
+  setCrop: (uri: string | undefined) => void;
 };
 
 const matrices: number[][] = [indentity, blackAndWhite];
 
 const Controls: React.FC<EffectIndicatorProps> = ({
-  cropSize,
   image,
   progress,
   cropRef,
-  canvasRef,
   setCrop,
 }) => {
-  const { width, height } = useWindowDimensions();
-
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [isRotated, setIsRotated] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
-  const rotate = () => {
+  function rotate() {
     cropRef?.current?.rotate(true, true, (angle) => {
       setIsRotated(angle !== 0);
     });
-  };
+  }
 
-  const flipVertical = () => {
+  function flipCanvasVertical() {
     cropRef.current?.flipHorizontal(true, () => setIsFlipped((prev) => !prev));
-  };
+  }
 
   /*
-   * In contast to image files where we use crop method from cropZoom here, it does not make any
-   * sense to use it here, as we do not have access to a file, we just take a snapshot of the canvas
-   * where our crop size is located at, starting  from the posiiton in the top left corner
+   * Draw the image at position 0 0, then translate it by the negative origin values of the crop
+   * context, this ensure the image will be in frame
    */
-  const cropCanvas = async () => {
+  async function crop() {
     setIsCropping(true);
 
-    const canvasCrop = rect(
-      (width - cropSize) / 2,
-      (height - CONTROLS_HEIGHT - cropSize) / 2,
-      cropSize,
-      cropSize
-    );
-    const canvasSnapshot = canvasRef.current?.makeImageSnapshot(canvasCrop);
-
-    if (canvasSnapshot !== undefined) {
-      const contents = canvasSnapshot.encodeToBase64(ImageFormat.PNG, 100);
-      const time = new Date().getTime();
-      const fileUri = `${cacheDirectory}picture${time}.png`;
-
-      writeAsStringAsync(fileUri, contents, { encoding: 'base64' }).then(() => {
-        setIsCropping(false);
-        setCrop(fileUri);
-      });
+    const cropContext = cropRef.current?.crop();
+    if (cropContext === undefined) {
+      return;
     }
-  };
+
+    const { flipHorizontal, flipVertical, rotationAngle } = cropContext.context;
+    const { width, height, originX, originY } = cropContext.crop;
+
+    const rotatedImage = drawImageRotated(
+      image,
+      rotationAngle,
+      flipHorizontal,
+      flipVertical
+    );
+
+    const surface = Skia.Surface.MakeOffscreen(width, height)!;
+    const canvas = surface.getCanvas();
+
+    const paint = Skia.Paint();
+    const activeMatrix = progress.value === 0 ? indentity : blackAndWhite;
+    paint.setColorFilter(Skia.ColorFilter.MakeMatrix(activeMatrix));
+
+    canvas.translate(-1 * originX, -1 * originY);
+    canvas.drawImageRectOptions(
+      rotatedImage,
+      rect(0, 0, rotatedImage.width(), rotatedImage.height()),
+      rect(0, 0, rotatedImage.width(), rotatedImage.height()),
+      FilterMode.Linear,
+      MipmapMode.Linear,
+      paint
+    )!;
+
+    const snapshot = surface.makeImageSnapshot();
+    saveBase64ImageToDisk(snapshot.encodeToBase64());
+  }
+
+  function drawImageRotated(
+    currentImage: SkImage,
+    angle: number,
+    flipH: boolean,
+    flipV: boolean
+  ): SkImage {
+    const isInverted = angle === 90 || angle === 270;
+    const width = isInverted ? image.height() : image.width();
+    const height = isInverted ? image.width() : image.height();
+
+    const surface = Skia.Surface.MakeOffscreen(width, height)!;
+    const canvas = surface.getCanvas();
+
+    canvas.translate(width / 2, height / 2);
+    canvas.rotate(angle, 0, 0);
+    canvas.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+
+    const x = -1 * (width / 2) + (width - currentImage.width()) / 2;
+    const y = -1 * (height / 2) + (height - currentImage.height()) / 2;
+
+    canvas.drawImageRectOptions(
+      currentImage,
+      rect(0, 0, currentImage.width(), currentImage.height()),
+      rect(x, y, currentImage.width(), currentImage.height()),
+      FilterMode.Linear,
+      MipmapMode.Linear
+    );
+
+    return surface.makeImageSnapshot();
+  }
+
+  async function saveBase64ImageToDisk(base64: string) {
+    const time = new Date().getTime();
+    const fileUri = `${cacheDirectory}picture${time}.png`;
+
+    writeAsStringAsync(fileUri, base64, { encoding: 'base64' })
+      .then(() => {
+        setCrop(fileUri);
+      })
+      .finally(() => {
+        setIsCropping(false);
+      });
+  }
 
   useEffect(() => {
     progress.value = withTiming(activeIndex);
@@ -120,7 +168,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
         />
       </Pressable>
 
-      <Pressable onPress={flipVertical}>
+      <Pressable onPress={flipCanvasVertical}>
         <Icon
           name={'flip-horizontal'}
           size={24}
@@ -128,7 +176,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
         />
       </Pressable>
 
-      <Pressable style={styles.button} onPress={cropCanvas}>
+      <Pressable style={styles.button} onPress={crop}>
         {isCropping ? (
           <ActivityIndicator size={'small'} color={baseColor} />
         ) : (

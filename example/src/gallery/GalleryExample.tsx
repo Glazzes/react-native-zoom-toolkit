@@ -89,21 +89,21 @@ const GalleryExample = () => {
   useEffect(() => {
     const requestAssets = async () => {
       const { granted } = await requestPermissionsAsync();
-      if (granted) {
-        const page = await getAssetsAsync({
-          first: 100,
-          mediaType: ['photo'],
-          sortBy: 'creationTime',
-        });
+      if (!granted) return;
 
-        const pageScales: SizeVector[] = [];
-        for (let asset of page.assets) {
-          pageScales.push({ width: asset.width, height: asset.height });
-        }
+      const page = await getAssetsAsync({
+        first: 100,
+        mediaType: ['photo'],
+        sortBy: 'creationTime',
+      });
 
-        setAssets(page.assets);
-        setScales(pageScales);
+      const pageScales: SizeVector[] = [];
+      for (let asset of page.assets) {
+        pageScales.push({ width: asset.width, height: asset.height });
       }
+
+      setAssets(page.assets);
+      setScales(pageScales);
     };
 
     requestAssets();

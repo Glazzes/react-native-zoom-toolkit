@@ -56,8 +56,8 @@ export const crop = (options: CanvasToSizeOptions) => {
     crop: {
       originX: x * sizeModifier,
       originY: y * sizeModifier,
-      width: Math.round(width * sizeModifier),
-      height: Math.round(height * sizeModifier),
+      width: Math.floor(width * sizeModifier),
+      height: Math.floor(height * sizeModifier),
     },
     resize,
   };

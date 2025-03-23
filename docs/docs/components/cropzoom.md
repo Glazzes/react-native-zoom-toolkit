@@ -1,5 +1,5 @@
 ---
-title: Croop Zoom
+title: CropZoom
 description: An ideal and unopinionated component for image and video cropping needs.
 outline: deep
 ---

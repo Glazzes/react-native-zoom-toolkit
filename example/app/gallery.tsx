@@ -1,8 +1,8 @@
 import React from 'react';
-import ResumableGalleryExample from '../src/gallery/GalleryExample';
+import { GalleryExample } from '../src/gallery';
 
 const resumablegallery = () => {
-  return <ResumableGalleryExample />;
+  return <GalleryExample />;
 };
 
 export default resumablegallery;
