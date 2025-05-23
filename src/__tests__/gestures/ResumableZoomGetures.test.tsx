@@ -1,15 +1,18 @@
 import React from 'react';
 import { View } from 'react-native';
+import { makeMutable } from 'react-native-reanimated';
 import {
   State,
   type PanGesture,
   type PinchGesture,
   type TapGesture,
+  type LongPressGesture,
 } from 'react-native-gesture-handler';
 import {
   fireGestureHandler,
   getByGestureTestId,
 } from 'react-native-gesture-handler/jest-utils';
+
 import {
   act,
   fireEvent,
@@ -24,7 +27,6 @@ import type {
   ResumableZoomType,
 } from '../../components/resumable/types';
 import type { PanMode, SizeVector } from '../../commons/types';
-import { makeMutable } from 'react-native-reanimated';
 
 type ResumableZoomPropsWithRef = ResumableZoomProps & {
   ref?: React.ForwardedRef<ResumableZoomType>;
@@ -73,6 +75,7 @@ describe('ResumableZoom Gesture Tests', () => {
     const onPanEnd = jest.fn();
     const onPinchEnd = jest.fn();
     const onPinchStart = jest.fn();
+    const onLongPress = jest.fn();
     const onTap = jest.fn();
     const onGestureEnd = jest.fn();
 
@@ -81,6 +84,7 @@ describe('ResumableZoom Gesture Tests', () => {
       onPanEnd,
       onPinchStart,
       onPinchEnd,
+      onLongPress,
       onTap,
       onGestureEnd,
       panEnabled: enabled,
@@ -91,9 +95,10 @@ describe('ResumableZoom Gesture Tests', () => {
 
     act(() => {
       fireGestureHandler<PanGesture>(getByGestureTestId('pan'));
-      fireGestureHandler<TapGesture>(getByGestureTestId('tap'));
       fireGestureHandler<PinchGesture>(getByGestureTestId('pinch'));
+      fireGestureHandler<TapGesture>(getByGestureTestId('tap'));
       fireGestureHandler<TapGesture>(getByGestureTestId('doubleTap'));
+      fireGestureHandler<LongPressGesture>(getByGestureTestId('longPress'));
 
       jest.runAllTimers();
     });
@@ -104,6 +109,8 @@ describe('ResumableZoom Gesture Tests', () => {
     expect(onPanEnd).toHaveBeenCalledTimes(timesCalled);
     expect(onTap).toHaveBeenCalledTimes(timesCalled);
     expect(onGestureEnd).toHaveBeenCalledTimes(timesCalled * 3);
+
+    expect(onLongPress).toHaveBeenCalledTimes(1);
   });
 
   /*
@@ -127,10 +134,12 @@ describe('ResumableZoom Gesture Tests', () => {
     const pan = getByGestureTestId('pan');
     const tap = getByGestureTestId('tap');
     const doubleTap = getByGestureTestId('doubleTap');
+    const longPress = getByGestureTestId('longPress');
 
     await waitFor(() => expect(pan.config.enabled).toBe(false));
     await waitFor(() => expect(tap.config.enabled).toBe(false));
     await waitFor(() => expect(doubleTap.config.enabled).toBe(false));
+    await waitFor(() => expect(longPress.config.enabled).toBe(false));
   });
 
   /*
