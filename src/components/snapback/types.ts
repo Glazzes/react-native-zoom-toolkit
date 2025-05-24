@@ -9,7 +9,7 @@ import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handle
 
 import type {
   CommonZoomState,
-  LongPressGestureCallbacks,
+  LongPressCallbacks,
   PinchGestureCallbacks,
   SizeVector,
   TapGestureCallbacks,
@@ -51,4 +51,4 @@ export type SnapBackZoomProps = { children: React.ReactNode } & Partial<{
 }> &
   PinchGestureCallbacks &
   TapGestureCallbacks &
-  LongPressGestureCallbacks;
+  LongPressCallbacks;

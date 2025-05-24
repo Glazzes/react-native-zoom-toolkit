@@ -4,7 +4,7 @@ import type { ViewStyle } from 'react-native';
 import type {
   CommonResumableProps,
   CommonZoomState,
-  LongPressGestureCallbacks,
+  LongPressCallbacks,
   PanGestureCallbacks,
   PinchCenteringMode,
   PinchGestureCallbacks,
@@ -35,7 +35,7 @@ export type ResumableZoomProps = Partial<{
   onOverPanning: (x: number, y: number) => void;
 }> & { children: React.ReactNode } & PanGestureCallbacks &
   PinchGestureCallbacks &
-  LongPressGestureCallbacks &
+  LongPressCallbacks &
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 

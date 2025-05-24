@@ -54,13 +54,13 @@ export type PinchGestureEvent =
 export type PanGestureEvent =
   GestureStateChangeEvent<PanGestureHandlerEventPayload>;
 
-export type LongPressGestureEvent =
+export type LongPressEvent =
   GestureStateChangeEvent<LongPressGestureHandlerEventPayload>;
 
 export type PanGestureEventCallback = (e: PanGestureEvent) => void;
 export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
-export type LongPressGestreEventCallback = (e: LongPressGestureEvent) => void;
+export type LongPressGestreEventCallback = (e: LongPressEvent) => void;
 
 export type PanGestureCallbacks = Partial<{
   onPanStart: PanGestureEventCallback;
@@ -77,7 +77,7 @@ export type TapGestureCallbacks = Partial<{
   onDoubleTap: TapGestureEventCallback;
 }>;
 
-export type LongPressGestureCallbacks = Partial<{
+export type LongPressCallbacks = Partial<{
   onLongPress: LongPressGestreEventCallback;
 }>;
 
