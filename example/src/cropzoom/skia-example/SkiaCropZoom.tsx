@@ -67,7 +67,8 @@ const SkiaCropZoom = () => {
 
   return (
     <View style={styles.root}>
-      <Canvas style={StyleSheet.absoluteFill} ref={canvasRef}>
+      {/* @ts-ignore */}
+      <Canvas ref={canvasRef} style={StyleSheet.absoluteFill}>
         <Image
           x={posX}
           y={posY}
