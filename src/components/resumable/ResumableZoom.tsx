@@ -50,7 +50,9 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     scaleMode = 'bounce',
     pinchCenteringMode = 'clamp',
     allowPinchPanning = true,
+    longPressDuration = 500,
     onTap,
+    onLongPress,
     onUpdate,
     onGestureEnd,
     onSwipe,
@@ -208,6 +210,15 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     .numberOfTaps(2)
     .onEnd(onDoubleTapEnd);
 
+  const longPress = Gesture.LongPress()
+    .withTestId('longPress')
+    .enabled(gesturesEnabled)
+    .minDuration(longPressDuration)
+    .runOnJS(true)
+    .onStart((e) => {
+      onLongPress && onLongPress(e);
+    });
+
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;
     rootSize.height.value = e.nativeEvent.layout.height;
@@ -307,7 +318,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     getVisibleRect: getVisibleRect,
   }));
 
-  const composedTap = Gesture.Exclusive(doubleTap, tap);
+  const composedTap = Gesture.Exclusive(doubleTap, tap, longPress);
   const composedGesture = Gesture.Race(pinch, pan, composedTap);
 
   return (

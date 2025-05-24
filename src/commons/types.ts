@@ -3,6 +3,7 @@ import type {
   PinchGestureHandlerEventPayload,
   TapGestureHandlerEventPayload,
   PanGestureHandlerEventPayload,
+  LongPressGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
 export type Rect = {
@@ -53,9 +54,13 @@ export type PinchGestureEvent =
 export type PanGestureEvent =
   GestureStateChangeEvent<PanGestureHandlerEventPayload>;
 
+export type LongPressEvent =
+  GestureStateChangeEvent<LongPressGestureHandlerEventPayload>;
+
 export type PanGestureEventCallback = (e: PanGestureEvent) => void;
 export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
+export type LongPressGestreEventCallback = (e: LongPressEvent) => void;
 
 export type PanGestureCallbacks = Partial<{
   onPanStart: PanGestureEventCallback;
@@ -70,6 +75,10 @@ export type PinchGestureCallbacks = Partial<{
 export type TapGestureCallbacks = Partial<{
   onTap: TapGestureEventCallback;
   onDoubleTap: TapGestureEventCallback;
+}>;
+
+export type LongPressCallbacks = Partial<{
+  onLongPress: LongPressGestreEventCallback;
 }>;
 
 export type ZoomEventCallbacks = Partial<{

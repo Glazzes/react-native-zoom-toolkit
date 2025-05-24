@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import {
+  type LongPressGesture,
   type PinchGesture,
   type TapGesture,
 } from 'react-native-gesture-handler';
@@ -39,6 +40,7 @@ describe('SnapbackZoom Gesture Tests', () => {
     const onPinchEnd = jest.fn();
     const onTap = jest.fn();
     const onDoubleTap = jest.fn();
+    const onLongPress = jest.fn();
     const onGestureEnd = jest.fn();
 
     render(
@@ -48,6 +50,7 @@ describe('SnapbackZoom Gesture Tests', () => {
         onTap={onTap}
         onDoubleTap={onDoubleTap}
         onGestureEnd={onGestureEnd}
+        onLongPress={onLongPress}
         gesturesEnabled={enabled}
       >
         <View />
@@ -57,12 +60,15 @@ describe('SnapbackZoom Gesture Tests', () => {
     fireGestureHandler<PinchGesture>(getByGestureTestId('pinch'));
     fireGestureHandler<TapGesture>(getByGestureTestId('tap'));
     fireGestureHandler<TapGesture>(getByGestureTestId('doubleTap'));
+    fireGestureHandler<LongPressGesture>(getByGestureTestId('longPress'));
+
     jest.runAllTimers();
 
     expect(onPinchStart).toHaveBeenCalledTimes(timesCalled);
     expect(onPinchEnd).toHaveBeenCalledTimes(timesCalled);
     expect(onTap).toHaveBeenCalledTimes(timesCalled);
     expect(onDoubleTap).toHaveBeenCalledTimes(timesCalled);
+    expect(onLongPress).toHaveBeenCalledTimes(timesCalled);
     expect(onGestureEnd).toHaveBeenCalledTimes(timesCalled);
   });
 });

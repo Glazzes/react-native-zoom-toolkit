@@ -254,6 +254,22 @@ Callback triggered when the pinch gesture starts.
 
 Callback triggered as soon as the user lifts their fingers off the screen after pinching.
 
+### longPressDuration
+
+| Type      | Default |
+| --------- | ------- |
+| `number`  | `500`   |
+
+Minimum time expressed in milliseconds required to trigger the long press gesture event, expect values greater than 250 to avoid collisions with tap and double tap gestures.
+
+### onLongPress
+
+| Type                                      | Default     | Additional Info                                                                                    |
+| ----------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `(e: LongPressEvent) => void` | `undefined` | see [long press gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/long-press-gesture/#event-data) |
+
+Callback triggered as soon as the long press gesture starts.
+
 ### onUpdate
 
 | Type                                      | Default     | Additional Info                                                                                    |

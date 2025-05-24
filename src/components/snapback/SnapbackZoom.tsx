@@ -25,11 +25,13 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   resizeConfig,
   timingConfig,
   gesturesEnabled = true,
+  longPressDuration = 500,
   scrollRef,
   onTap,
   onDoubleTap,
   onPinchStart,
   onPinchEnd,
+  onLongPress,
   onUpdate,
   onGestureEnd,
 }) => {
@@ -151,6 +153,13 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .runOnJS(true)
     .onEnd((e) => onDoubleTap?.(e));
 
+  const longPress = Gesture.LongPress()
+    .withTestId('longPress')
+    .enabled(gesturesEnabled)
+    .minDuration(longPressDuration)
+    .runOnJS(true)
+    .onStart((e) => onLongPress?.(e));
+
   const containerStyle = useAnimatedStyle(
     () => ({
       width: resizeConfig?.size.width,
@@ -175,7 +184,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     };
   }, [childrenSize, translate, scale]);
 
-  const composedTapGesture = Gesture.Exclusive(doubleTap, tap);
+  const composedTapGesture = Gesture.Exclusive(doubleTap, tap, longPress);
 
   return (
     <GestureDetector gesture={Gesture.Race(pinch, composedTapGesture)}>

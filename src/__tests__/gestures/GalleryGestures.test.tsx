@@ -6,6 +6,7 @@ import {
 } from 'react-native-gesture-handler/jest-utils';
 import {
   State,
+  type LongPressGesture,
   type PanGesture,
   type PinchGesture,
   type TapGesture,
@@ -55,18 +56,20 @@ describe('Gallery Gesture Tests', () => {
   it('should trigger gesture callbacks', () => {
     const onPanStart = jest.fn();
     const onPanEnd = jest.fn();
+    const onLongPress = jest.fn();
     const onGestureEnd = jest.fn();
 
-    renderGallery({ onPanStart, onPanEnd, onGestureEnd });
+    renderGallery({ onPanStart, onPanEnd, onLongPress, onGestureEnd });
 
-    fireGestureHandler<TapGesture>(getByGestureTestId('tap'), [
-      { state: State.ACTIVE, x: 50, y: 50 },
-    ]);
     fireGestureHandler<PanGesture>(getByGestureTestId('pan'));
+    fireGestureHandler<TapGesture>(getByGestureTestId('tap'));
+    fireGestureHandler<LongPressGesture>(getByGestureTestId('longPress'));
+
     jest.runAllTimers();
 
     expect(onPanStart).toHaveReturnedTimes(1);
     expect(onPanEnd).toHaveReturnedTimes(1);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
     expect(onGestureEnd).toHaveReturnedTimes(1);
   });
 
