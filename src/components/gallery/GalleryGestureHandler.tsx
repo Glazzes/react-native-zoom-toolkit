@@ -47,12 +47,14 @@ type GalleryGestureHandlerProps = {
   zoomEnabled: boolean;
   scaleMode: ScaleMode;
   pinchCenteringMode: PinchCenteringMode;
+  longPressDuration: number;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
   onPanEnd?: GalleryProps['onPanEnd'];
   onPinchStart?: GalleryProps['onPinchStart'];
   onPinchEnd?: GalleryProps['onPinchEnd'];
   onSwipe?: GalleryProps['onSwipe'];
+  onLongPress?: GalleryProps['onLongPress'];
   onVerticalPull?: GalleryProps['onVerticalPull'];
   onGestureEnd?: GalleryProps['onGestureEnd'];
 };
@@ -74,12 +76,14 @@ const GalleryGestureHandler = ({
   allowOverflow,
   allowPinchPanning,
   pinchCenteringMode,
+  longPressDuration,
   onTap,
   onPanStart,
   onPanEnd,
   onPinchStart: onUserPinchStart,
   onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
+  onLongPress,
   onVerticalPull,
   onGestureEnd,
 }: GalleryGestureHandlerProps) => {
@@ -429,6 +433,13 @@ const GalleryGestureHandler = ({
     .maxDuration(250)
     .onEnd(onDoubleTapEnd);
 
+  const longPress = Gesture.LongPress()
+    .withTestId('longPress')
+    .enabled(gesturesEnabled)
+    .minDuration(longPressDuration)
+    .runOnJS(true)
+    .onStart((e) => onLongPress?.(e, activeIndex.value));
+
   const detectorStyle = useAnimatedStyle(() => {
     const width = Math.max(rootSize.width.value, rootChildSize.width.value);
     const height = Math.max(rootSize.height.value, rootChildSize.height.value);
@@ -446,7 +457,8 @@ const GalleryGestureHandler = ({
     };
   }, [rootSize, rootChildSize, translate, scale]);
 
-  const composed = Gesture.Race(pan, pinch, Gesture.Exclusive(doubleTap, tap));
+  const composedTaps = Gesture.Exclusive(doubleTap, tap, longPress);
+  const composed = Gesture.Race(pan, pinch, composedTaps);
 
   return (
     <GestureDetector gesture={composed}>
@@ -463,6 +475,8 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.onPinchStart === next.onPinchStart &&
     prev.onPinchEnd === next.onPinchEnd &&
     prev.onSwipe === next.onSwipe &&
+    prev.onLongPress === next.onLongPress &&
+    prev.onVerticalPull === next.onVerticalPull &&
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
@@ -470,7 +484,6 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.scaleMode === next.scaleMode &&
     prev.allowPinchPanning === next.allowPinchPanning &&
     prev.allowOverflow === next.allowOverflow &&
-    prev.pinchCenteringMode === next.pinchCenteringMode &&
-    prev.onVerticalPull === next.onVerticalPull
+    prev.pinchCenteringMode === next.pinchCenteringMode
   );
 });

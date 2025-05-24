@@ -38,6 +38,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     scaleMode = 'bounce',
     pinchCenteringMode = 'clamp',
     allowPinchPanning = true,
+    longPressDuration = 500,
     customTransition,
     onIndexChange,
     onScroll,
@@ -48,6 +49,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     onPinchStart,
     onPinchEnd,
     onSwipe,
+    onLongPress,
     onZoomBegin,
     onZoomEnd,
     onVerticalPull,
@@ -238,12 +240,14 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         allowOverflow={allowOverflow}
         allowPinchPanning={allowPinchPanning}
         pinchCenteringMode={pinchCenteringMode}
+        longPressDuration={longPressDuration}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}
         onPinchStart={onPinchStart}
         onPinchEnd={onPinchEnd}
         onSwipe={onSwipe}
+        onLongPress={onLongPress}
         onVerticalPull={onVerticalPull}
         onGestureEnd={onGestureEnd}
       />
