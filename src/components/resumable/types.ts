@@ -53,6 +53,6 @@ export interface ResumableZoomRefType {
     state: ResumableZoomTransformState,
     animate?: boolean
   ) => void;
-  zoom: (accScale: number, xy?: Vector<number>) => void;
+  zoom: (newScale: number, position?: Vector<number>) => void;
   getVisibleRect: () => Rect;
 }
