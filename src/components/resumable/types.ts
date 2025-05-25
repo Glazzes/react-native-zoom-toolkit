@@ -3,6 +3,7 @@ import type { ViewStyle } from 'react-native';
 
 import type {
   CommonResumableProps,
+  CommonTransformState,
   CommonZoomState,
   LongPressCallbacks,
   PanGestureCallbacks,
@@ -15,7 +16,7 @@ import type {
   Vector,
 } from '../../commons/types';
 
-export type ResumableZoomAssignableState = Omit<
+export type ResumableZoomTransformState = Omit<
   CommonZoomState<number>,
   'width' | 'height'
 >;
@@ -39,10 +40,19 @@ export type ResumableZoomProps = Partial<{
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 
-export interface ResumableZoomType {
+export type ResumableZoomState = {
+  containerSize: SizeVector<number>;
+  childSize: SizeVector<number>;
+  maxScale: number;
+} & CommonTransformState<number>;
+
+export interface ResumableZoomRefType {
   reset: (animate?: boolean) => void;
-  requestState: () => CommonZoomState<number>;
-  assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
+  getState: () => ResumableZoomState;
+  setTransformState: (
+    state: ResumableZoomTransformState,
+    animate?: boolean
+  ) => void;
   zoom: (accScale: number, xy?: Vector<number>) => void;
   getVisibleRect: () => Rect;
 }

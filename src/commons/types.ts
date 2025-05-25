@@ -36,6 +36,12 @@ export type CommonZoomState<T> = {
   scale: T;
 };
 
+export type CommonTransformState<T> = {
+  translateX: T;
+  translateY: T;
+  scale: T;
+};
+
 export type CommonResumableProps = Partial<{
   minScale: number;
   maxScale: number;
