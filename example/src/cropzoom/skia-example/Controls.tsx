@@ -9,7 +9,7 @@ import {
   MipmapMode,
 } from '@shopify/react-native-skia';
 import { cacheDirectory, writeAsStringAsync } from 'expo-file-system';
-import type { CropZoomType } from 'react-native-zoom-toolkit';
+import type { CropZoomRefType } from 'react-native-zoom-toolkit';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 
 import {
@@ -25,7 +25,7 @@ import { theme } from '../../constants';
 type EffectIndicatorProps = {
   image: SkImage;
   progress: SharedValue<number>;
-  cropRef: React.RefObject<CropZoomType>;
+  cropRef: React.RefObject<CropZoomRefType>;
   setCrop: (uri: string | undefined) => void;
 };
 

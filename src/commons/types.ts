@@ -28,19 +28,17 @@ export type PanMode = 'clamp' | 'free' | 'friction';
 export type ScaleMode = 'clamp' | 'bounce';
 export type PinchCenteringMode = 'clamp' | 'sync';
 
-export type CommonZoomState<T> = {
-  width: T;
-  height: T;
-  translateX: T;
-  translateY: T;
-  scale: T;
-};
-
 export type CommonTransformState<T> = {
   translateX: T;
   translateY: T;
   scale: T;
 };
+
+export type CommonZoomState<T> = {
+  containerSize: SizeVector<T>;
+  childSize: SizeVector<T>;
+  maxScale: T;
+} & CommonTransformState<T>;
 
 export type CommonResumableProps = Partial<{
   minScale: number;

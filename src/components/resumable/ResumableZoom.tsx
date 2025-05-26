@@ -20,16 +20,12 @@ import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
   BoundsFuction,
+  CommonTransformState,
+  CommonZoomState,
   Rect,
-  SizeVector,
   Vector,
 } from '../../commons/types';
-import type {
-  ResumableZoomProps,
-  ResumableZoomRefType,
-  ResumableZoomState,
-  ResumableZoomTransformState,
-} from './types';
+import type { ResumableZoomProps, ResumableZoomRefType } from './types';
 
 type ResumableZoomPropsWithRef = ResumableZoomProps & {
   reference?: React.ForwardedRef<ResumableZoomRefType>;
@@ -249,7 +245,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     };
   }, [extendedSize, translate, scale]);
 
-  const getState = (): ResumableZoomState<number, SizeVector<number>> => {
+  const getState = (): CommonZoomState<number> => {
     return {
       containerSize: {
         width: rootSize.width.value,
@@ -266,7 +262,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     };
   };
 
-  const setState = (state: ResumableZoomTransformState, animate = true) => {
+  const setState = (state: CommonTransformState<number>, animate = true) => {
     const toScale = clamp(state.scale, minScale, maxScale.value);
     const { x: boundX, y: boundY } = boundsFn(toScale);
     const toX = clamp(state.translateX, -1 * boundX, boundX);

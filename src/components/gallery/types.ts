@@ -57,8 +57,8 @@ export type GalleryProps<T = unknown> = {
   PanGestureCallbacks &
   ZoomEventCallbacks;
 
-export type GalleryType = {
+export interface GalleryRefType {
   setIndex: (index: number) => void;
   reset: (animate: boolean | undefined) => void;
-  requestState: () => CommonZoomState<number>;
-};
+  getState: () => CommonZoomState<number>;
+}

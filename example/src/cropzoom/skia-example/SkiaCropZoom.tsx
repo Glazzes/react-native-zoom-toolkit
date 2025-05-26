@@ -13,7 +13,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import {
   CropZoom,
-  type CropZoomType,
+  type CropZoomRefType,
   useTransformationState,
 } from 'react-native-zoom-toolkit';
 
@@ -33,7 +33,7 @@ const IMAGE =
 
 const SkiaCropZoom = () => {
   const canvasRef = useCanvasRef();
-  const ref = useRef<CropZoomType>(null);
+  const ref = useRef<CropZoomRefType>(null);
 
   const image = useImage(IMAGE);
   const { onUpdate, transform, state } = useTransformationState('crop');
@@ -45,13 +45,17 @@ const SkiaCropZoom = () => {
 
   const progress = useSharedValue(0);
   const posX = useDerivedValue(
-    () => (screenWidth - state.width.value) / 2,
+    () => (screenWidth - state.childSize.width.value) / 2,
     [state, screenWidth]
   );
 
   const posY = useDerivedValue(
     () =>
-      (screenHeight - state.height.value - buttonSize - theme.spacing.s) / 2,
+      (screenHeight -
+        state.childSize.height.value -
+        buttonSize -
+        theme.spacing.s) /
+      2,
     [state, screenHeight]
   );
 
@@ -72,8 +76,8 @@ const SkiaCropZoom = () => {
         <Image
           x={posX}
           y={posY}
-          width={state.width}
-          height={state.height}
+          width={state.childSize.width}
+          height={state.childSize.height}
           image={image}
           fit={'cover'}
           origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT) / 2)}

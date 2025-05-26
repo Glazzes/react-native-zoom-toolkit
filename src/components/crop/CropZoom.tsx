@@ -27,10 +27,10 @@ import type { BoundsFuction } from '../../commons/types';
 import type {
   CropZoomProps,
   CropContextResult,
-  CropZoomType,
+  CropZoomRefType,
   FlipCallback,
   CropZoomState,
-  CropAssignableState,
+  CropZoomTransformState,
   RotationCallback,
 } from './types';
 import withCropValidation from '../../commons/hoc/withCropValidation';
@@ -39,7 +39,7 @@ const TAU = Math.PI * 2;
 const RAD2DEG = 180 / Math.PI;
 
 type CropZoomPropsWithRef = CropZoomProps & {
-  reference?: React.ForwardedRef<CropZoomType>;
+  reference?: React.ForwardedRef<CropZoomRefType>;
 };
 
 const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
@@ -115,8 +115,15 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
 
   useDerivedValue(() => {
     onUpdate?.({
-      width: childSize.width.value,
-      height: childSize.height.value,
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      maxScale: maxScale.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
@@ -124,7 +131,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
       rotateX: rotate.x.value,
       rotateY: rotate.y.value,
     });
-  }, [childSize, translate, scale, rotation, rotate]);
+  }, [rootSize, childSize, maxScale, translate, scale, rotation, rotate]);
 
   const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
@@ -241,7 +248,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   }, [childSize, translate, scale, rotation, rotate]);
 
   // Reference handling section
-  const resetTo = (st: CropAssignableState, animate: boolean = true) => {
+  const resetTo = (st: CropZoomTransformState, animate: boolean = true) => {
     translate.x.value = animate ? withTiming(st.translateX) : st.translateX;
     translate.y.value = animate ? withTiming(st.translateY) : st.translateY;
     scale.value = animate ? withTiming(st.scale) : st.scale;
@@ -324,18 +331,30 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     };
   };
 
-  const handleRequestState = (): CropZoomState<number> => ({
-    width: childSize.width.value,
-    height: childSize.height.value,
-    translateX: translate.x.value,
-    translateY: translate.y.value,
-    scale: scale.value,
-    rotate: rotation.value,
-    rotateX: rotate.x.value,
-    rotateY: rotate.y.value,
-  });
+  const getState = (): CropZoomState<number> => {
+    return {
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      maxScale: maxScale.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+      rotate: rotation.value,
+      rotateX: rotate.x.value,
+      rotateY: rotate.y.value,
+    };
+  };
 
-  const assignState = (state: CropAssignableState, animate: boolean = true) => {
+  const setTransformState = (
+    state: CropZoomTransformState,
+    animate: boolean = true
+  ) => {
     const toScale = clamp(state.scale, minScale, maxScale.value);
 
     const { x: boundX, y: boundY } = boundsFn(toScale);
@@ -361,6 +380,8 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
   };
 
   useImperativeHandle(reference, () => ({
+    getState: getState,
+    setTransformState: setTransformState,
     rotate: handleRotate,
     flipHorizontal: flipHorizontal,
     flipVertical: flipVertical,
@@ -377,8 +398,6 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
         animate
       ),
     crop: handleCrop,
-    requestState: handleRequestState,
-    assignState: assignState,
   }));
 
   const rootStyle: ViewStyle = {
@@ -416,4 +435,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withCropValidation<CropZoomType, CropZoomProps>(CropZoom);
+export default withCropValidation<CropZoomRefType, CropZoomProps>(CropZoom);

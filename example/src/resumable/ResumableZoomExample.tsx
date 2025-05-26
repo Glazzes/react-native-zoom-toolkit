@@ -14,7 +14,7 @@ import {
   fitContainer,
   ResumableZoom,
   useImageResolution,
-  type ResumableZoomType,
+  type ResumableZoomRefType,
 } from 'react-native-zoom-toolkit';
 
 import Appbar from './Appbar';
@@ -24,7 +24,7 @@ const IMAGE =
   'https://media.formula1.com/image/upload/v1705423544/fom-website/2023/McLaren/Formula%201%20header%20template%20%2835%29.png';
 
 const ResumableZoomExample: React.FC = ({}) => {
-  const ref = useRef<ResumableZoomType>(null);
+  const ref = useRef<ResumableZoomRefType>(null);
   const { width, height } = useWindowDimensions();
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
 

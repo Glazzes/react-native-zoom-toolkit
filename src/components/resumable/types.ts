@@ -16,11 +16,6 @@ import type {
   Vector,
 } from '../../commons/types';
 
-export type ResumableZoomTransformState = Omit<
-  CommonZoomState<number>,
-  'width' | 'height'
->;
-
 export type ResumableZoomProps = Partial<{
   style: ViewStyle;
   decay: boolean;
@@ -32,7 +27,7 @@ export type ResumableZoomProps = Partial<{
   pinchCenteringMode: PinchCenteringMode;
   longPressDuration: number;
   onSwipe: (direction: SwipeDirection) => void;
-  onUpdate: (e: ResumableZoomState<number, SizeVector<number>>) => void;
+  onUpdate: (e: CommonZoomState<number>) => void;
   onOverPanning: (x: number, y: number) => void;
 }> & { children: React.ReactNode } & PanGestureCallbacks &
   PinchGestureCallbacks &
@@ -40,17 +35,11 @@ export type ResumableZoomProps = Partial<{
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 
-export type ResumableZoomState<T, S> = {
-  containerSize: S;
-  childSize: S;
-  maxScale: T;
-} & CommonTransformState<T>;
-
 export interface ResumableZoomRefType {
   reset: (animate?: boolean) => void;
-  getState: () => ResumableZoomState<number, SizeVector<number>>;
+  getState: () => CommonZoomState<number>;
   setTransformState: (
-    state: ResumableZoomTransformState,
+    state: CommonTransformState<number>,
     animate?: boolean
   ) => void;
   zoom: (newScale: number, position?: Vector<number>) => void;

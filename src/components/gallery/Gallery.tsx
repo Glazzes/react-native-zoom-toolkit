@@ -15,10 +15,11 @@ import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 import GalleryGestureHandler from './GalleryGestureHandler';
 import GalleryItem from './GalleryItem';
 import { GalleryContext } from './context';
-import { type GalleryProps, type GalleryType } from './types';
+import { type GalleryProps, type GalleryRefType } from './types';
+import type { CommonZoomState } from '../../commons/types';
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
-  reference?: React.ForwardedRef<GalleryType>;
+  reference?: React.ForwardedRef<GalleryRefType>;
 };
 
 const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
@@ -113,22 +114,27 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     [overflow]
   );
 
+  useDerivedValue(() => {
+    onUpdate?.({
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: rootChildSize.width.value,
+        height: rootChildSize.height.value,
+      },
+      maxScale: maxScale.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    });
+  }, [rootSize, rootChildSize, maxScale, translate, scale]);
+
   useAnimatedReaction(
     () => ({ scroll: scroll.value, itemSize: itemSize.value }),
     (value) => onScroll?.(value.scroll, (data.length - 1) * value.itemSize),
     [scroll, itemSize]
-  );
-
-  useAnimatedReaction(
-    () => ({
-      width: rootChildSize.width.value,
-      height: rootChildSize.height.value,
-      translateX: translate.x.value,
-      translateY: translate.y.value,
-      scale: scale.value,
-    }),
-    (state) => onUpdate && onUpdate(state),
-    [rootChildSize, translate, scale]
   );
 
   useAnimatedReaction(
@@ -181,13 +187,22 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     });
   };
 
-  const requestState = () => ({
-    width: rootChildSize.width.get(),
-    height: rootChildSize.height.get(),
-    translateX: translate.x.get(),
-    translateY: translate.y.get(),
-    scale: scale.get(),
-  });
+  const getState = (): CommonZoomState<number> => {
+    return {
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: rootChildSize.width.value,
+        height: rootChildSize.height.value,
+      },
+      maxScale: maxScale.value,
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+    };
+  };
 
   const reset = (animate = true) => {
     translate.x.value = animate ? withTiming(0) : 0;
@@ -198,7 +213,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   useImperativeHandle(reference, () => ({
     setIndex,
     reset,
-    requestState,
+    getState: getState,
   }));
 
   return (

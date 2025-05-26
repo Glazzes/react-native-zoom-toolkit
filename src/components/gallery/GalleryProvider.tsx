@@ -7,11 +7,11 @@ import { useSizeVector } from '../../commons/hooks/useSizeVector';
 
 import Gallery from './Gallery';
 import { GalleryContext, type GalleryContextType } from './context';
-import type { GalleryProps, GalleryType } from './types';
+import type { GalleryProps, GalleryRefType } from './types';
 
 const GalleryProvider = <T extends unknown>(
   props: GalleryProps<T>,
-  ref?: React.ForwardedRef<GalleryType>
+  ref?: React.ForwardedRef<GalleryRefType>
 ) => {
   const startIndex = clamp(props.initialIndex ?? 0, 0, props.data.length - 1);
   const activeIndex = useSharedValue<number>(startIndex);
@@ -52,7 +52,7 @@ const GalleryProvider = <T extends unknown>(
 };
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
-  ref?: React.ForwardedRef<GalleryType>;
+  ref?: React.ForwardedRef<GalleryRefType>;
 };
 
 export default forwardRef(GalleryProvider) as <T>(

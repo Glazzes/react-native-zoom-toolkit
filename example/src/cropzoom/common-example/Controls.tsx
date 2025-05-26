@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
 import { FlipType, SaveFormat, ImageManipulator } from 'expo-image-manipulator';
 import { createAlbumAsync, createAssetAsync } from 'expo-media-library';
-import { type CropZoomType } from 'react-native-zoom-toolkit';
+import { type CropZoomRefType } from 'react-native-zoom-toolkit';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { activeColor, baseColor } from '../commons/contants';
@@ -11,7 +11,7 @@ import { theme } from '../../constants';
 type ControlProps = {
   uri: string;
   setCrop: (uri: string | undefined) => void;
-  cropRef: React.RefObject<CropZoomType>;
+  cropRef: React.RefObject<CropZoomRefType>;
 };
 
 const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {

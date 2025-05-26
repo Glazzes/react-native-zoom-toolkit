@@ -8,11 +8,12 @@ import type { GestureType } from 'react-native-gesture-handler';
 import type { HitSlop } from 'react-native-gesture-handler/lib/typescript/handlers/gestureHandlerCommon';
 
 import type {
-  CommonZoomState,
+  CommonTransformState,
   LongPressCallbacks,
   PinchGestureCallbacks,
   SizeVector,
   TapGestureCallbacks,
+  Vector,
 } from '../../commons/types';
 
 export type BlocksGesture =
@@ -33,22 +34,23 @@ export type ResizeConfig = {
 };
 
 export type SnapbackZoomState<T> = {
-  x: T;
-  y: T;
-  resizedWidth: T | undefined;
-  resizedHeight: T | undefined;
-} & CommonZoomState<T>;
+  size: SizeVector<T>;
+  position: Vector<T>;
+  resize?: SizeVector<T>;
+} & CommonTransformState<T>;
 
-export type SnapBackZoomProps = { children: React.ReactNode } & Partial<{
-  resizeConfig: ResizeConfig;
-  gesturesEnabled: boolean;
-  longPressDuration: number;
-  hitSlop: HitSlop;
-  timingConfig: TimingConfig;
-  scrollRef: BlocksGesture;
-  onGestureEnd: () => void;
-  onUpdate: (e: SnapbackZoomState<number>) => void;
-}> &
+export type SnapBackZoomProps = React.PropsWithChildren<
+  Partial<{
+    resizeConfig: ResizeConfig;
+    gesturesEnabled: boolean;
+    longPressDuration: number;
+    hitSlop: HitSlop;
+    timingConfig: TimingConfig;
+    scrollRef: BlocksGesture;
+    onGestureEnd: () => void;
+    onUpdate: (e: SnapbackZoomState<number>) => void;
+  }>
+> &
   PinchGestureCallbacks &
   TapGestureCallbacks &
   LongPressCallbacks;

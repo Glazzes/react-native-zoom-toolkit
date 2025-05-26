@@ -15,7 +15,7 @@ import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
-import type { SnapBackZoomProps } from './types';
+import type { SnapBackZoomProps, SnapbackZoomState } from './types';
 
 const DEFAULT_HITSLOP = { vertical: 0, horizontal: 0 };
 
@@ -74,17 +74,25 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   useDerivedValue(() => {
     const { width, height } = childrenSize.value;
 
-    onUpdate?.({
-      x: position.x.value,
-      y: position.y.value,
-      width: containerSize.width.value,
-      height: containerSize.height.value,
-      resizedWidth: resizeConfig ? width : undefined,
-      resizedHeight: resizeConfig ? height : undefined,
+    const state: SnapbackZoomState<number> = {
+      size: {
+        width: containerSize.width.value,
+        height: containerSize.height.value,
+      },
+      position: {
+        x: position.x.value,
+        y: position.y.value,
+      },
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
-    });
+    };
+
+    if (resizeConfig !== undefined) {
+      state.resize = { width, height };
+    }
+
+    onUpdate?.(state);
   }, [childrenSize, position, containerSize, resizeConfig, translate, scale]);
 
   const pinch = Gesture.Pinch()
