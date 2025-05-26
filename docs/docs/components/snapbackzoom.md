@@ -232,22 +232,19 @@ At a scale of one your image is a tile of 200x200 pixel size, in other words a s
 
 ### ResizeConfig
 
-| Property    | type                               | description                                                                   |
-| ----------- | ---------------------------------- | ----------------------------------------------------------------------------- |
-| size        | `{width: number; height: number;}` | Fields specify the width and height of your component.                        |
-| aspectRatio | `number`                           | Aspect ratio of your image/video/component.                                   |
-| scale       | `number`                           | At which scale your component will be fully resized to meet the aspect ratio. |
+| Property    | type           | description                                                                   |
+|-------------|----------------|-------------------------------------------------------------------------------|
+| size        | `Size<number>` | Width and height values for the wrapped component.                            |
+| aspectRatio | `number`       | Aspect ratio of your image/video/component.                                   |
+| scale       | `number`       | At which scale your component will be fully resized to meet the aspect ratio. |
 
 ### SnapbackZoomState
 
-| Name            | Type                  | Description                                                                                                                 |
-| --------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `x`             | `number`              | Position in the x axis starting from the top left corner of the screen                                                      |
-| `y`             | `number`              | Position in the y axis starting from the top left corner of the screen                                                      |
-| `width`         | `number`              | Inital width measurement of your component                                                                                  |
-| `height`        | `number`              | Inital height measurement of your component                                                                                 |
-| `resizedWidth`  | `number \| undefined` | Current width measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too  |
-| `resizedHeight` | `number \| undefined` | Current height measurement of your component, if `resizeConfig` property is `undefined`, this value will be `undefined` too |
-| `translateX`    | `number`              | Current translateX transformation value                                                                                     |
-| `translateY`    | `number`              | Current translateY transformation value                                                                                     |
-| `scale`         | `number`              | Current scale transformation value                                                                                          |
+| Name       | type                        | Description                                                                    |
+|------------|-----------------------------|--------------------------------------------------------------------------------|
+| size       | `Size<number>`              | Width and height of the wrapped component.                                     |
+| position   | `Vector<number>`            | Position relative to viewport of the wrapped component.                        |
+| resize     | `Size<number> \| undefined` | Width and height of the wrapped component when `resizeConfig` property is set. |
+| translateX | number                      | Current translateX transformation value.                                       |
+| translateY | number                      | Current translateY transformation value.                                       |
+| scale      | number                      | Current scale transformation value.                                            |
