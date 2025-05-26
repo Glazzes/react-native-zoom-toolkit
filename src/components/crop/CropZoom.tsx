@@ -171,7 +171,7 @@ const CropZoom: React.FC<CropZoomPropsWithRef> = (props) => {
     maxScale,
     allowPinchPanning,
     scaleMode,
-    pinchCenteringMode: 'sync',
+    pinchMode: 'free',
     boundFn: boundsFn,
     userCallbacks: {
       onGestureEnd: onGestureEnd,

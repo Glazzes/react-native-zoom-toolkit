@@ -37,7 +37,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     tapOnEdgeToItem = true,
     zoomEnabled = true,
     scaleMode = 'bounce',
-    pinchCenteringMode = 'clamp',
+    pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
     customTransition,
@@ -254,7 +254,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         scaleMode={scaleMode}
         allowOverflow={allowOverflow}
         allowPinchPanning={allowPinchPanning}
-        pinchCenteringMode={pinchCenteringMode}
+        pinchMode={pinchMode}
         longPressDuration={longPressDuration}
         onTap={onTap}
         onPanStart={onPanStart}

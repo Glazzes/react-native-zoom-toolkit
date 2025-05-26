@@ -45,7 +45,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = 'clamp',
     scaleMode = 'bounce',
-    pinchCenteringMode = 'clamp',
+    pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
     onTap,
@@ -144,7 +144,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     maxScale,
     allowPinchPanning,
     scaleMode,
-    pinchCenteringMode,
+    pinchMode,
     boundFn: boundsFn,
     userCallbacks: {
       onGestureEnd,

@@ -7,7 +7,7 @@ import type {
   CommonZoomState,
   LongPressCallbacks,
   PanGestureCallbacks,
-  PinchCenteringMode,
+  PinchMode,
   PinchGestureCallbacks,
   Rect,
   SizeVector,
@@ -24,7 +24,7 @@ export type ResumableZoomProps = Partial<{
   panEnabled: boolean;
   pinchEnabled: boolean;
   maxScale: SizeVector<number> | number;
-  pinchCenteringMode: PinchCenteringMode;
+  pinchMode: PinchMode;
   longPressDuration: number;
   onSwipe: (direction: SwipeDirection) => void;
   onUpdate: (e: CommonZoomState<number>) => void;

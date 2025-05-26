@@ -64,7 +64,7 @@ const ResumableZoomExample: React.FC = ({}) => {
         ref={ref}
         extendGestures={true}
         maxScale={resolution}
-        pinchCenteringMode={'sync'}
+        pinchMode={'free'}
         onTap={onTap}
       >
         <Image

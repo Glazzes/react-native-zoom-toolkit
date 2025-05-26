@@ -3,7 +3,7 @@ import type {
   CommonZoomState,
   LongPressEvent,
   PanGestureCallbacks,
-  PinchCenteringMode,
+  PinchMode,
   PinchGestureCallbacks,
   ScaleMode,
   SizeVector,
@@ -41,7 +41,7 @@ export type GalleryProps<T = unknown> = {
   zoomEnabled: boolean;
   scaleMode: ScaleMode;
   allowPinchPanning: boolean;
-  pinchCenteringMode: PinchCenteringMode;
+  pinchMode: PinchMode;
   longPressDuration: number;
   customTransition: GalleryTransitionCallback;
   onTap: (e: TapGestureEvent, index: number) => void;

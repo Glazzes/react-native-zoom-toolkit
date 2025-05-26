@@ -126,7 +126,7 @@ const GalleryExample = () => {
           activeIndex.value = idx;
         }}
         onTap={onTap}
-        pinchCenteringMode={'sync'}
+        pinchMode={'free'}
         onVerticalPull={onVerticalPulling}
       />
 
