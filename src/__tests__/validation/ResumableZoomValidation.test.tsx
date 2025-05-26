@@ -39,4 +39,14 @@ describe('ResumableZoom Validation Tests', () => {
       );
     }).toThrow();
   });
+
+  it('should throw error when longPressDuration is lesser than equals 250', () => {
+    expect(() => {
+      return render(
+        <ResumableZoom longPressDuration={200}>
+          <View style={{ width: 200, height: 200 }} />
+        </ResumableZoom>
+      );
+    }).toThrow();
+  });
 });

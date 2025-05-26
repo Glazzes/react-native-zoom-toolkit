@@ -7,17 +7,19 @@ import {
 
 import { useVector } from '../commons/hooks/useVector';
 import { useSizeVector } from '../commons/hooks/useSizeVector';
-import type { CommonZoomState } from '../commons/types';
 import type { SnapbackZoomState } from '../components/snapback/types';
 import type { CropZoomState } from '../components/crop/types';
+import type { CommonZoomState } from '../commons/types';
+
+type SharedNumber = SharedValue<number>;
 
 type ComponentSelection = 'resumable' | 'snapback' | 'crop';
 
-type StateSelection<T extends ComponentSelection, S> = T extends 'snapback'
-  ? SnapbackZoomState<S>
-  : T extends 'crop'
-  ? CropZoomState<S>
-  : CommonZoomState<S>;
+type StateSelection<C extends ComponentSelection, T> = C extends 'snapback'
+  ? SnapbackZoomState<T>
+  : C extends 'crop'
+  ? CropZoomState<T>
+  : CommonZoomState<T>;
 
 type TransformNames = 'matrix' | 'translateX' | 'translateY';
 
@@ -51,7 +53,7 @@ type Transforms3d =
 
 type TransformationState<T extends ComponentSelection> = {
   onUpdate: (state: StateSelection<T, number>) => void;
-  state: StateSelection<T, SharedValue<number>>;
+  state: StateSelection<T, SharedNumber>;
   transform: Readonly<SharedValue<Transforms3d[]>>;
 };
 
@@ -61,11 +63,14 @@ const initialPosition = -1 * Math.max(width, height);
 export const useTransformationState = <T extends ComponentSelection>(
   param: T
 ): TransformationState<T> => {
-  const size = useSizeVector(0, 0);
+  const containerSize = useSizeVector(0, 0);
+  const childSize = useSizeVector(0, 0);
+  const maxScale = useSharedValue<number>(1);
+
   const translate = useVector(0, 0);
   const scale = useSharedValue<number>(1);
 
-  const xy = useVector(initialPosition, initialPosition);
+  const position = useVector(initialPosition, initialPosition);
   const resize = useSizeVector(0, 0);
 
   const rotate = useVector(0, 0);
@@ -115,30 +120,55 @@ export const useTransformationState = <T extends ComponentSelection>(
     ];
   }, [translate, scale, rotation, rotate]);
 
-  const createSharedState = (): StateSelection<T, SharedValue<number>> => {
+  const createSharedState = (): StateSelection<T, SharedNumber> => {
     // @ts-ignore
-    const state: SharedStateSelection<T> = {
-      width: size.width,
-      height: size.height,
+    const state: StateSelection<T, SharedNumber, SharedSize> = {
       translateX: translate.x,
       translateY: translate.y,
       scale: scale,
     };
 
+    if (param === 'resumable' || param === 'crop') {
+      const st = state as CommonZoomState<SharedNumber>;
+
+      st.containerSize = {
+        width: containerSize.width,
+        height: containerSize.height,
+      };
+
+      st.childSize = {
+        width: childSize.width,
+        height: childSize.height,
+      };
+
+      st.maxScale = maxScale;
+    }
+
     if (param === 'crop') {
-      (state as CropZoomState<SharedValue<number>>).rotateX = rotate.x;
-      (state as CropZoomState<SharedValue<number>>).rotateY = rotate.y;
-      (state as CropZoomState<SharedValue<number>>).rotate = rotation;
+      const st = state as CropZoomState<SharedNumber>;
+
+      st.rotateX = rotate.x;
+      st.rotateY = rotate.y;
+      st.rotate = rotation;
     }
 
     if (param === 'snapback') {
-      (state as SnapbackZoomState<SharedValue<number>>).x = xy.x;
-      (state as SnapbackZoomState<SharedValue<number>>).y = xy.y;
-      (state as SnapbackZoomState<SharedValue<number>>).resizedWidth =
-        resize.width;
+      const st = state as SnapbackZoomState<SharedNumber>;
 
-      (state as SnapbackZoomState<SharedValue<number>>).resizedHeight =
-        resize.height;
+      st.size = {
+        width: containerSize.width,
+        height: containerSize.height,
+      };
+
+      st.resize = {
+        width: resize.width,
+        height: resize.height,
+      };
+
+      st.position = {
+        x: position.x,
+        y: position.y,
+      };
     }
 
     return state;
@@ -146,11 +176,20 @@ export const useTransformationState = <T extends ComponentSelection>(
 
   const onUpdate = (state: StateSelection<T, number>): void => {
     'worklet';
-    size.width.value = state.width;
-    size.height.value = state.height;
+
     translate.x.value = state.translateX;
     translate.y.value = state.translateY;
     scale.value = state.scale;
+
+    if (param === 'resumable' || param === 'crop') {
+      const commonState = state as CommonZoomState<number>;
+
+      childSize.width.value = commonState.childSize.width;
+      childSize.height.value = commonState.childSize.height;
+      containerSize.width.value = commonState.containerSize.width;
+      containerSize.height.value = commonState.containerSize.height;
+      maxScale.value = commonState.maxScale;
+    }
 
     if (param === 'crop') {
       const cropState = state as CropZoomState<number>;
@@ -160,15 +199,17 @@ export const useTransformationState = <T extends ComponentSelection>(
     }
 
     if (param === 'snapback') {
-      const snapbackState = state as SnapbackZoomState<number>;
-      snapbackState.resizedWidth &&
-        (resize.width.value = snapbackState.resizedWidth);
+      const snapState = state as SnapbackZoomState<number>;
 
-      snapbackState.resizedHeight &&
-        (resize.height.value = snapbackState.resizedHeight);
+      if (snapState.resize !== undefined) {
+        resize.width.value = snapState.resize.width;
+        resize.height.value = snapState.resize.height;
+      }
 
-      xy.x.value = (state as SnapbackZoomState<number>).x;
-      xy.y.value = (state as SnapbackZoomState<number>).y;
+      containerSize.width.value = snapState.size.width;
+      containerSize.height.value = snapState.size.height;
+      position.x.value = snapState.position.x;
+      position.y.value = snapState.position.y;
     }
   };
 

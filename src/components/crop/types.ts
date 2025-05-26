@@ -1,6 +1,7 @@
 import type React from 'react';
 import type {
   CommonResumableProps,
+  CommonZoomState,
   PanGestureCallbacks,
   PinchGestureCallbacks,
   SizeVector,
@@ -23,19 +24,14 @@ export type CropContextResult = {
 };
 
 export type CropZoomState<T> = {
-  width: T;
-  height: T;
-  translateX: T;
-  translateY: T;
-  scale: T;
   rotate: T;
   rotateX: T;
   rotateY: T;
-};
+} & CommonZoomState<T>;
 
-export type CropAssignableState = Omit<
+export type CropZoomTransformState = Omit<
   CropZoomState<number>,
-  'width' | 'height'
+  'containerSize' | 'childSize' | 'maxScale'
 >;
 
 export type FlipCallback = (
@@ -49,16 +45,6 @@ export type RotationCallback = (
   cb?: (value: number) => void
 ) => void;
 
-export type CropZoomType = {
-  requestState: () => CropZoomState<number>;
-  assignState: (state: CropAssignableState, animate?: boolean) => void;
-  rotate: RotationCallback;
-  flipHorizontal: FlipCallback;
-  flipVertical: FlipCallback;
-  reset: (animate?: boolean) => void;
-  crop: (fixedWidth?: number) => CropContextResult;
-};
-
 export type CropGestureEventCallBack = (event: CropZoomState<number>) => void;
 
 export type CropZoomProps = React.PropsWithChildren<{
@@ -71,3 +57,13 @@ export type CropZoomProps = React.PropsWithChildren<{
   PanGestureCallbacks &
   PinchGestureCallbacks &
   Omit<TapGestureCallbacks, 'onDoubleTap'>;
+
+export interface CropZoomRefType {
+  getState: () => CropZoomState<number>;
+  setTransformState: (state: CropZoomTransformState, animate?: boolean) => void;
+  rotate: RotationCallback;
+  flipHorizontal: FlipCallback;
+  flipVertical: FlipCallback;
+  reset: (animate?: boolean) => void;
+  crop: (fixedWidth?: number) => CropContextResult;
+}

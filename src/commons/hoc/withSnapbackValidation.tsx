@@ -11,6 +11,13 @@ export default function withSnapbackValidation(
       throw new Error(message);
     }
 
+    if (
+      props.longPressDuration !== undefined &&
+      props.longPressDuration <= 250
+    ) {
+      throw new Error('longPressDuration must be greater than 250ms');
+    }
+
     return <Component {...props} />;
   };
 }

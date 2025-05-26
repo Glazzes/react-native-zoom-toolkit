@@ -12,7 +12,7 @@ import {
   MediaType,
   type Asset,
 } from 'expo-media-library';
-import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
+import { Gallery, type GalleryRefType } from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
 import VideoControls from './controls/VideoControls';
@@ -22,7 +22,7 @@ import { StatusBar } from 'expo-status-bar';
 type SizeVector = { width: number; height: number };
 
 const GalleryExample = () => {
-  const ref = useRef<GalleryType>(null);
+  const ref = useRef<GalleryRefType>(null);
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [scales, setScales] = useState<SizeVector[]>([]);
@@ -126,7 +126,7 @@ const GalleryExample = () => {
           activeIndex.value = idx;
         }}
         onTap={onTap}
-        pinchCenteringMode={'sync'}
+        pinchMode={'free'}
         onVerticalPull={onVerticalPulling}
       />
 

@@ -3,10 +3,11 @@ import type { ViewStyle } from 'react-native';
 
 import type {
   CommonResumableProps,
+  CommonTransformState,
   CommonZoomState,
   LongPressCallbacks,
   PanGestureCallbacks,
-  PinchCenteringMode,
+  PinchMode,
   PinchGestureCallbacks,
   Rect,
   SizeVector,
@@ -14,11 +15,6 @@ import type {
   TapGestureCallbacks,
   Vector,
 } from '../../commons/types';
-
-export type ResumableZoomAssignableState = Omit<
-  CommonZoomState<number>,
-  'width' | 'height'
->;
 
 export type ResumableZoomProps = Partial<{
   style: ViewStyle;
@@ -28,7 +24,7 @@ export type ResumableZoomProps = Partial<{
   panEnabled: boolean;
   pinchEnabled: boolean;
   maxScale: SizeVector<number> | number;
-  pinchCenteringMode: PinchCenteringMode;
+  pinchMode: PinchMode;
   longPressDuration: number;
   onSwipe: (direction: SwipeDirection) => void;
   onUpdate: (e: CommonZoomState<number>) => void;
@@ -39,10 +35,13 @@ export type ResumableZoomProps = Partial<{
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 
-export interface ResumableZoomType {
+export interface ResumableZoomRefType {
   reset: (animate?: boolean) => void;
-  requestState: () => CommonZoomState<number>;
-  assignState: (state: ResumableZoomAssignableState, animate?: boolean) => void;
-  zoom: (accScale: number, xy?: Vector<number>) => void;
+  getState: () => CommonZoomState<number>;
+  setTransformState: (
+    state: CommonTransformState<number>,
+    animate?: boolean
+  ) => void;
+  zoom: (newScale: number, position?: Vector<number>) => void;
   getVisibleRect: () => Rect;
 }

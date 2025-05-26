@@ -142,11 +142,11 @@ defined by `minScale` and `maxScale` properties, possible values are:
 Lets the user pan the component around as they pinch as well as providing a more accurate pinch gesture calculation
 to user interaction. Panning as you pinch will not trigger any pan gesture related callbacks.
 
-### pinchCenteringMode
+### pinchMode
 
 | Type                | Default   |
 | ------------------- | --------- |
-| `'clamp' \| 'sync'` | `'clamp'` |
+| `'clamp' \| 'free'` | `'clamp'` |
 
 ::: tip Requirements
 Requires `allowPinchPanning` property is set to `true`.
@@ -157,7 +157,7 @@ possible values are:
 
 - `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
   gesture, just like seen on Android galleries.
-- `sync` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+- `free` lets the user drag the component out of the container boundaries while pinching, if the pinch gesture was released in an out bonds
   position it will animate back to a position within the bondaries of its enclosing container.
 
 ### decay
@@ -297,16 +297,43 @@ All methods are accessible through a ref object.
 import { useRef } from 'react';
 import {
   ResumableZoom,
-  type ResumableZoomType,
+  type ResumableZoomRefType,
 } from 'react-native-zoom-toolkit';
 
-const ref = useRef<ResumableZoomType>(null);
+const ref = useRef<ResumableZoomRefType>(null);
 ref.current?.reset(false);
 
 <ResumableZoom ref={ref}>
   <SomeComponent />
 </ResumableZoom>;
 ```
+
+### getState
+
+Request internal transformation values of this component at the moment of the calling.
+
+- type definition: `() => CommonZoomState<number>`
+- return type: [CommonZoomState\<number\>](#commonzoomstate)
+
+### getVisibleRect
+
+Get the coordinates of the current visible rectangle within ResumableZoom's frame.
+
+- type definition: `() => Rect`
+- return type: `{x: number, y: number, width: number, height: number}`
+
+### setTransformState
+
+Assign the internal transformation values for this component, if the state you have provided is considered
+to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+
+- type definition: `(state: CommonTransformState<number>, animate?: boolean) => void`
+- parameter information
+
+| Name    | Type                                                          | Description                                                                       |
+| ------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| state   | [CommonTransformState\<number\>](#commontransformstate) | Object containg the transformation values to assign to `ResumableZoom` component. |
+| animate | `boolean \| undefined`                                        | Whether to animate the transition or not, defaults to `true`.                     |
 
 ### reset
 
@@ -323,54 +350,28 @@ Reset all transformations to their initial state.
 
 Programmatically zoom in or out to a xy position within the child component.
 
-- type definition: `(multiplier: number, xy?: Vector<number>) => void`
+- type definition: `(newScale: number, position?: Vector<number>) => void`
 - parameter information
 
-| Name       | Type                          | Description                                                                                                                                                                                                                      |
-| ---------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| multiplier | `number`                      | Value to multiply the current scale for, values greater than one zoom in and values less than one zoom out.                                                                                                                      |
-| xy         | `Vector<number> \| undefined` | Position of the point to zoom in or out starting from the top left corner of your component, leaving this value as undefined will be infered as zooming in or out from the center of the child component's current visible area. |
-
-### getVisibleRect
-
-Get the coordinates of the current visible rectangle within ResumableZoom's frame.
-
-- type definition: `() => Rect`
-- return type: `{x: number, y: number, width: number, height: number}`
-
-### requestState
-
-Request internal transformation values of this component at the moment of the calling.
-
-- type definition: `() => CommonZoomState<number>`
-- return type: [CommonZoomState\<number\>](#commonzoomstate)
-
-### assignState
-
-Assign the internal transformation values for this component, if the state you have provided is considered
-to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
-
-- type definition: `(state: ResumableZoomAssignableState, animate?: boolean) => void`
-- parameter information
-
-| Name    | Type                                                          | Description                                                                       |
-| ------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| state   | [ResumableZoomAssignableState](#resumablezoomassignablestate) | Object containg the transformation values to assign to `ResumableZoom` component. |
-| animate | `boolean \| undefined`                                        | Whether to animate the transition or not, defaults to `true`.                     |
+| Name       | Type             | Description                                                                                                                                                                                                                      |
+|------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| newScale | `number`         | Scale value, this one is clamped between `minScale` and `maxScale`.                                                                                                                                                              |
+| position         | `Vector<number> \| undefined` | Position of the point to zoom in or out starting from the top left corner of your component, leaving this value as undefined will be infered as zooming in or out from the center of the child component's current visible area. |
 
 ## Type Definitions
 
 ### CommonZoomState
 
-| Property     | Type     | Description                              |
-| ------------ | -------- | ---------------------------------------- |
-| `width`      | `number` | Width of the wrapped component.          |
-| `height`     | `number` | Height of the wrapped component.         |
-| `translateX` | `number` | Current translateX transformation value. |
-| `translateY` | `number` | Current translateY transformation value. |
-| `scale`      | `number` | Current scale transformation value.      |
+| Property        | Type           | Description                                |
+|-----------------|----------------|--------------------------------------------|
+| `containerSize` | `Size<number>` | Width and height of ResumableZoom.         |
+| `childSize`     | `Size<number>` | Width and height of the wrapped component. |
+| `maxScale`      | `number`       | Maximum scale allowed by the component.    |
+| `translateX`    | `number`       | Current translateX transformation value.   |
+| `translateY`    | `number`       | Current translateY transformation value.   |
+| `scale`         | `number`       | Current scale transformation value.        |
 
-### ResumableZoomAssignableState
+### CommonTransformState
 
 | Property     | Type     | Description                      |
 | ------------ | -------- | -------------------------------- |

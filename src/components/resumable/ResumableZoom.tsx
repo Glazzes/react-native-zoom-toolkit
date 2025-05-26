@@ -15,23 +15,20 @@ import { useSizeVector } from '../../commons/hooks/useSizeVector';
 import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
-import withResumableValidation from '../../commons/hoc/withResumableValidation';
 import { getVisibleRect as getRect } from '../../commons/utils/getVisibleRect';
+import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
 import type {
   BoundsFuction,
+  CommonTransformState,
   CommonZoomState,
   Rect,
   Vector,
 } from '../../commons/types';
-import type {
-  ResumableZoomProps,
-  ResumableZoomType,
-  ResumableZoomAssignableState,
-} from './types';
+import type { ResumableZoomProps, ResumableZoomRefType } from './types';
 
 type ResumableZoomPropsWithRef = ResumableZoomProps & {
-  reference?: React.ForwardedRef<ResumableZoomType>;
+  reference?: React.ForwardedRef<ResumableZoomRefType>;
 };
 
 const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
@@ -48,7 +45,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     maxScale: userMaxScale = 6,
     panMode = 'clamp',
     scaleMode = 'bounce',
-    pinchCenteringMode = 'clamp',
+    pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
     onTap,
@@ -114,13 +111,20 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   useDerivedValue(() => {
     onUpdate?.({
-      width: childSize.width.value,
-      height: childSize.height.value,
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      maxScale: maxScale.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [childSize, translate, scale]);
+  }, [rootSize, childSize, translate, maxScale, scale]);
 
   const {
     gesturesEnabled,
@@ -140,7 +144,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     maxScale,
     allowPinchPanning,
     scaleMode,
-    pinchCenteringMode,
+    pinchMode,
     boundFn: boundsFn,
     userCallbacks: {
       onGestureEnd,
@@ -241,17 +245,24 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     };
   }, [extendedSize, translate, scale]);
 
-  const requestState = (): CommonZoomState<number> => {
+  const getState = (): CommonZoomState<number> => {
     return {
-      width: childSize.width.value,
-      height: childSize.height.value,
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      maxScale: maxScale.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
     };
   };
 
-  const assignState = (state: ResumableZoomAssignableState, animate = true) => {
+  const setState = (state: CommonTransformState<number>, animate = true) => {
     const toScale = clamp(state.scale, minScale, maxScale.value);
     const { x: boundX, y: boundY } = boundsFn(toScale);
     const toX = clamp(state.translateX, -1 * boundX, boundX);
@@ -275,10 +286,10 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     });
   };
 
-  const zoom = (multiplier: number, xy?: Vector<number>) => {
-    const toScale = clamp(scale.value * multiplier, minScale, maxScale.value);
+  const zoom = (newScale: number, position?: Vector<number>) => {
+    const toScale = clamp(newScale, minScale, maxScale.value);
 
-    let focal = xy;
+    let focal = position;
     if (focal !== undefined) {
       focal = {
         x: clamp(focal.x, 0, childSize.width.value),
@@ -312,8 +323,8 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   useImperativeHandle(reference, () => ({
     reset: (animate = true) => set(0, 0, minScale, animate),
-    requestState: requestState,
-    assignState: assignState,
+    getState: getState,
+    setTransformState: setState,
     zoom: zoom,
     getVisibleRect: getVisibleRect,
   }));
@@ -344,6 +355,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withResumableValidation<ResumableZoomType, ResumableZoomProps>(
-  ResumableZoom
-);
+export default withResumableValidation<
+  ResumableZoomRefType,
+  ResumableZoomProps
+>(ResumableZoom);

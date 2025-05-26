@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import {
   CropZoom,
   useImageResolution,
-  type CropZoomType,
+  type CropZoomRefType,
   type SizeVector,
 } from 'react-native-zoom-toolkit';
 
@@ -16,7 +16,7 @@ const IMAGE =
   'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const BasicCropZoom = ({}) => {
-  const cropRef = useRef<CropZoomType>(null);
+  const cropRef = useRef<CropZoomRefType>(null);
 
   const { width } = useWindowDimensions();
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });

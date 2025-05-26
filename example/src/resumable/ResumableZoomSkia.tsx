@@ -50,7 +50,7 @@ const App = () => {
         <ResumableZoom
           maxScale={resolution}
           extendGestures={true}
-          pinchCenteringMode={'sync'}
+          pinchMode={'free'}
           onUpdate={onUpdate}
         >
           <View style={{ width: imageSize.width, height: imageSize.height }} />

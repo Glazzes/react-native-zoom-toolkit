@@ -223,13 +223,43 @@ All methods are accessible through a ref object.
 
 ```tsx
 import { useRef } from 'react';
-import { CropZoom, type CropZoomType } from 'react-native-zoom-toolkit';
+import { CropZoom, type CropZoomRefType } from 'react-native-zoom-toolkit';
 
-const ref = useRef<CropZoomType>(null);
+const ref = useRef<CropZoomRefType>(null);
 ref.current?.crop(200);
 
 <CropZoom ref={ref} />;
 ```
+
+### getState
+
+Request internal transformation values of this component at the moment of the call.
+
+- type definition `() => CropZoomState<number>`
+- return type [CropZoomState\<number\>](#cropzoomstate).
+
+### setTransformState
+
+Assign the internal transformation values for this component, if the state provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
+
+- type definition: `(state: CropZoomTransformState, animate?: boolean) => void`
+- parameter information
+
+| Name    | Type                                            | Description                                                                  |
+| ------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| state   | [CropAssignableState](#cropzoomtransformstate) | Object describing the transformation values to assign to CropZoom component. |
+| animate | `boolean \| undefined`                          | Whether to animate the transition or not, defaults to `true`.                |
+
+### reset
+
+Reset all transformations to their initial state.
+
+- type definition: `(animate:? boolean) => void`
+- parameter information:
+
+| Name    | Type                   | Default | Description                               |
+| ------- | ---------------------- | ------- | ----------------------------------------- |
+| animate | `boolean \| undefined` | `true`  | Whether to animate the transition or not. |
 
 ### crop
 
@@ -250,20 +280,6 @@ Expo Image Manipulator, see [CropZoom and Expo Image Manipulator](../guides/crop
 Calling crop method with the `fixedWidth` argument will subject your crops to one pixel margin of error,
 this behavior is intentional in order to prevent image cropping libraries from crashing your app.
 :::
-
-### rotate
-
-Rotate the component 90 degrees clockwise or counterclockwise in a range from 0 to 360 degrees
-(or 0 to -360 degrees counterclockwise).
-
-- type definition: `(animate?: boolean, clockwise?: boolean, cb?: (angle: number) => void) => void`
-- paramter information
-
-| Name      | Type                    | Default     | Description                                                                                                                                                                                                                                                 |
-| --------- | ----------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| animate   | `boolean \| undefined`  | `true`      | Whether to animate the transition or not.                                                                                                                                                                                                                   |
-| clockwise | `boolean \| undefined`  | `true`      | Whether to rotate clockwise (90 degrees) or counterclockwise (-90 degrees)                                                                                                                                                                                  |
-| cb        | `function \| undefined` | `undefined` | Callback triggered at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (or -360 degrees if counterclockwise) (at 360 or -360 degrees it's clamped to 0). |
 
 ### flipHorizontal
 
@@ -289,35 +305,19 @@ Flip the component vertically.
 | animate | `boolean \| undefined`  | `true`      | Whether to animate the transition or not.                                                                                                               |
 | cb      | `function \| undefined` | `undefined` | Callback to trigger at the beginning of the transition, as its only argument receives the angle your component will transition to, values are 0 or 180. |
 
-### reset
+### rotate
 
-Reset all transformations to their initial state.
+Rotate the component 90 degrees clockwise or counterclockwise in a range from 0 to 360 degrees
+(or 0 to -360 degrees counterclockwise).
 
-- type definition: `(animate:? boolean) => void`
-- parameter information:
+- type definition: `(animate?: boolean, clockwise?: boolean, cb?: (angle: number) => void) => void`
+- paramter information
 
-| Name    | Type                   | Default | Description                               |
-| ------- | ---------------------- | ------- | ----------------------------------------- |
-| animate | `boolean \| undefined` | `true`  | Whether to animate the transition or not. |
-
-### requestState
-
-Request internal transformation values of this component at the moment of the call.
-
-- type definition `() => CropZoomState`
-- return type [CropZoomState](#cropzoomstate).
-
-### assignState
-
-Assign the internal transformation values for this component, if the state provided is considered to be not achievable by the component's boundaries, it'll be approximated to the closest valid state.
-
-- type definition: `(state: CropAssignableState, animate?: boolean) => void`
-- parameter information
-
-| Name    | Type                                            | Description                                                                  |
-| ------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| state   | [CropAssignableState](#cropzoomassignablestate) | Object describing the transformation values to assign to CropZoom component. |
-| animate | `boolean \| undefined`                          | Whether to animate the transition or not, defaults to `true`.                |
+| Name      | Type                    | Default     | Description                                                                                                                                                                                                                                                 |
+| --------- | ----------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| animate   | `boolean \| undefined`  | `true`      | Whether to animate the transition or not.                                                                                                                                                                                                                   |
+| clockwise | `boolean \| undefined`  | `true`      | Whether to rotate clockwise (90 degrees) or counterclockwise (-90 degrees)                                                                                                                                                                                  |
+| cb        | `function \| undefined` | `undefined` | Callback triggered at the beginning of the transition, as its only argument receives the angle your component will transition to, this angle ranges from 0 to 360 degrees (or -360 degrees if counterclockwise) (at 360 or -360 degrees it's clamped to 0). |
 
 ## Type Definitions
 
@@ -333,7 +333,7 @@ Assign the internal transformation values for this component, if the state provi
 | `rotateX`    | `number` | Current rotateX transformation value, angle is measured in radians. |
 | `rotateY`    | `number` | Current rotateY transformation value, angle is measured in radians. |
 
-### CropAssignableState
+### CropZoomTransformState
 
 | Name         | Type     | Description                                              |
 | ------------ | -------- | -------------------------------------------------------- |
@@ -342,6 +342,8 @@ Assign the internal transformation values for this component, if the state provi
 | `rotate`     | `number` | Rotate transformation value, angle measured in radians.  |
 | `rotateX`    | `number` | RotateX transformation value, angle measured in radians. |
 | `rotateY`    | `number` | RotateY transformation value, angle measured in radians. |
+
+### CropContextResult
 
 <table>
 <tr>
@@ -364,7 +366,7 @@ Assign the internal transformation values for this component, if the state provi
 ```
 
 </td>
-<td>Fields specify the top left corner and size of the crop.</td>
+<td>Specify the top left corner and size of the crop.</td>
 </tr>
 
 <tr>
@@ -380,7 +382,7 @@ Assign the internal transformation values for this component, if the state provi
 ```
 
 </td>
-<td>Fields specify if the image/video needs to flipped and to what angle must be rotated, the angle is measured in degrees.</td>
+<td>Specify if the image/video needs to flipped and to what angle must be rotated, the angle is measured in degrees.</td>
 </tr>
 
 <tr>
@@ -396,7 +398,7 @@ Assign the internal transformation values for this component, if the state provi
 
 </td>
 <td>
-Fields specify the size your image/video must be resized to before cropping, if this property is undefined it means no resizing is necessary. <br/><br/> This property is always undefined if you call <a href="#crop">crop method</a> without fixedWidth argument.
+Specify the size your image/video must be resized to before cropping, if this property is undefined it means no resizing is necessary. <br/><br/> This property is always undefined if you call <a href="#crop">crop method</a> without fixedWidth argument.
 </td>
 </tr>
 

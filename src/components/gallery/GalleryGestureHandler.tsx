@@ -26,7 +26,7 @@ import type {
   BoundsFuction,
   PanGestureEvent,
   ScaleMode,
-  PinchCenteringMode,
+  PinchMode,
 } from '../../commons/types';
 import { GalleryContext } from './context';
 import { type GalleryProps } from './types';
@@ -46,7 +46,7 @@ type GalleryGestureHandlerProps = {
   allowOverflow: boolean;
   zoomEnabled: boolean;
   scaleMode: ScaleMode;
-  pinchCenteringMode: PinchCenteringMode;
+  pinchMode: PinchMode;
   longPressDuration: number;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
@@ -75,7 +75,7 @@ const GalleryGestureHandler = ({
   scaleMode,
   allowOverflow,
   allowPinchPanning,
-  pinchCenteringMode,
+  pinchMode,
   longPressDuration,
   onTap,
   onPanStart,
@@ -249,7 +249,7 @@ const GalleryGestureHandler = ({
     maxScale,
     scaleMode,
     allowPinchPanning,
-    pinchCenteringMode,
+    pinchMode,
     boundFn: boundsFn,
     userCallbacks: {
       onPinchStart: onUserPinchStart,
@@ -484,6 +484,6 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.scaleMode === next.scaleMode &&
     prev.allowPinchPanning === next.allowPinchPanning &&
     prev.allowOverflow === next.allowOverflow &&
-    prev.pinchCenteringMode === next.pinchCenteringMode
+    prev.pinchMode === next.pinchMode
   );
 });

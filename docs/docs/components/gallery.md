@@ -254,14 +254,14 @@ defined by the minimum scale (1) and `maxScale` property, possible values are:
 
 Lets the user drag the current item around as they pinch, it also provides a more accurate pinch gesture calculation to user interaction.
 
-### pinchCenteringMode
+### pinchMode
 
 | Type                | Default   |
 | ------------------- | --------- |
-| `'clamp' \| 'sync'` | `'clamp'` |
+| `'clamp' \| 'free'` | `'clamp'` |
 
-::: tip Tip
-This property does nothing unless `allowPinchPanning` property is set to `true`.
+::: tip Requirements
+Requires `allowPinchPanning` property is set to `true`.
 :::
 
 Determine the behavior used by the pinch gesture relative to the boundaries of its enclosing component,
@@ -269,7 +269,7 @@ possible values are:
 
 - `clamp` keeps the pinch gesture clamped to the borders or its enclosing container during the entirity of the
   gesture, just like seen on Android galleries.
-- `sync` keeps the pinch gesture in sync with user interaction, if the pinch gesture was released in an out bonds
+- `free` lets the user drag the component out of the container boundaries while pinching, if the pinch gesture was released in an out bonds
   position it will animate back to a position within the bondaries of its enclosing container.
 
 ### onIndexChange
@@ -438,31 +438,20 @@ All methods are accessible through a ref object.
 
 ```tsx
 import { useRef } from 'react';
-import { Gallery, type GalleryType } from 'react-native-zoom-toolkit';
+import { Gallery, type GalleryRefType } from 'react-native-zoom-toolkit';
 
-const ref = useRef<GalleryType>(null);
+const ref = useRef<GalleryRefType>(null);
 ref.current?.requestState();
 
 <Gallery ref={ref} />;
 ```
 
-### reset
-
-Reset all transformations to their initial state.
-
-- type definition: `(animate?: boolean) => void`
-- parameter information
-
-| Name      | Type                   | Description                                                   |
-| --------- | ---------------------- | ------------------------------------------------------------- |
-| `animate` | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
-
-### requestState
+### getState
 
 Request internal transformation values of the current item at the moment of the calling
 
 - type definition: `() => CommonZoomState<number>`;
-- return type: [CommonZoomState](#commonzoomstate).
+- return type: [CommonZoomState\<number\>](#commonzoomstate).
 
 ### setIndex
 
@@ -475,17 +464,29 @@ Jump to the item at the given index.
 | ----- | -------- | ----------------------------------- |
 | index | `number` | Index of the item to transition to. |
 
+### reset
+
+Reset all transformations to their initial state.
+
+- type definition: `(animate?: boolean) => void`
+- parameter information
+
+| Name      | Type                   | Description                                                   |
+| --------- | ---------------------- | ------------------------------------------------------------- |
+| `animate` | `boolean \| undefined` | Whether to animate the transition or not, defaults to `true`. |
+
 ## Type Definitions
 
 ### CommonZoomState
 
-| Property     | Type     | Description                              |
-| ------------ | -------- | ---------------------------------------- |
-| `width`      | `number` | Width of the current item.               |
-| `height`     | `number` | Height of the current item.              |
-| `translateX` | `number` | Current translateX transformation value. |
-| `translateY` | `number` | Current translateY transformation value. |
-| `scale`      | `number` | Current scale transformation value.      |
+| Property        | Type           | Description                                        |
+|-----------------|----------------|----------------------------------------------------|
+| `containerSize` | `Size<number>` | Width and height of the Gallery component.         |
+| `childSize`     | `Size<number>` | Width and height of the current list element.      |
+| `maxScale`      | `number`       | Maximum scale allowed by the current list element. |
+| `translateX`    | `number`       | Current translateX transformation value.           |
+| `translateY`    | `number`       | Current translateY transformation value.           |
+| `scale`         | `number`       | Current scale transformation value.                |
 
 ### GalleryTransitionState
 

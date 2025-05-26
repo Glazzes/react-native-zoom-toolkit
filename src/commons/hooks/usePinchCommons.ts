@@ -24,7 +24,7 @@ import type {
   PinchGestureEventCallback,
   PinchGestureEvent,
   ScaleMode,
-  PinchCenteringMode,
+  PinchMode,
 } from '../types';
 
 type PinchOptions = {
@@ -37,7 +37,7 @@ type PinchOptions = {
   minScale: number;
   maxScale: SharedValue<number>;
   boundFn: BoundsFuction;
-  pinchCenteringMode: PinchCenteringMode;
+  pinchMode: PinchMode;
   allowPinchPanning: boolean;
   userCallbacks: Partial<{
     onGestureEnd: () => void;
@@ -59,13 +59,13 @@ export const usePinchCommons = (options: PinchOptions) => {
     minScale,
     maxScale,
     scaleMode,
-    pinchCenteringMode,
+    pinchMode,
     allowPinchPanning,
     boundFn,
     userCallbacks,
   } = options;
 
-  const pinchClamp = pinchCenteringMode === 'clamp';
+  const pinchClamp = pinchMode === 'clamp';
   const scaleClamp = scaleMode === 'clamp';
 
   const initialFocal = useVector(0, 0);

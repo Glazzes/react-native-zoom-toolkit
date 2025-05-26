@@ -13,7 +13,7 @@ export * from './components/gallery/types';
 export type {
   PanMode,
   ScaleMode,
-  PinchCenteringMode,
+  PinchMode,
   SwipeDirection,
 } from './commons/types';
 
