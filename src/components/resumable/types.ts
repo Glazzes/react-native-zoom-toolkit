@@ -32,7 +32,7 @@ export type ResumableZoomProps = Partial<{
   pinchCenteringMode: PinchCenteringMode;
   longPressDuration: number;
   onSwipe: (direction: SwipeDirection) => void;
-  onUpdate: (e: CommonZoomState<number>) => void;
+  onUpdate: (e: ResumableZoomState<number, SizeVector<number>>) => void;
   onOverPanning: (x: number, y: number) => void;
 }> & { children: React.ReactNode } & PanGestureCallbacks &
   PinchGestureCallbacks &
@@ -40,15 +40,15 @@ export type ResumableZoomProps = Partial<{
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 
-export type ResumableZoomState = {
-  containerSize: SizeVector<number>;
-  childSize: SizeVector<number>;
-  maxScale: number;
-} & CommonTransformState<number>;
+export type ResumableZoomState<T, S> = {
+  containerSize: S;
+  childSize: S;
+  maxScale: T;
+} & CommonTransformState<T>;
 
 export interface ResumableZoomRefType {
   reset: (animate?: boolean) => void;
-  getState: () => ResumableZoomState;
+  getState: () => ResumableZoomState<number, SizeVector<number>>;
   setTransformState: (
     state: ResumableZoomTransformState,
     animate?: boolean

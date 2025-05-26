@@ -18,7 +18,12 @@ import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
 import { getVisibleRect as getRect } from '../../commons/utils/getVisibleRect';
 import withResumableValidation from '../../commons/hoc/withResumableValidation';
 
-import type { BoundsFuction, Rect, Vector } from '../../commons/types';
+import type {
+  BoundsFuction,
+  Rect,
+  SizeVector,
+  Vector,
+} from '../../commons/types';
 import type {
   ResumableZoomProps,
   ResumableZoomRefType,
@@ -110,13 +115,20 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   useDerivedValue(() => {
     onUpdate?.({
-      width: childSize.width.value,
-      height: childSize.height.value,
+      containerSize: {
+        width: rootSize.width.value,
+        height: rootSize.height.value,
+      },
+      childSize: {
+        width: childSize.width.value,
+        height: childSize.height.value,
+      },
+      maxScale: maxScale.value,
       translateX: translate.x.value,
       translateY: translate.y.value,
       scale: scale.value,
     });
-  }, [childSize, translate, scale]);
+  }, [rootSize, childSize, translate, maxScale, scale]);
 
   const {
     gesturesEnabled,
@@ -237,7 +249,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     };
   }, [extendedSize, translate, scale]);
 
-  const getState = (): ResumableZoomState => {
+  const getState = (): ResumableZoomState<number, SizeVector<number>> => {
     return {
       containerSize: {
         width: rootSize.width.value,
