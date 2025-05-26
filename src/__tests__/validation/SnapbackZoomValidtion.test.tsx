@@ -31,4 +31,14 @@ describe('SnapbackZoom Validation Tests', () => {
     const message = `SnapbackZoom expected one child but received 2 children`;
     expect(() => render(snapback)).toThrow(message);
   });
+
+  test('should throw error when longPressDuration is lesser than equals 250', () => {
+    expect(() => {
+      return render(
+        <SnapbackZoom longPressDuration={200}>
+          <View style={{ width: 200, height: 200 }} />
+        </SnapbackZoom>
+      );
+    }).toThrow();
+  });
 });

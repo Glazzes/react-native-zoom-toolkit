@@ -15,10 +15,13 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { Gallery } from '../../index';
 import type { SizeVector, Vector } from '../../commons/types';
-import type { GalleryProps, GalleryType } from '../../components/gallery/types';
+import type {
+  GalleryProps,
+  GalleryRefType,
+} from '../../components/gallery/types';
 
 type GalleryPropsWithRef = GalleryProps<number> & {
-  ref?: React.ForwardedRef<GalleryType>;
+  ref?: React.ForwardedRef<GalleryRefType>;
 };
 
 describe('Gallery Gesture Tests', () => {
@@ -123,7 +126,7 @@ describe('Gallery Gesture Tests', () => {
       expectedScale: 1,
     },
   ])('$title', ({ enabled, timesCalled, expectedScale }) => {
-    const ref = React.createRef<GalleryType>();
+    const ref = React.createRef<GalleryRefType>();
     const onPinchStart = jest.fn();
     const onPinchEnd = jest.fn();
     const onGestureEnd = jest.fn();
@@ -147,6 +150,6 @@ describe('Gallery Gesture Tests', () => {
     expect(onPinchStart).toHaveBeenCalledTimes(timesCalled);
     expect(onPinchEnd).toHaveBeenCalledTimes(timesCalled);
     expect(onGestureEnd).toHaveBeenCalledTimes(timesCalled * 2);
-    expect(ref.current?.requestState().scale).toBe(expectedScale);
+    expect(ref.current?.getState().scale).toBe(expectedScale);
   });
 });

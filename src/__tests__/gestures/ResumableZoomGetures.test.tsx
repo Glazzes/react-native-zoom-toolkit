@@ -24,12 +24,12 @@ import {
 import ResumableZoom from '../../components/resumable/ResumableZoom';
 import type {
   ResumableZoomProps,
-  ResumableZoomType,
+  ResumableZoomRefType,
 } from '../../components/resumable/types';
 import type { PanMode, SizeVector } from '../../commons/types';
 
 type ResumableZoomPropsWithRef = ResumableZoomProps & {
-  ref?: React.ForwardedRef<ResumableZoomType>;
+  ref?: React.ForwardedRef<ResumableZoomRefType>;
 };
 
 describe('ResumableZoom Gesture Tests', () => {
@@ -149,7 +149,7 @@ describe('ResumableZoom Gesture Tests', () => {
    * I placed this test here, becuase ResumableZoom is the heart of this library.
    */
   it('should scale to maxScale on double tap and viceversa', () => {
-    const ref = React.createRef<ResumableZoomType>();
+    const ref = React.createRef<ResumableZoomRefType>();
     renderResumableZoom({
       ref,
       maxScale: resolution,
@@ -160,12 +160,12 @@ describe('ResumableZoom Gesture Tests', () => {
     fireGestureHandler<TapGesture>(doubleTap);
     jest.runAllTimers();
 
-    expect(ref.current?.requestState().scale).toBe(6);
+    expect(ref.current?.getState().scale).toBe(6);
 
     fireGestureHandler<TapGesture>(doubleTap);
     jest.runAllTimers();
 
-    expect(ref.current?.requestState().scale).toBe(1);
+    expect(ref.current?.getState().scale).toBe(1);
   });
 
   it('should trigger onOverPanning callback', () => {
@@ -215,7 +215,7 @@ describe('ResumableZoom Gesture Tests', () => {
       boundary: 150,
     },
   ])('$title', async ({ panMode, boundary }) => {
-    const ref = React.createRef<ResumableZoomType>();
+    const ref = React.createRef<ResumableZoomRefType>();
 
     renderResumableZoom({
       ref,
@@ -245,6 +245,6 @@ describe('ResumableZoom Gesture Tests', () => {
       jest.runAllTimers();
     });
 
-    expect(ref.current?.requestState().translateX).toBe(boundary);
+    expect(ref.current?.getState().translateX).toBe(boundary);
   });
 });

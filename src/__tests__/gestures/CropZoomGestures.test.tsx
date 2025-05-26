@@ -12,10 +12,13 @@ import { act, render } from '@testing-library/react-native';
 
 import CropZoom from '../../components/crop/CropZoom';
 import type { SizeVector } from '../../commons/types';
-import type { CropZoomProps, CropZoomType } from '../../components/crop/types';
+import type {
+  CropZoomProps,
+  CropZoomRefType,
+} from '../../components/crop/types';
 
 type CropZoomPropsWithRef = CropZoomProps & {
-  ref?: React.ForwardedRef<CropZoomType>;
+  ref?: React.ForwardedRef<CropZoomRefType>;
 };
 
 describe('CropZoom Gesture Tests', () => {
