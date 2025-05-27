@@ -185,9 +185,6 @@ const GalleryGestureHandler = ({
     if (direction === 'right' && !vertical) toIndex -= 1;
 
     toIndex = clamp(toIndex, 0, length - 1);
-    if (toIndex === activeIndex.value) {
-      return;
-    }
 
     const newScrollPosition = getScrollPosition({
       index: toIndex,
@@ -293,10 +290,11 @@ const GalleryGestureHandler = ({
     .minVelocity(100)
     .enabled(gesturesEnabled)
     .onStart((e) => {
-      onPanStart && runOnJS(onPanStart)(e);
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
       cancelAnimation(scroll);
+
+      onPanStart && runOnJS(onPanStart)(e);
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
@@ -363,8 +361,13 @@ const GalleryGestureHandler = ({
       const snapV = vertical && (direction === undefined || isSwipingH);
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
-      (snapV || snapH) && snapToScrollPosition(e);
-      direction === undefined && onPanEnd && runOnJS(onPanEnd)(e);
+      if (snapV || snapH) {
+        snapToScrollPosition(e);
+      }
+
+      if (direction === undefined && onPanEnd !== undefined) {
+        runOnJS(onPanEnd)(e);
+      }
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
       const configY = { velocity: e.velocityY, clamp: [-bounds.y, bounds.y] };
