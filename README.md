@@ -35,6 +35,7 @@ If your requirements are too specific and you need support tailored to your need
 
 ## Support
 If you've found good usage out of this library, feel free to support its development.
+
 [<img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" width="150px" />](https://ko-fi.com/glazzes)
 
 ## Demo
