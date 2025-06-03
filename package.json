@@ -1,6 +1,6 @@
 {
   "name": "react-native-zoom-toolkit",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Most complete set of pinch to zoom utilites for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

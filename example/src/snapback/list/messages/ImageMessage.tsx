@@ -43,7 +43,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
 
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: backgroundColor.value,
-    // borderRadius: theme.spacing.s,
+    borderRadius: theme.spacing.s,
     padding: theme.spacing.xs / 2,
   }));
 
@@ -105,7 +105,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   const imageStyle: ImageStyle = {
     width: size.width,
     height: size.height,
-    // borderRadius: theme.spacing.s,
+    borderRadius: theme.spacing.s,
   };
 
   return (

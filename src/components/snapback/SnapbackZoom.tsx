@@ -72,8 +72,6 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   }, [resizeConfig, containerSize, scale]);
 
   useDerivedValue(() => {
-    const { width, height } = childrenSize.value;
-
     const state: SnapbackZoomState<number> = {
       size: {
         width: containerSize.width.value,
@@ -83,17 +81,20 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
         x: position.x.value,
         y: position.y.value,
       },
-      translateX: translate.x.value,
-      translateY: translate.y.value,
+      translateX: translate.x.value - childrenSize.value.deltaX,
+      translateY: translate.y.value - childrenSize.value.deltaY,
       scale: scale.value,
     };
 
     if (resizeConfig !== undefined) {
-      state.resize = { width, height };
+      state.resize = {
+        width: childrenSize.value.width,
+        height: childrenSize.value.height,
+      };
     }
 
     onUpdate?.(state);
-  }, [childrenSize, position, containerSize, resizeConfig, translate, scale]);
+  }, [containerSize, position, childrenSize, resizeConfig, translate, scale]);
 
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
