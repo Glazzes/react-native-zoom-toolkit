@@ -34,7 +34,7 @@ To check out the docs, visit https://glazzes.github.io/react-native-zoom-toolkit
 If your requirements are too specific and you need support tailored to your needs, you can reach out to me with your use case at santiagop1@protonmail.com, I'll see if we make a good fit, so we can work together!
 
 ## Support
-If you've found good usage out of this library, feel free to support its development.
+If you've found good usage out of this library, you can make a donation by clicking on the image down below.
 
 [<img src="https://storage.ko-fi.com/cdn/fullLogoKofi.png" width="150px" />](https://ko-fi.com/glazzes)
 
