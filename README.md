@@ -42,4 +42,4 @@ If you've found good usage out of this library, feel free to support its develop
 The example app comes with five different examples from which you can learn from, see the [Example app](./example/).
 
 ## License
-[Mit license](./LICENSE
+[Mit license](./LICENSE)
