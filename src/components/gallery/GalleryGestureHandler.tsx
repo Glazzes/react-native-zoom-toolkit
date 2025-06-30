@@ -185,6 +185,7 @@ const GalleryGestureHandler = ({
     if (direction === 'right' && !vertical) toIndex -= 1;
 
     toIndex = clamp(toIndex, 0, length - 1);
+    if (toIndex === activeIndex.value) return;
 
     const newScrollPosition = getScrollPosition({
       index: toIndex,
@@ -354,7 +355,9 @@ const GalleryGestureHandler = ({
         onSwipe(direction);
       }
 
-      direction !== undefined && onUserSwipe && runOnJS(onUserSwipe)(direction);
+      if (direction !== undefined && onUserSwipe !== undefined) {
+        runOnJS(onUserSwipe)(direction);
+      }
 
       if (isPullingVertical.value) {
         pullReleased.value = true;
@@ -371,12 +374,12 @@ const GalleryGestureHandler = ({
       const snapV = vertical && (direction === undefined || isSwipingH);
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
-      if (snapV || snapH) {
-        snapToScrollPosition(e);
-      }
-
       if (direction === undefined && onPanEnd !== undefined) {
         runOnJS(onPanEnd)(e);
+      }
+
+      if (snapV || snapH) {
+        snapToScrollPosition(e);
       }
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
@@ -392,8 +395,6 @@ const GalleryGestureHandler = ({
 
       translate.x.value = withDecay(configX as WithDecayConfig);
       translate.y.value = withDecay(configY as WithDecayConfig);
-
-      console.log('here');
     });
 
   const tap = Gesture.Tap()
