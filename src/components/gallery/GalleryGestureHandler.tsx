@@ -344,7 +344,16 @@ const GalleryGestureHandler = ({
         },
       });
 
-      direction !== undefined && onSwipe(direction);
+      const canSwipeHorizontal =
+        !vertical && (direction === 'left' || direction === 'right');
+
+      const canSwipeVertical =
+        vertical && (direction === 'up' || direction === 'down');
+
+      if (canSwipeHorizontal || canSwipeVertical) {
+        onSwipe(direction);
+      }
+
       direction !== undefined && onUserSwipe && runOnJS(onUserSwipe)(direction);
 
       if (isPullingVertical.value) {
@@ -383,6 +392,8 @@ const GalleryGestureHandler = ({
 
       translate.x.value = withDecay(configX as WithDecayConfig);
       translate.y.value = withDecay(configY as WithDecayConfig);
+
+      console.log('here');
     });
 
   const tap = Gesture.Tap()
