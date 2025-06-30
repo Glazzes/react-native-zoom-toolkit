@@ -169,16 +169,17 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     },
   });
 
-  const { onDoubleTapEnd } = useDoubleTapCommons({
-    container: extendedSize,
-    translate,
-    scale,
-    minScale,
-    maxScale,
-    scaleOffset,
-    boundsFn: boundsFn,
-    onGestureEnd,
-  });
+  const { onDoubleTapStart, onDoubleTapEnd, enablePanGestureByDoubleTap } =
+    useDoubleTapCommons({
+      container: extendedSize,
+      translate,
+      scale,
+      minScale,
+      maxScale,
+      scaleOffset,
+      boundsFn: boundsFn,
+      onGestureEnd,
+    });
 
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
@@ -193,7 +194,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
 
   const pan = Gesture.Pan()
     .withTestId('pan')
-    .enabled(panEnabled && gesturesEnabled)
+    .enabled(panEnabled && gesturesEnabled && enablePanGestureByDoubleTap)
     .maxPointers(1)
     .onStart(onPanStart)
     .onChange(onPanChange)
@@ -212,6 +213,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     .enabled(tapsEnabled && gesturesEnabled)
     .maxDuration(250)
     .numberOfTaps(2)
+    .onStart(onDoubleTapStart)
     .onEnd(onDoubleTapEnd);
 
   const longPress = Gesture.LongPress()
@@ -219,9 +221,7 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     .enabled(gesturesEnabled)
     .minDuration(longPressDuration)
     .runOnJS(true)
-    .onStart((e) => {
-      onLongPress && onLongPress(e);
-    });
+    .onStart((e) => onLongPress?.(e));
 
   const measureRoot = (e: LayoutChangeEvent) => {
     rootSize.width.value = e.nativeEvent.layout.width;

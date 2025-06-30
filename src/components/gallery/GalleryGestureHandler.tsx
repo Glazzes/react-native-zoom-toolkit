@@ -255,16 +255,17 @@ const GalleryGestureHandler = ({
     },
   });
 
-  const { onDoubleTapEnd } = useDoubleTapCommons({
-    container: rootSize,
-    translate,
-    scale,
-    minScale,
-    maxScale,
-    scaleOffset,
-    boundsFn,
-    onGestureEnd,
-  });
+  const { onDoubleTapStart, onDoubleTapEnd, enablePanGestureByDoubleTap } =
+    useDoubleTapCommons({
+      container: rootSize,
+      translate,
+      scale,
+      minScale,
+      maxScale,
+      scaleOffset,
+      boundsFn,
+      onGestureEnd,
+    });
 
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
@@ -288,7 +289,7 @@ const GalleryGestureHandler = ({
     .withTestId('pan')
     .maxPointers(1)
     .minVelocity(100)
-    .enabled(gesturesEnabled)
+    .enabled(gesturesEnabled && enablePanGestureByDoubleTap)
     .onStart((e) => {
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
@@ -434,6 +435,7 @@ const GalleryGestureHandler = ({
     .enabled(gesturesEnabled && zoomEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
+    .onStart(onDoubleTapStart)
     .onEnd(onDoubleTapEnd);
 
   const longPress = Gesture.LongPress()

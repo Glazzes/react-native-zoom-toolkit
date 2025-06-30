@@ -9,6 +9,7 @@ import type {
   TapGestureEvent,
   Vector,
 } from '../types';
+import { useState } from 'react';
 
 type DoubleTapOptions = {
   container: SizeVector<SharedValue<number>>;
@@ -31,6 +32,13 @@ export const useDoubleTapCommons = ({
   boundsFn,
   onGestureEnd,
 }: DoubleTapOptions) => {
+  const [isPanGestureEnabled, setIsPanGestureEnabled] = useState<boolean>(true);
+
+  const onDoubleTapStart = () => {
+    'worklet';
+    runOnJS(setIsPanGestureEnabled)(false);
+  };
+
   const onDoubleTapEnd = (event: TapGestureEvent) => {
     'worklet';
 
@@ -55,9 +63,14 @@ export const useDoubleTapCommons = ({
     translate.y.value = withTiming(toY);
     scaleOffset.value = toScale;
     scale.value = withTiming(toScale, undefined, (finished) => {
+      runOnJS(setIsPanGestureEnabled)(true);
       finished && onGestureEnd && runOnJS(onGestureEnd)();
     });
   };
 
-  return { onDoubleTapEnd };
+  return {
+    onDoubleTapStart,
+    onDoubleTapEnd,
+    enablePanGestureByDoubleTap: isPanGestureEnabled,
+  };
 };
