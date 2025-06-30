@@ -176,18 +176,18 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   );
 
   // Reference handling
-  const setIndex = (index: number) => {
-    const clamped = clamp(index, 0, data.length - 1);
-    activeIndex.value = clamped;
+  function setIndex(index: number) {
+    const clampedIndex = clamp(index, 0, data.length - 1);
+    activeIndex.value = clampedIndex;
 
     scroll.value = getScrollPosition({
-      index: activeIndex.get(),
-      itemSize: itemSize.get(),
+      index: clampedIndex,
+      itemSize: itemSize.value,
       gap,
     });
-  };
+  }
 
-  const getState = (): CommonZoomState<number> => {
+  function getState(): CommonZoomState<number> {
     return {
       containerSize: {
         width: rootSize.width.value,
@@ -202,13 +202,13 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       translateY: translate.y.value,
       scale: scale.value,
     };
-  };
+  }
 
-  const reset = (animate = true) => {
+  function reset(animate = true) {
     translate.x.value = animate ? withTiming(0) : 0;
     translate.y.value = animate ? withTiming(0) : 0;
     scale.value = animate ? withTiming(1) : 1;
-  };
+  }
 
   useImperativeHandle(reference, () => ({
     setIndex,
