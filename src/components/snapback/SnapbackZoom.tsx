@@ -111,7 +111,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     })
     .onStart((e) => {
       measureContainer();
-      onPinchStart && onPinchStart(e);
+      onPinchStart && runOnJS(onPinchStart)(e);
 
       initialFocal.x.value = currentFocal.x.value;
       initialFocal.y.value = currentFocal.y.value;

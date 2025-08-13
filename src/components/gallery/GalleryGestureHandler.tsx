@@ -185,6 +185,7 @@ const GalleryGestureHandler = ({
     if (direction === 'right' && !vertical) toIndex -= 1;
 
     toIndex = clamp(toIndex, 0, length - 1);
+    if (toIndex === activeIndex.value) return;
 
     const newScrollPosition = getScrollPosition({
       index: toIndex,
@@ -255,16 +256,17 @@ const GalleryGestureHandler = ({
     },
   });
 
-  const { onDoubleTapEnd } = useDoubleTapCommons({
-    container: rootSize,
-    translate,
-    scale,
-    minScale,
-    maxScale,
-    scaleOffset,
-    boundsFn,
-    onGestureEnd,
-  });
+  const { onDoubleTapStart, onDoubleTapEnd, enablePanGestureByDoubleTap } =
+    useDoubleTapCommons({
+      container: rootSize,
+      translate,
+      scale,
+      minScale,
+      maxScale,
+      scaleOffset,
+      boundsFn,
+      onGestureEnd,
+    });
 
   const pinch = Gesture.Pinch()
     .withTestId('pinch')
@@ -288,7 +290,7 @@ const GalleryGestureHandler = ({
     .withTestId('pan')
     .maxPointers(1)
     .minVelocity(100)
-    .enabled(gesturesEnabled)
+    .enabled(gesturesEnabled && enablePanGestureByDoubleTap)
     .onStart((e) => {
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
@@ -343,8 +345,19 @@ const GalleryGestureHandler = ({
         },
       });
 
-      direction !== undefined && onSwipe(direction);
-      direction !== undefined && onUserSwipe && runOnJS(onUserSwipe)(direction);
+      const canSwipeHorizontal =
+        !vertical && (direction === 'left' || direction === 'right');
+
+      const canSwipeVertical =
+        vertical && (direction === 'up' || direction === 'down');
+
+      if (canSwipeHorizontal || canSwipeVertical) {
+        onSwipe(direction);
+      }
+
+      if (direction !== undefined && onUserSwipe !== undefined) {
+        runOnJS(onUserSwipe)(direction);
+      }
 
       if (isPullingVertical.value) {
         pullReleased.value = true;
@@ -361,12 +374,12 @@ const GalleryGestureHandler = ({
       const snapV = vertical && (direction === undefined || isSwipingH);
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
-      if (snapV || snapH) {
-        snapToScrollPosition(e);
-      }
-
       if (direction === undefined && onPanEnd !== undefined) {
         runOnJS(onPanEnd)(e);
+      }
+
+      if (snapV || snapH) {
+        snapToScrollPosition(e);
       }
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
@@ -434,6 +447,7 @@ const GalleryGestureHandler = ({
     .enabled(gesturesEnabled && zoomEnabled)
     .numberOfTaps(2)
     .maxDuration(250)
+    .onStart(onDoubleTapStart)
     .onEnd(onDoubleTapEnd);
 
   const longPress = Gesture.LongPress()
