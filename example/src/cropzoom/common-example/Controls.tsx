@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import { FlipType, SaveFormat, ImageManipulator } from 'expo-image-manipulator';
-import { createAlbumAsync, createAssetAsync } from 'expo-media-library';
-import { type CropZoomRefType } from 'react-native-zoom-toolkit';
+
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { createAlbumAsync, createAssetAsync } from 'expo-media-library';
+import { FlipType, SaveFormat, ImageManipulator } from 'expo-image-manipulator';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { type CropZoomRefType } from 'react-native-zoom-toolkit';
 
 import { activeColor, baseColor } from '../commons/contants';
 import { theme } from '../../constants';
@@ -15,6 +17,8 @@ type ControlProps = {
 };
 
 const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
+  const insets = useSafeAreaInsets()
+
   const [isCropping, setIsCropping] = useState<boolean>(false);
 
   const [isFlippedH, setIsFlippedH] = useState<boolean>(false);
@@ -76,7 +80,7 @@ const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
   }
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { paddingBottom: insets.bottom }]}>
       <Pressable onPress={rotate}>
         <Icon
           name={'format-rotate-90'}
@@ -119,14 +123,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     paddingHorizontal: theme.spacing.m,
-    paddingBottom: theme.spacing.s,
     gap: theme.spacing.l,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   button: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: "50%",
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#75DAEA',

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
+
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { File, Paths,  } from 'expo-file-system';
 import { withTiming, type SharedValue } from 'react-native-reanimated';
 import {
   rect,
@@ -8,9 +11,8 @@ import {
   FilterMode,
   MipmapMode,
 } from '@shopify/react-native-skia';
-import { cacheDirectory, writeAsStringAsync } from 'expo-file-system';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { CropZoomRefType } from 'react-native-zoom-toolkit';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 
 import {
   baseColor,
@@ -37,6 +39,8 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   cropRef,
   setCrop,
 }) => {
+  const insets = useSafeAreaInsets()
+
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [isRotated, setIsRotated] = useState<boolean>(false);
@@ -92,7 +96,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
     )!;
 
     const snapshot = surface.makeImageSnapshot();
-    saveBase64ImageToDisk(snapshot.encodeToBase64());
+    writeImageByesToDisk(snapshot.encodeToBytes());
   }
 
   function drawImageRotated(
@@ -126,17 +130,15 @@ const Controls: React.FC<EffectIndicatorProps> = ({
     return surface.makeImageSnapshot();
   }
 
-  async function saveBase64ImageToDisk(base64: string) {
+  async function writeImageByesToDisk(bytes: Uint8Array) {
     const time = new Date().getTime();
-    const fileUri = `${cacheDirectory}picture${time}.png`;
 
-    writeAsStringAsync(fileUri, base64, { encoding: 'base64' })
-      .then(() => {
-        setCrop(fileUri);
-      })
-      .finally(() => {
-        setIsCropping(false);
-      });
+    const file = new File(Paths.cache, `picture${time}.png`)
+    file.create()
+    file.write(bytes)
+
+    setCrop(file.uri)
+    setIsCropping(false)
   }
 
   useEffect(() => {
@@ -144,7 +146,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   }, [activeIndex, progress]);
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { paddingBottom: insets.bottom }]}>
       <View style={styles.previewContainer}>
         {matrices.map((matrix, index) => {
           return (
@@ -195,7 +197,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     paddingHorizontal: theme.spacing.m,
-    paddingBottom: theme.spacing.s,
     gap: theme.spacing.l,
     zIndex: 100,
   },

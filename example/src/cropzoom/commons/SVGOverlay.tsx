@@ -4,6 +4,7 @@ import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import { CONTROLS_HEIGHT } from './contants';
 
 import type { SizeVector } from 'react-native-zoom-toolkit';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type SVGOverlayProps = {
   cropSize: SizeVector<number>;
@@ -14,10 +15,13 @@ type SVGOverlayProps = {
  * one also draws a "hole" in it as big as the crop size.
  */
 const SVGOverlay: React.FC<SVGOverlayProps> = ({ cropSize }) => {
-  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets()
+  let { width, height } = useWindowDimensions();
+
+  height = height - CONTROLS_HEIGHT - insets.bottom;
 
   const path = useMemo(() => {
-    const center = { x: width / 2, y: (height - CONTROLS_HEIGHT) / 2 };
+    const center = { x: width / 2, y: (height) / 2 };
     const commands = [
       'M 0 0',
       `h ${width} v ${height}`,
@@ -32,7 +36,7 @@ const SVGOverlay: React.FC<SVGOverlayProps> = ({ cropSize }) => {
 
   const style: ViewStyle = {
     width,
-    height: height - CONTROLS_HEIGHT,
+    height,
   };
 
   return (

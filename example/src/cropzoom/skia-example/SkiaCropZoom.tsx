@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
+
+import { StatusBar } from 'expo-status-bar';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import {
   Canvas,
@@ -10,7 +12,6 @@ import {
   Lerp,
   useCanvasRef,
 } from '@shopify/react-native-skia';
-import { StatusBar } from 'expo-status-bar';
 import {
   CropZoom,
   type CropZoomRefType,
@@ -21,15 +22,12 @@ import CropModal from '../commons/CropModal';
 import SVGOverlay from '../commons/SVGOverlay';
 import Controls from './Controls';
 import {
-  buttonSize,
-  blackAndWhite,
+  IMAGE,
   CONTROLS_HEIGHT,
+  blackAndWhite,
   indentity,
 } from '../commons/contants';
-import { theme } from '../../constants';
-
-const IMAGE =
-  'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SkiaCropZoom = () => {
   const canvasRef = useCanvasRef();
@@ -38,10 +36,11 @@ const SkiaCropZoom = () => {
   const image = useImage(IMAGE);
   const { onUpdate, transform, state } = useTransformationState('crop');
 
+  const insets = useSafeAreaInsets()
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [cropImage, setCropImage] = useState<string | undefined>(undefined);
 
-  const cropSize = screenWidth * 0.9;
+  const cropSize = screenWidth * 0.8;
 
   const progress = useSharedValue(0);
   const posX = useDerivedValue(
@@ -51,10 +50,10 @@ const SkiaCropZoom = () => {
 
   const posY = useDerivedValue(
     () =>
-      (screenHeight -
-        state.childSize.height.value -
-        buttonSize -
-        theme.spacing.s) /
+      (screenHeight
+        - CONTROLS_HEIGHT
+        - insets.bottom
+        - state.childSize.height.value) /
       2,
     [state, screenHeight]
   );
@@ -80,7 +79,7 @@ const SkiaCropZoom = () => {
           height={state.childSize.height}
           image={image}
           fit={'cover'}
-          origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT) / 2)}
+          origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT - insets.bottom) / 2)}
           transform={transform}
         >
           <Lerp t={progress}>
@@ -103,6 +102,7 @@ const SkiaCropZoom = () => {
       <Controls
         progress={progress}
         image={image}
+        // @ts-ignore
         cropRef={ref}
         setCrop={setCropImage}
       />
