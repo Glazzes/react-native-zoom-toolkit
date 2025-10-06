@@ -9,8 +9,29 @@ This library relies on both Reanimated and Gesture Handler making part of your p
 
 | React Native Version | React Native Zoom Toolkit Version | Gesture Handler version |
 | -------------------- | --------------------------------- | ----------------------- |
-| `<= 0.76`            | `>= 3.0.0`                        | 2.16.0 and beyond.      |
-| `>= 0.76`            | `>= 4.0.0`                        | 2.19.0 and beyond.      |
+| `<= 0.76`            | `>= 3.0.0`                        | 2.16.0 and above.       |
+| `>= 0.76`            | `>= 4.0.0`                        | 2.19.0 and above.       |
+| `>= 0.81`            | `>= 6.0.0`                        | 2.19.0 and above.       |
+
+For Expo 54 and above.
+
+::: code-group
+
+```sh [npm]
+npm install react-native-zoom-toolkit react-native-gesture-handler react-native-reanimated react-native-worklets
+```
+
+```sh [yarn]
+yarn add react-native-zoom-toolkit react-native-gesture-handler react-native-reanimated react-native-worklets
+```
+
+```sh [expo]
+npx expo install react-native-zoom-toolkit react-native-gesture-handler react-native-reanimated react-native-worklets
+```
+
+:::
+
+For Expo 53 and below.
 
 ::: code-group
 
