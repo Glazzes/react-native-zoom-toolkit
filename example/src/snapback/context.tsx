@@ -13,7 +13,7 @@ export type Context = {
 
 export const ReflectionContext = createContext<Context>({} as Context);
 
-export const ReflectionProvider: React.FC = ({ children }) => {
+export function ReflectionProvider(props: React.PropsWithChildren) {
   const position = useVector(-1 * maxDimension, -1 * maxDimension);
   const width = useSharedValue<number>(0);
   const height = useSharedValue<number>(0);
@@ -29,7 +29,7 @@ export const ReflectionProvider: React.FC = ({ children }) => {
 
   return (
     <ReflectionContext.Provider value={context}>
-      {children}
+      {props.children}
     </ReflectionContext.Provider>
   );
 };

@@ -18,7 +18,7 @@ export type Vector<T> = {
   y: T;
 };
 
-export type SizeVector<T> = {
+export type Size<T> = {
   width: T;
   height: T;
 };
@@ -35,8 +35,8 @@ export type CommonTransformState<T> = {
 };
 
 export type CommonZoomState<T> = {
-  containerSize: SizeVector<T>;
-  childSize: SizeVector<T>;
+  containerSize: Size<T>;
+  childSize: Size<T>;
   maxScale: T;
 } & CommonTransformState<T>;
 

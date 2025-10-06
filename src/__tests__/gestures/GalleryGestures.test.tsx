@@ -14,7 +14,7 @@ import {
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { Gallery } from '../../index';
-import type { SizeVector, Vector } from '../../commons/types';
+import type { Size, Vector } from '../../commons/types';
 import type {
   GalleryProps,
   GalleryRefType,
@@ -32,8 +32,8 @@ describe('Gallery Gesture Tests', () => {
   const renderGallery = (
     props: Omit<GalleryPropsWithRef, 'data' | 'renderItem'>
   ) => {
-    const rootResolution: SizeVector<number> = { width: 100, height: 600 };
-    const childResolution: SizeVector<number> = { width: 100, height: 100 };
+    const rootResolution: Size<number> = { width: 100, height: 600 };
+    const childResolution: Size<number> = { width: 100, height: 100 };
     const data: number[] = [1, 2];
     render(
       <Gallery

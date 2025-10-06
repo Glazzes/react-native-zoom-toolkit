@@ -1,18 +1,18 @@
 import {
   cancelAnimation,
+  clamp,
   withTiming,
   useSharedValue,
   withDecay,
-  runOnJS,
   type SharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import type {
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
-import { clamp } from '../utils/clamp';
 import { useVector } from './useVector';
 import { friction } from '../utils/friction';
 import { getSwipeDirection } from '../utils/getSwipeDirection';
@@ -21,14 +21,14 @@ import type {
   PanMode,
   BoundsFuction,
   Vector,
-  SizeVector,
+  Size,
   PanGestureEventCallback,
   PanGestureEvent,
   SwipeDirection,
 } from '../types';
 
 type PanCommmonOptions = {
-  container: SizeVector<SharedValue<number>>;
+  container: Size<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   panMode: PanMode;
@@ -69,7 +69,10 @@ export const usePanCommons = (options: PanCommmonOptions) => {
   const onPanStart = (e: PanGestureEvent) => {
     'worklet';
 
-    userCallbacks.onPanStart && runOnJS(userCallbacks.onPanStart)(e);
+    if (userCallbacks.onPanStart !== undefined) {
+      scheduleOnRN(userCallbacks.onPanStart, e)
+    }
+
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
 
@@ -141,12 +144,14 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       });
 
       if (direction !== undefined) {
-        runOnJS(onSwipe)(direction);
+        scheduleOnRN(onSwipe, direction);
         return;
       }
     }
 
-    userCallbacks.onPanEnd && runOnJS(userCallbacks.onPanEnd)(e);
+    if (userCallbacks.onPanEnd !== undefined) {
+      scheduleOnRN(userCallbacks.onPanEnd, e)
+    }
 
     const { x: boundX, y: boundY } = boundFn();
     const clampX: [number, number] = [-1 * boundX, boundX];
@@ -170,12 +175,16 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     if (decayX || decayY) {
       const config = restX > restY ? decayConfigX : decayConfigY;
       gestureEnd.value = withDecay(config, (finished) => {
-        finished && onGestureEnd && runOnJS(onGestureEnd)();
+        if (finished && onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
+        }
       });
     } else {
       const toValue = restX > restY ? toX : toY;
       gestureEnd.value = withTiming(toValue, undefined, (finished) => {
-        finished && onGestureEnd && runOnJS(onGestureEnd)();
+        if (finished && onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
+        }
       });
     }
   };

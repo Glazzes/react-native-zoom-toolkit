@@ -1,19 +1,21 @@
 import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import Constants from 'expo-constants';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { theme } from '../../../constants';
 import Animated from 'react-native-reanimated';
 
-const barHeight = Constants.statusBarHeight;
+import { theme } from '../../../constants';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 /*
  * Just a text area component nothing relevant here.
  */
-const TextArea: React.FC = () => {
+export default function TextArea() {
+  const insets = useSafeAreaInsets()
+
   return (
-    <Animated.View style={styles.root}>
+    <Animated.View style={[styles.root, { height: 48 + insets.bottom, paddingBottom: insets.bottom }]}>
       <Icon
         name={'sticker-emoji'}
         color={theme.colors.foregroundAccent}
@@ -47,7 +49,6 @@ const TextArea: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     width: '100%',
-    height: barHeight * 2,
     backgroundColor: theme.colors.foreground,
     flexDirection: 'row',
     alignItems: 'center',
@@ -69,5 +70,3 @@ const styles = StyleSheet.create({
     gap: theme.spacing.m,
   },
 });
-
-export default TextArea;

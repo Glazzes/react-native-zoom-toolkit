@@ -1,9 +1,9 @@
-import type { SizeVector } from '../commons/types';
+import type { Size } from '../commons/types';
 
 export const fitContainer = (
   aspectRatio: number,
-  container: SizeVector<number>
-): SizeVector<number> => {
+  container: Size<number>
+): Size<number> => {
   'worklet';
 
   let width = container.width;

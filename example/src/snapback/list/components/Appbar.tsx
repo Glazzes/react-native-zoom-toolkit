@@ -1,21 +1,22 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { theme } from '../../../constants';
-
-const barHeight = Constants.statusBarHeight;
-const pictureSize = barHeight * 2 * 0.8;
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /*
  * Just an Appbar component, nothing relevant here.
  */
-const Appbar: React.FC = () => {
+
+const PICTURE_SIZE = 40;
+
+export default function Appbar() {
   const router = useRouter();
+  const insets = useSafeAreaInsets()
 
   const goBack = () => {
     if (router.canGoBack()) {
@@ -24,7 +25,7 @@ const Appbar: React.FC = () => {
   };
 
   return (
-    <View style={styles.appbar}>
+    <View style={[styles.appbar, { height: 50 + insets.top, paddingTop: insets.top }]}>
       <StatusBar style={'light'} backgroundColor={'transparent'} />
 
       <Pressable onPress={goBack}>
@@ -64,8 +65,6 @@ const Appbar: React.FC = () => {
 const styles = StyleSheet.create({
   appbar: {
     width: '100%',
-    height: barHeight * 3,
-    paddingTop: barHeight,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.foreground,
@@ -79,10 +78,9 @@ const styles = StyleSheet.create({
     gap: theme.spacing.s,
   },
   profilePicture: {
-    width: pictureSize,
-    height: pictureSize,
-    borderRadius: pictureSize / 2,
-    backgroundColor: 'lime',
+    width: PICTURE_SIZE,
+    height: PICTURE_SIZE,
+    borderRadius: PICTURE_SIZE / 2,
   },
   username: {
     fontWeight: 'bold',
@@ -93,5 +91,3 @@ const styles = StyleSheet.create({
     color: theme.colors.online,
   },
 });
-
-export default Appbar;

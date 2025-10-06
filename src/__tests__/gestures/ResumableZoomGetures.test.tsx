@@ -26,16 +26,16 @@ import type {
   ResumableZoomProps,
   ResumableZoomRefType,
 } from '../../components/resumable/types';
-import type { PanMode, SizeVector } from '../../commons/types';
+import type { PanMode, Size } from '../../commons/types';
 
 type ResumableZoomPropsWithRef = ResumableZoomProps & {
   ref?: React.ForwardedRef<ResumableZoomRefType>;
 };
 
 describe('ResumableZoom Gesture Tests', () => {
-  const resolution: SizeVector<number> = { width: 600, height: 600 };
-  const rootResolution: SizeVector<number> = { width: 100, height: 600 };
-  const childResolution: SizeVector<number> = { width: 100, height: 100 };
+  const resolution: Size<number> = { width: 600, height: 600 };
+  const rootResolution: Size<number> = { width: 100, height: 600 };
+  const childResolution: Size<number> = { width: 100, height: 100 };
 
   const renderResumableZoom = (props: ResumableZoomPropsWithRef) => {
     render(<ResumableZoom {...props}>{props.children}</ResumableZoom>);

@@ -1,10 +1,10 @@
-import type { SizeVector, Vector, Rect } from '../types';
+import type { Size, Vector, Rect } from '../types';
 
 type Options = {
   scale: number;
   translation: Vector<number>; // cartesian system values with the y axis flipped
-  itemSize: SizeVector<number>; // Size of the wrapped component
-  containerSize: SizeVector<number>; // Size of zoom component
+  itemSize: Size<number>; // Size of the wrapped component
+  containerSize: Size<number>; // Size of zoom component
 };
 
 export const getVisibleRect = (options: Options): Rect => {

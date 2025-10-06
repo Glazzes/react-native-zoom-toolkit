@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { type LayoutChangeEvent } from 'react-native';
+
 import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,

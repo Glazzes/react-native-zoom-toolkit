@@ -1,14 +1,14 @@
 import React, { useContext, useImperativeHandle, useState } from 'react';
 import { type LayoutChangeEvent } from 'react-native';
 import Animated, {
-  runOnJS,
+  clamp,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { runOnJS } from 'react-native-worklets'
 
-import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 

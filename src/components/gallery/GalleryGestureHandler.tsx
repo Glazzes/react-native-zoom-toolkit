@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import Animated, {
+  clamp,
   Easing,
   cancelAnimation,
-  runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -11,9 +11,9 @@ import Animated, {
   type SharedValue,
   type WithDecayConfig,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
-import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { snapPoint } from '../../commons/utils/snapPoint';
 import { getVisibleRect } from '../../commons/utils/getVisibleRect';
@@ -33,7 +33,7 @@ import { type GalleryProps } from './types';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
 const minScale = 1;
-const config = { duration: 300, easing: Easing.linear };
+const config = { duration: 300, easing: Easing.out(Easing.cubic) };
 
 type GalleryGestureHandlerProps = {
   length: number;
@@ -296,7 +296,9 @@ const GalleryGestureHandler = ({
       cancelAnimation(translate.y);
       cancelAnimation(scroll);
 
-      onPanStart && runOnJS(onPanStart)(e);
+      if (onPanStart !== undefined) {
+        scheduleOnRN(onPanStart, e)
+      }
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
@@ -356,7 +358,7 @@ const GalleryGestureHandler = ({
       }
 
       if (direction !== undefined && onUserSwipe !== undefined) {
-        runOnJS(onUserSwipe)(direction);
+        scheduleOnRN(onUserSwipe, direction);
       }
 
       if (isPullingVertical.value) {
@@ -375,7 +377,7 @@ const GalleryGestureHandler = ({
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
       if (direction === undefined && onPanEnd !== undefined) {
-        runOnJS(onPanEnd)(e);
+        scheduleOnRN(onPanEnd, e);
       }
 
       if (snapV || snapH) {
@@ -390,7 +392,9 @@ const GalleryGestureHandler = ({
       const finalConfig = restX > restY ? configX : configY;
       gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
       gestureEnd.value = withDecay(finalConfig as WithDecayConfig, () => {
-        onGestureEnd && runOnJS(onGestureEnd)();
+        if (onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
+        }
       });
 
       translate.x.value = withDecay(configX as WithDecayConfig);
@@ -426,7 +430,9 @@ const GalleryGestureHandler = ({
 
       toIndex = clamp(toIndex, 0, length - 1);
       if (toIndex === activeIndex.value) {
-        onTap && runOnJS(onTap)(event, activeIndex.value);
+        if(onTap !== undefined) {
+          scheduleOnRN(onTap, event, activeIndex.value);
+        }
         return;
       }
 

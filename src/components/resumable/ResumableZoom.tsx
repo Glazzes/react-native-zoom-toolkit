@@ -1,6 +1,8 @@
 import React, { useImperativeHandle } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+
 import Animated, {
+  clamp,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -8,7 +10,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
-import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';

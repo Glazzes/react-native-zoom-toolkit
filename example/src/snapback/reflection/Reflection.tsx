@@ -1,6 +1,9 @@
 import React, { useContext } from 'react';
-import { ReflectionContext } from '../context';
+
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+
+import { ReflectionContext } from '../context';
+
 
 /*
  * This component is a "reflection" of the background seen in the meassages, once you pinch
@@ -11,7 +14,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
  * the entire component needs to update its zIndex value, because of the parent-child relationship
  * of the zIndex property, this background will overlay the appbar, giving a poor user experience.
  */
-const Reflection: React.FC = () => {
+export default function Reflection() {
   const context = useContext(ReflectionContext);
   const { width, height, backgroundColor, x, y } = context;
 
@@ -27,5 +30,3 @@ const Reflection: React.FC = () => {
 
   return <Animated.View style={style} />;
 };
-
-export default Reflection;

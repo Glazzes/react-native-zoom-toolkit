@@ -5,6 +5,7 @@ import {
   type LayoutChangeEvent,
   type ViewStyle,
 } from 'react-native';
+
 import Animated, {
   clamp,
   useAnimatedStyle,
@@ -21,9 +22,9 @@ import { usePanCommons } from '../../commons/hooks/usePanCommons';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { useVector } from '../../commons/hooks/useVector';
+import withCropValidation from '../../commons/hoc/withCropValidation';
 
 import type { BoundsFuction } from '../../commons/types';
-
 import type {
   CropZoomProps,
   CropContextResult,
@@ -33,7 +34,6 @@ import type {
   CropZoomTransformState,
   RotationCallback,
 } from './types';
-import withCropValidation from '../../commons/hoc/withCropValidation';
 
 const TAU = Math.PI * 2;
 const RAD2DEG = 180 / Math.PI;

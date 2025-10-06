@@ -1,13 +1,14 @@
 import React from 'react';
+
 import Animated, {
   measure,
-  runOnJS,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
@@ -21,6 +22,8 @@ const DEFAULT_HITSLOP = { vertical: 0, horizontal: 0 };
 
 const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,
+  minScale = 0,
+  maxScale: userMaxScale,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
   timingConfig,
@@ -111,7 +114,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     })
     .onStart((e) => {
       measureContainer();
-      onPinchStart && runOnJS(onPinchStart)(e);
+      onPinchStart && scheduleOnRN(onPinchStart, e);
 
       initialFocal.x.value = currentFocal.x.value;
       initialFocal.y.value = currentFocal.y.value;
@@ -130,15 +133,17 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
       translate.x.value = toX;
       translate.y.value = toY;
-      scale.value = e.scale;
+      scale.value = e.scale; // clamp(e.scale, minScale ?? 0, maxScale);
     })
     .onEnd((e) => {
-      onPinchEnd && runOnJS(onPinchEnd)(e);
+      onPinchEnd && scheduleOnRN(onPinchEnd, e);
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        onGestureEnd && runOnJS(onGestureEnd)();
+        if(onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd)
+        }
       });
     });
 

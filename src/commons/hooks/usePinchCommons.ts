@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import {
   withTiming,
+  clamp,
   cancelAnimation,
-  runOnJS,
   useSharedValue,
   type SharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import type {
   GestureStateManager,
   GestureTouchEvent,
@@ -13,13 +14,12 @@ import type {
   PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
-import { clamp } from '../utils/clamp';
 import { useVector } from './useVector';
 import { pinchTransform } from '../utils/pinchTransform';
 
 import type {
   BoundsFuction,
-  SizeVector,
+  Size,
   Vector,
   PinchGestureEventCallback,
   PinchGestureEvent,
@@ -28,7 +28,7 @@ import type {
 } from '../types';
 
 type PinchOptions = {
-  container: SizeVector<SharedValue<number>>;
+  container: Size<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
   offset: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
@@ -108,8 +108,11 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchStart = (e: PinchGestureEvent) => {
     'worklet';
-    runOnJS(switchGesturesState)(false);
-    userCallbacks.onPinchStart && runOnJS(userCallbacks.onPinchStart)(e);
+    scheduleOnRN(switchGesturesState, false)
+
+    if (userCallbacks.onPinchStart !== undefined) {
+      scheduleOnRN(userCallbacks.onPinchStart, e);
+    }
 
     cancelAnimation(translate.x);
     cancelAnimation(translate.y);
@@ -171,13 +174,16 @@ export const usePinchCommons = (options: PinchOptions) => {
     translate.y.value = withTiming(toY);
     scale.value = withTiming(toScale, undefined, (finished) => {
       scaleOffset.value = scale.value;
-      finished && runOnJS(switchGesturesState)(true);
+
+      if (finished) {
+        scheduleOnRN(switchGesturesState, true)
+      }
     });
 
     gestureEnd.value = withTiming(toValue, undefined, (finished) => {
       gestureEnd.value = 0;
       if (finished && userCallbacks.onGestureEnd !== undefined) {
-        runOnJS(userCallbacks.onGestureEnd)();
+        scheduleOnRN(userCallbacks.onGestureEnd);
       }
     });
   };
@@ -185,7 +191,9 @@ export const usePinchCommons = (options: PinchOptions) => {
   const onPinchEnd = (e: PinchGestureEvent) => {
     'worklet';
 
-    userCallbacks.onPinchEnd && runOnJS(userCallbacks.onPinchEnd)(e);
+    if (userCallbacks.onPinchEnd !== undefined) {
+      scheduleOnRN(userCallbacks.onPinchEnd, e);
+    }
 
     const toScale = clamp(scale.value, minScale, maxScale.value);
     const deltaY =

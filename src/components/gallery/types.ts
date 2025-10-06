@@ -6,7 +6,7 @@ import type {
   PinchMode,
   PinchGestureCallbacks,
   ScaleMode,
-  SizeVector,
+  Size,
   SwipeDirection,
   TapGestureEvent,
   ZoomEventCallbacks,
@@ -19,7 +19,7 @@ export type GalleryTransitionState = {
   direction: 'vertical' | 'horizontal';
   isScrolling: boolean;
   scroll: number;
-  gallerySize: SizeVector<number>;
+  gallerySize: Size<number>;
 };
 
 export type GalleryTransitionCallback = (
@@ -31,7 +31,7 @@ export type GalleryProps<T = unknown> = {
   renderItem: (item: T, index: number) => React.ReactElement;
 } & Partial<{
   keyExtractor: (item: T, index: number) => string;
-  maxScale: number | SizeVector<number>[];
+  maxScale: number | Size<number>[];
   initialIndex: number;
   windowSize: number;
   gap: number;

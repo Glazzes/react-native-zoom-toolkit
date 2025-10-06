@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
+
 import Animated, {
   measure,
   useAnimatedRef,

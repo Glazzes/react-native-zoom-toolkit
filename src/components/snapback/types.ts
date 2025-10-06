@@ -11,7 +11,7 @@ import type {
   CommonTransformState,
   LongPressCallbacks,
   PinchGestureCallbacks,
-  SizeVector,
+  Size,
   TapGestureCallbacks,
   Vector,
 } from '../../commons/types';
@@ -28,19 +28,21 @@ export type TimingConfig = Partial<{
 }>;
 
 export type ResizeConfig = {
-  size: SizeVector<number>;
+  size: Size<number>;
   aspectRatio: number;
   scale: number;
 };
 
 export type SnapbackZoomState<T> = {
-  size: SizeVector<T>;
+  size: Size<T>;
   position: Vector<T>;
-  resize?: SizeVector<T>;
+  resize?: Size<T>;
 } & CommonTransformState<T>;
 
 export type SnapBackZoomProps = React.PropsWithChildren<
   Partial<{
+    minScale: number;
+    maxScale: Size<number> | number;
     resizeConfig: ResizeConfig;
     gesturesEnabled: boolean;
     longPressDuration: number;

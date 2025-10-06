@@ -10,7 +10,7 @@ import type {
   PinchMode,
   PinchGestureCallbacks,
   Rect,
-  SizeVector,
+  Size,
   SwipeDirection,
   TapGestureCallbacks,
   Vector,
@@ -23,7 +23,7 @@ export type ResumableZoomProps = Partial<{
   tapsEnabled: boolean;
   panEnabled: boolean;
   pinchEnabled: boolean;
-  maxScale: SizeVector<number> | number;
+  maxScale: Size<number> | number;
   pinchMode: PinchMode;
   longPressDuration: number;
   onSwipe: (direction: SwipeDirection) => void;

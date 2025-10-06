@@ -4,7 +4,7 @@ import type {
   CommonZoomState,
   PanGestureCallbacks,
   PinchGestureCallbacks,
-  SizeVector,
+  Size,
   TapGestureCallbacks,
 } from '../../commons/types';
 
@@ -20,7 +20,7 @@ export type CropContextResult = {
     flipVertical: boolean;
     flipHorizontal: boolean;
   };
-  resize?: SizeVector<number>;
+  resize?: Size<number>;
 };
 
 export type CropZoomState<T> = {
@@ -48,8 +48,8 @@ export type RotationCallback = (
 export type CropGestureEventCallBack = (event: CropZoomState<number>) => void;
 
 export type CropZoomProps = React.PropsWithChildren<{
-  cropSize: SizeVector<number>;
-  resolution: SizeVector<number>;
+  cropSize: Size<number>;
+  resolution: Size<number>;
   onUpdate?: CropGestureEventCallBack;
   OverlayComponent?: () => React.ReactElement<any>;
 }> &
