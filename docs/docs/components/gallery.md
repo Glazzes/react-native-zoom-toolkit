@@ -272,6 +272,14 @@ possible values are:
 - `free` lets the user drag the component out of the container boundaries while pinching, if the pinch gesture was released in an out bonds
   position it will animate back to a position within the bondaries of its enclosing container.
 
+### snapTransitionConfig
+
+| Type                                     | Default                                     |
+| ---------------------------------------- | ------------------------------------------- |
+| `{ duration: number, easing: function }` | `{ duration: 300, easing: Easing.linear };` |
+
+Sets the duration and the type of transition to apply when an image snaps to the side of the screen.
+
 ### onIndexChange
 
 | Type                      | Default     |
@@ -354,16 +362,16 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 
 ### longPressDuration
 
-| Type      | Default |
-| --------- | ------- |
-| `number`  | `500`   |
+| Type     | Default |
+| -------- | ------- |
+| `number` | `500`   |
 
 Minimum time expressed in milliseconds required to trigger the long press gesture event, expect values greater than 250 to avoid collisions with tap and double tap gestures.
 
 ### onLongPress
 
-| Type                                      | Default     | Additional Info                                                                                    |
-| ----------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| Type                                         | Default     | Additional Info                                                                                                                           |
+| -------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `(e: LongPressEvent, index: number) => void` | `undefined` | see [long press gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/long-press-gesture/#event-data) |
 
 Callback triggered as soon as the long press gesture starts.
@@ -480,7 +488,7 @@ Reset all transformations to their initial state.
 ### CommonZoomState
 
 | Property        | Type           | Description                                        |
-|-----------------|----------------|----------------------------------------------------|
+| --------------- | -------------- | -------------------------------------------------- |
 | `containerSize` | `Size<number>` | Width and height of the Gallery component.         |
 | `childSize`     | `Size<number>` | Width and height of the current list element.      |
 | `maxScale`      | `number`       | Maximum scale allowed by the current list element. |

@@ -6,6 +6,7 @@ import type {
   PinchMode,
   PinchGestureCallbacks,
   ScaleMode,
+  TimingConfig,
   SizeVector,
   SwipeDirection,
   TapGestureEvent,
@@ -43,6 +44,7 @@ export type GalleryProps<T = unknown> = {
   allowPinchPanning: boolean;
   pinchMode: PinchMode;
   longPressDuration: number;
+  snapTransitionConfig: TimingConfig;
   customTransition: GalleryTransitionCallback;
   onTap: (e: TapGestureEvent, index: number) => void;
   onLongPress: (e: LongPressEvent, index: number) => void;

@@ -5,6 +5,11 @@ import type {
   PanGestureHandlerEventPayload,
   LongPressGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+import type {
+  EasingFunction,
+  EasingFunctionFactory,
+  ReduceMotion,
+} from 'react-native-reanimated';
 
 export type Rect = {
   x: number;
@@ -91,3 +96,9 @@ export type ZoomEventCallbacks = Partial<{
 }>;
 
 export type BoundsFuction = (scale?: number) => Vector<number>;
+
+export type TimingConfig = Partial<{
+  duration: number;
+  easing: EasingFunction | EasingFunctionFactory;
+  reduceMotion: ReduceMotion;
+}>;

@@ -40,6 +40,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
+    snapTransitionConfig,
     customTransition,
     onIndexChange,
     onScroll,
@@ -256,6 +257,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         allowPinchPanning={allowPinchPanning}
         pinchMode={pinchMode}
         longPressDuration={longPressDuration}
+        snapTransitionConfig={snapTransitionConfig}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}

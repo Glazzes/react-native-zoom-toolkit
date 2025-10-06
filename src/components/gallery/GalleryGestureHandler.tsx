@@ -27,13 +27,14 @@ import type {
   PanGestureEvent,
   ScaleMode,
   PinchMode,
+  TimingConfig,
 } from '../../commons/types';
 import { GalleryContext } from './context';
 import { type GalleryProps } from './types';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
 const minScale = 1;
-const config = { duration: 300, easing: Easing.linear };
+const defaultConfig = { duration: 300, easing: Easing.linear };
 
 type GalleryGestureHandlerProps = {
   length: number;
@@ -48,6 +49,7 @@ type GalleryGestureHandlerProps = {
   scaleMode: ScaleMode;
   pinchMode: PinchMode;
   longPressDuration: number;
+  snapTransitionConfig?: TimingConfig;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
   onPanEnd?: GalleryProps['onPanEnd'];
@@ -77,6 +79,7 @@ const GalleryGestureHandler = ({
   allowPinchPanning,
   pinchMode,
   longPressDuration,
+  snapTransitionConfig = defaultConfig,
   onTap,
   onPanStart,
   onPanEnd,
@@ -162,7 +165,7 @@ const GalleryGestureHandler = ({
     const velocity = vertical ? e.velocityY : e.velocityX;
     const toScroll = snapPoint(scroll.value, velocity, [prev, current, next]);
 
-    scroll.value = withTiming(toScroll, config, (finished) => {
+    scroll.value = withTiming(toScroll, snapTransitionConfig, (finished) => {
       if (!finished) return;
       if (toScroll !== current) {
         activeIndex.value += toScroll === next ? 1 : -1;
@@ -193,13 +196,17 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    scroll.value = withTiming(newScrollPosition, config, (finished) => {
-      if (!finished) return;
+    scroll.value = withTiming(
+      newScrollPosition,
+      snapTransitionConfig,
+      (finished) => {
+        if (!finished) return;
 
-      activeIndex.value = toIndex;
-      isScrolling.value = false;
-      reset(0, 0, minScale, false);
-    });
+        activeIndex.value = toIndex;
+        isScrolling.value = false;
+        reset(0, 0, minScale, false);
+      }
+    );
   };
 
   useAnimatedReaction(
