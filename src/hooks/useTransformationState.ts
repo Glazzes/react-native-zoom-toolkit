@@ -13,7 +13,7 @@ import type { CommonZoomState } from '../commons/types';
 
 type SharedNumber = SharedValue<number>;
 
-type ComponentSelection = 'resumable' | 'snapback' | 'crop';
+type ComponentSelection = 'common' | 'snapback' | 'crop';
 
 type StateSelection<C extends ComponentSelection, T> = C extends 'snapback'
   ? SnapbackZoomState<T>
@@ -128,7 +128,7 @@ export const useTransformationState = <T extends ComponentSelection>(
       scale: scale,
     };
 
-    if (param === 'resumable' || param === 'crop') {
+    if (param === 'common' || param === 'crop') {
       const st = state as CommonZoomState<SharedNumber>;
 
       st.containerSize = {
@@ -181,7 +181,7 @@ export const useTransformationState = <T extends ComponentSelection>(
     translate.y.value = state.translateY;
     scale.value = state.scale;
 
-    if (param === 'resumable' || param === 'crop') {
+    if (param === 'common' || param === 'crop') {
       const commonState = state as CommonZoomState<number>;
 
       childSize.width.value = commonState.childSize.width;
