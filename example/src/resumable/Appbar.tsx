@@ -1,20 +1,18 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { useRouter } from 'expo-router';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import Constants from 'expo-constants';
 import Animated, {
   useAnimatedStyle,
   type SharedValue,
 } from 'react-native-reanimated';
 import { theme } from '../constants';
-import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type AppbarProps = {
   translateY: SharedValue<number>;
 };
-
-const barHeight = Constants.statusBarHeight;
-const appbarHeight = barHeight * 3.1;
 
 /*
  * Just an appbar component that hides when you tap on the image.
@@ -22,6 +20,7 @@ const appbarHeight = barHeight * 3.1;
  */
 const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const goBack = () => {
     if (router.canGoBack()) {
@@ -30,11 +29,20 @@ const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
+    width: '100%',
+    height: 60 + insets.top,
+    paddingTop: insets.top,
+    paddingHorizontal: theme.spacing.m,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    zIndex: 1,
     transform: [{ translateY: translateY.value }],
   }));
 
   return (
-    <Animated.View style={[animatedStyle, styles.root]}>
+    <Animated.View style={animatedStyle}>
       <View style={styles.container}>
         <Pressable onPress={goBack}>
           <Icon name={'arrow-left'} size={24} color={'#fff'} />
@@ -54,17 +62,6 @@ const Appbar: React.FC<AppbarProps> = ({ translateY }) => {
 };
 
 const styles = StyleSheet.create({
-  root: {
-    width: '100%',
-    height: appbarHeight,
-    paddingTop: barHeight,
-    paddingHorizontal: theme.spacing.m,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    zIndex: 1,
-  },
   container: {
     flex: 1,
     flexDirection: 'row',
