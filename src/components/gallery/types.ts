@@ -30,11 +30,12 @@ export type GalleryProps<T = unknown> = {
   data: T[];
   renderItem: (item: T, index: number) => React.ReactElement;
 } & Partial<{
+  windowSize: number;
   keyExtractor: (item: T, index: number) => string;
   maxScale: number | Size<number>[];
   initialIndex: number;
-  windowSize: number;
   gap: number;
+  rtl: boolean;
   vertical: boolean;
   allowOverflow: boolean;
   tapOnEdgeToItem: boolean;

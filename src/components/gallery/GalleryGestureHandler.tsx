@@ -40,6 +40,7 @@ type GalleryGestureHandlerProps = {
   gap: number;
   maxScale: SharedValue<number>;
   itemSize: Readonly<SharedValue<number>>;
+  rtl: boolean;
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
@@ -69,6 +70,7 @@ const GalleryGestureHandler = ({
   gap,
   maxScale,
   itemSize,
+  rtl,
   vertical,
   tapOnEdgeToItem,
   zoomEnabled,
@@ -108,6 +110,8 @@ const GalleryGestureHandler = ({
   const gestureEnd = useSharedValue<number>(0);
   const isPullingVertical = useSharedValue<boolean>(false);
   const pullReleased = useSharedValue<boolean>(false);
+
+  const horizontalScrollDirection = rtl ? -1 : 1;
 
   const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
@@ -151,7 +155,7 @@ const GalleryGestureHandler = ({
     const current = getScrollPosition({
       index: activeIndex.value,
       itemSize: itemSize.value,
-      gap,
+      gap
     });
     const next = getScrollPosition({
       index: clamp(activeIndex.value + 1, 0, length - 1),
@@ -173,19 +177,24 @@ const GalleryGestureHandler = ({
     });
   };
 
-  const onSwipe = (direction: SwipeDirection) => {
+  const onSwipe = (swipeDirection: SwipeDirection) => {
     'worklet';
 
     cancelAnimation(scroll);
 
     let toIndex = activeIndex.value;
-    if (direction === 'up' && vertical) toIndex += 1;
-    if (direction === 'down' && vertical) toIndex -= 1;
-    if (direction === 'left' && !vertical) toIndex += 1;
-    if (direction === 'right' && !vertical) toIndex -= 1;
+    if (swipeDirection === 'up' && vertical) toIndex += 1;
+    if (swipeDirection === 'down' && vertical) toIndex -= 1;
+    if (swipeDirection === 'left' && !vertical) toIndex += horizontalScrollDirection;
+    if (swipeDirection === 'right' && !vertical) toIndex -= horizontalScrollDirection;
 
     toIndex = clamp(toIndex, 0, length - 1);
-    if (toIndex === activeIndex.value) return;
+
+    // Even tho this statement looks redundant, don't remove it because it makes the items translate
+    // outside of their parent container boundaries, I don't know why and I don't want to know.
+    if (toIndex === activeIndex.value) {
+      return;
+    }
 
     const newScrollPosition = getScrollPosition({
       index: toIndex,
@@ -194,7 +203,9 @@ const GalleryGestureHandler = ({
     });
 
     scroll.value = withTiming(newScrollPosition, config, (finished) => {
-      if (!finished) return;
+      if (!finished) {
+        return;
+      }
 
       activeIndex.value = toIndex;
       isScrolling.value = false;
@@ -322,7 +333,7 @@ const GalleryGestureHandler = ({
       const toY = offset.y.value + e.translationY;
 
       const { x: boundX, y: boundY } = boundsFn(scale.value);
-      const exceedX = Math.max(0, Math.abs(toX) - boundX);
+      const exceedX = horizontalScrollDirection * Math.max(0, Math.abs(toX) - boundX);
       const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
       const scrollX = -1 * Math.sign(toX) * exceedX;
@@ -425,12 +436,12 @@ const GalleryGestureHandler = ({
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
-      if (event.x <= leftEdge && canGoToItem) toIndex -= 1;
-      if (event.x >= rightEdge && canGoToItem) toIndex += 1;
+      if (event.x <= leftEdge && canGoToItem) toIndex -= horizontalScrollDirection;
+      if (event.x >= rightEdge && canGoToItem) toIndex += horizontalScrollDirection;
 
       toIndex = clamp(toIndex, 0, length - 1);
       if (toIndex === activeIndex.value) {
-        if(onTap !== undefined) {
+        if (onTap !== undefined) {
           scheduleOnRN(onTap, event, activeIndex.value);
         }
         return;
