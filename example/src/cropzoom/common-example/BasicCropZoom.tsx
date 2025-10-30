@@ -6,7 +6,7 @@ import {
   CropZoom,
   useImageResolution,
   type CropZoomRefType,
-  type SizeVector,
+  type Size,
 } from 'react-native-zoom-toolkit';
 
 import { IMAGE } from '../commons/contants';
@@ -22,7 +22,7 @@ const BasicCropZoom = ({}) => {
 
   const [result, setResult] = useState<string | undefined>(undefined);
 
-  const cropSize: SizeVector<number> = {
+  const cropSize: Size<number> = {
     width: width * 0.8,
     height: width * 0.8,
   };

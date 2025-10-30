@@ -3,11 +3,11 @@ import { useWindowDimensions, type ViewStyle } from 'react-native';
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import { CONTROLS_HEIGHT } from './contants';
 
-import type { SizeVector } from 'react-native-zoom-toolkit';
+import type { Size } from 'react-native-zoom-toolkit';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type SVGOverlayProps = {
-  cropSize: SizeVector<number>;
+  cropSize: Size<number>;
 };
 
 /*
