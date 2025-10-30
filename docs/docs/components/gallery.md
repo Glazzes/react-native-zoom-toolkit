@@ -176,7 +176,14 @@ Blank space between items.
 | -------- | ------- |
 | `number` | `0`     |
 
-Sets the initial position of the list.
+Set the initial position of the list.
+
+### rtl
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `false` |
+
+Invert the gallery's orientation in horizontal mode, [more info](https://github.com/Glazzes/react-native-zoom-toolkit/issues/99#issuecomment-3029442065).
 
 ### vertical
 
@@ -184,13 +191,13 @@ Sets the initial position of the list.
 | --------- | ------- |
 | `boolean` | `false` |
 
-Modifies the orientation of the component to vertical mode.
+Modify the orientation of the component to vertical mode.
 
 ### maxScale
 
 | Type                             | Default |
 | -------------------------------- | ------- |
-| `SizeVector<number>[] \| number` | `6`     |
+| `Size<number>[] \| number`       | `6`     |
 
 Maximum scale value allowed by the pinch gesture for all elements, expects values bigger than or equals one.
 
@@ -498,4 +505,4 @@ Reset all transformations to their initial state.
 | `direction`   | `vertical \| horizontal` | Direction of the gallery.                             |
 | `isScrolling` | `boolean`                | Whether the gallery is actively being scrolled.       |
 | `scroll`      | `number`                 | Current scroll value.                                 |
-| `gallerySize` | `SizeVector<number>`     | Width and height of the gallery.                      |
+| `gallerySize` | `Size<number>`           | Width and height of the gallery.                      |
