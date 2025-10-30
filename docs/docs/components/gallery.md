@@ -193,6 +193,14 @@ Invert the gallery's orientation in horizontal mode, [more info](https://github.
 
 Modify the orientation of the component to vertical mode.
 
+### snapTimingConfig
+
+| Type     | Default     | Adittional Info |
+| -------- | ------------| --------------- |
+| `object` | `undefined` | see [timingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
+
+Set the timing config used to snap between gallery's elements.
+
 ### maxScale
 
 | Type                             | Default |
