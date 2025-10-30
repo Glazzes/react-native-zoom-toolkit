@@ -20,7 +20,7 @@ export type {
 export type {
   CommonZoomState,
   Vector,
-  Size as SizeVector,
+  Size,
   PanGestureEvent,
   PanGestureEventCallback,
   PinchGestureEvent,

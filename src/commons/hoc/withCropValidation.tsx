@@ -23,6 +23,6 @@ export default function withCropValidation<T, P extends CropZoomProps>(
       throw new Error('minScale property must not be greater than maxScale');
     }
 
-    return <Component {...props} reference={ref} />;
+    return <Component {...(props as P)} reference={ref} />;
   });
 }

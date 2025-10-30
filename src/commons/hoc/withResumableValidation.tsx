@@ -37,6 +37,6 @@ export default function withResumableValidation<
       throw new Error('longPressDuration must be greater than 250ms');
     }
 
-    return <Component {...props} reference={ref} />;
+    return <Component {...(props as P)} reference={ref} />;
   });
 }
