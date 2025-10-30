@@ -10,6 +10,7 @@ import type {
   SwipeDirection,
   TapGestureEvent,
   ZoomEventCallbacks,
+  TimingConfig,
 } from '../../commons/types';
 
 export type GalleryTransitionState = {
@@ -44,6 +45,7 @@ export type GalleryProps<T = unknown> = {
   allowPinchPanning: boolean;
   pinchMode: PinchMode;
   longPressDuration: number;
+  snapTimingConfig: TimingConfig;
   customTransition: GalleryTransitionCallback;
   onTap: (e: TapGestureEvent, index: number) => void;
   onLongPress: (e: LongPressEvent, index: number) => void;

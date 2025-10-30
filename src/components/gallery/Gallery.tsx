@@ -3,6 +3,7 @@ import { type LayoutChangeEvent } from 'react-native';
 
 import Animated, {
   clamp,
+  Easing,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
@@ -23,6 +24,8 @@ type GalleryPropsWithRef<T> = GalleryProps<T> & {
   reference?: React.ForwardedRef<GalleryRefType>;
 };
 
+const defaultTimingConfig = { duration: 300, easing: Easing.out(Easing.cubic) };
+
 const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   const {
     reference,
@@ -42,6 +45,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
+    snapTimingConfig = defaultTimingConfig,
     customTransition,
     onIndexChange,
     onScroll,
@@ -269,6 +273,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         allowPinchPanning={allowPinchPanning}
         pinchMode={pinchMode}
         longPressDuration={longPressDuration}
+        snapTimingConfig={snapTimingConfig}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}
