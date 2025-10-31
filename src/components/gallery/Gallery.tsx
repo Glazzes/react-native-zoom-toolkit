@@ -9,7 +9,7 @@ import Animated, {
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets'
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
@@ -144,7 +144,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     (value) => {
       const scrollableItems = data.length - 1;
       const totalGap = gap * scrollableItems;
-      onScroll?.(value.scroll, scrollableItems * value.itemSize + totalGap)
+      onScroll?.(value.scroll, scrollableItems * value.itemSize + totalGap);
     },
     [scroll, itemSize]
   );

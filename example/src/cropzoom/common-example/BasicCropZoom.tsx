@@ -55,7 +55,7 @@ const BasicCropZoom = ({}) => {
        * The height of this component is subtracted from the screen height, so the overlay
        * height is screen height - controls height
        */}
-       {/* @ts-ignore */}
+      {/* @ts-ignore */}
       <Controls uri={IMAGE} cropRef={cropRef} setCrop={setResult} />
 
       {/*

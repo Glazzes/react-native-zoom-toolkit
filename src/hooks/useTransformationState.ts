@@ -16,8 +16,8 @@ type ComponentSelection = 'common' | 'snapback' | 'crop';
 type StateSelection<C extends ComponentSelection, T> = C extends 'snapback'
   ? SnapbackZoomState<T>
   : C extends 'crop'
-  ? CropZoomState<T>
-  : CommonZoomState<T>;
+    ? CropZoomState<T>
+    : CommonZoomState<T>;
 
 type TransformNames = 'matrix' | 'translateX' | 'translateY';
 
@@ -37,7 +37,7 @@ type Matrix4x4 = [
   number,
   number,
   number,
-  number
+  number,
 ];
 
 type Transformations = {

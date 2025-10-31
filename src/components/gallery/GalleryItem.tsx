@@ -101,7 +101,8 @@ const GalleryItem = ({
     }
 
     const direction = rtl ? -1 : 1;
-    const currentScroll = direction * -1 * scroll.value + (direction * index * gap);
+    const currentScroll =
+      direction * -1 * scroll.value + direction * index * gap;
 
     const isSizeNotDefined =
       rootSize.width.value === 0 && rootSize.height.value === 0;
@@ -112,7 +113,7 @@ const GalleryItem = ({
       return { transform: [{ translateY }], opacity };
     }
 
-    const translateX = (direction * index * rootSize.width.value) + currentScroll;
+    const translateX = direction * index * rootSize.width.value + currentScroll;
     return { transform: [{ translateX }], opacity };
   });
 

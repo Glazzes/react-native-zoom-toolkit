@@ -36,7 +36,7 @@ const SkiaCropZoom = () => {
   const image = useImage(IMAGE);
   const { onUpdate, transform, state } = useTransformationState('crop');
 
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [cropImage, setCropImage] = useState<string | undefined>(undefined);
 
@@ -50,10 +50,10 @@ const SkiaCropZoom = () => {
 
   const posY = useDerivedValue(
     () =>
-      (screenHeight
-        - CONTROLS_HEIGHT
-        - insets.bottom
-        - state.childSize.height.value) /
+      (screenHeight -
+        CONTROLS_HEIGHT -
+        insets.bottom -
+        state.childSize.height.value) /
       2,
     [state, screenHeight]
   );
@@ -79,7 +79,10 @@ const SkiaCropZoom = () => {
           height={state.childSize.height}
           image={image}
           fit={'cover'}
-          origin={vec(screenWidth / 2, (screenHeight - CONTROLS_HEIGHT - insets.bottom) / 2)}
+          origin={vec(
+            screenWidth / 2,
+            (screenHeight - CONTROLS_HEIGHT - insets.bottom) / 2
+          )}
           transform={transform}
         >
           <Lerp t={progress}>

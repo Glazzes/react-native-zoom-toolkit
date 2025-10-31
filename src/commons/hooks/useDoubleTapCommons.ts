@@ -1,9 +1,4 @@
-import type {
-  BoundsFuction,
-  Size,
-  TapGestureEvent,
-  Vector,
-} from '../types';
+import type { BoundsFuction, Size, TapGestureEvent, Vector } from '../types';
 import { useState } from 'react';
 
 import { clamp, withTiming, type SharedValue } from 'react-native-reanimated';

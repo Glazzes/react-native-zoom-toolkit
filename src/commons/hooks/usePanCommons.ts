@@ -70,7 +70,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     'worklet';
 
     if (userCallbacks.onPanStart !== undefined) {
-      scheduleOnRN(userCallbacks.onPanStart, e)
+      scheduleOnRN(userCallbacks.onPanStart, e);
     }
 
     cancelAnimation(translate.x);
@@ -150,7 +150,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     }
 
     if (userCallbacks.onPanEnd !== undefined) {
-      scheduleOnRN(userCallbacks.onPanEnd, e)
+      scheduleOnRN(userCallbacks.onPanEnd, e);
     }
 
     const { x: boundX, y: boundY } = boundFn();

@@ -129,17 +129,20 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
       let toScale = Math.max(minScale, e.scale);
 
-      if(typeof maxScale === 'object') {
+      if (typeof maxScale === 'object') {
         const actualMaxScale = getMaxScale(
-          {width: containerSize.width.value, height: containerSize.height.value},
+          {
+            width: containerSize.width.value,
+            height: containerSize.height.value,
+          },
           maxScale
         );
 
         toScale = clamp(e.scale, minScale, actualMaxScale);
       }
 
-      if(typeof maxScale === 'number') {
-        toScale =clamp(e.scale, minScale, maxScale);
+      if (typeof maxScale === 'number') {
+        toScale = clamp(e.scale, minScale, maxScale);
       }
 
       const deltaX = currentFocal.x.value - initialFocal.x.value;
@@ -158,8 +161,8 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        if(onGestureEnd !== undefined) {
-          scheduleOnRN(onGestureEnd)
+        if (onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
         }
       });
     });

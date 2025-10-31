@@ -108,7 +108,7 @@ export const usePinchCommons = (options: PinchOptions) => {
 
   const onPinchStart = (e: PinchGestureEvent) => {
     'worklet';
-    scheduleOnRN(switchGesturesState, false)
+    scheduleOnRN(switchGesturesState, false);
 
     if (userCallbacks.onPinchStart !== undefined) {
       scheduleOnRN(userCallbacks.onPinchStart, e);
@@ -176,7 +176,7 @@ export const usePinchCommons = (options: PinchOptions) => {
       scaleOffset.value = scale.value;
 
       if (finished) {
-        scheduleOnRN(switchGesturesState, true)
+        scheduleOnRN(switchGesturesState, true);
       }
     });
 

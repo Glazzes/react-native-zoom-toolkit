@@ -16,7 +16,7 @@ const PICTURE_SIZE = 40;
 
 export default function Appbar() {
   const router = useRouter();
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   const goBack = () => {
     if (router.canGoBack()) {
@@ -25,7 +25,12 @@ export default function Appbar() {
   };
 
   return (
-    <View style={[styles.appbar, { height: 50 + insets.top, paddingTop: insets.top }]}>
+    <View
+      style={[
+        styles.appbar,
+        { height: 50 + insets.top, paddingTop: insets.top },
+      ]}
+    >
       <StatusBar style={'light'} backgroundColor={'transparent'} />
 
       <Pressable onPress={goBack}>
@@ -60,7 +65,7 @@ export default function Appbar() {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   appbar: {

@@ -156,7 +156,7 @@ const GalleryGestureHandler = ({
     const current = getScrollPosition({
       index: activeIndex.value,
       itemSize: itemSize.value,
-      gap
+      gap,
     });
     const next = getScrollPosition({
       index: clamp(activeIndex.value + 1, 0, length - 1),
@@ -186,8 +186,10 @@ const GalleryGestureHandler = ({
     let toIndex = activeIndex.value;
     if (swipeDirection === 'up' && vertical) toIndex += 1;
     if (swipeDirection === 'down' && vertical) toIndex -= 1;
-    if (swipeDirection === 'left' && !vertical) toIndex += horizontalScrollDirection;
-    if (swipeDirection === 'right' && !vertical) toIndex -= horizontalScrollDirection;
+    if (swipeDirection === 'left' && !vertical)
+      toIndex += horizontalScrollDirection;
+    if (swipeDirection === 'right' && !vertical)
+      toIndex -= horizontalScrollDirection;
 
     toIndex = clamp(toIndex, 0, length - 1);
 
@@ -203,15 +205,19 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    scroll.value = withTiming(newScrollPosition, snapTimingConfig, (finished) => {
-      if (!finished) {
-        return;
-      }
+    scroll.value = withTiming(
+      newScrollPosition,
+      snapTimingConfig,
+      (finished) => {
+        if (!finished) {
+          return;
+        }
 
-      activeIndex.value = toIndex;
-      isScrolling.value = false;
-      reset(0, 0, minScale, false);
-    });
+        activeIndex.value = toIndex;
+        isScrolling.value = false;
+        reset(0, 0, minScale, false);
+      }
+    );
   };
 
   useAnimatedReaction(
@@ -309,7 +315,7 @@ const GalleryGestureHandler = ({
       cancelAnimation(scroll);
 
       if (onPanStart !== undefined) {
-        scheduleOnRN(onPanStart, e)
+        scheduleOnRN(onPanStart, e);
       }
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
@@ -334,7 +340,8 @@ const GalleryGestureHandler = ({
       const toY = offset.y.value + e.translationY;
 
       const { x: boundX, y: boundY } = boundsFn(scale.value);
-      const exceedX = horizontalScrollDirection * Math.max(0, Math.abs(toX) - boundX);
+      const exceedX =
+        horizontalScrollDirection * Math.max(0, Math.abs(toX) - boundX);
       const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
       const scrollX = -1 * Math.sign(toX) * exceedX;
@@ -437,8 +444,10 @@ const GalleryGestureHandler = ({
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
-      if (event.x <= leftEdge && canGoToItem) toIndex -= horizontalScrollDirection;
-      if (event.x >= rightEdge && canGoToItem) toIndex += horizontalScrollDirection;
+      if (event.x <= leftEdge && canGoToItem)
+        toIndex -= horizontalScrollDirection;
+      if (event.x >= rightEdge && canGoToItem)
+        toIndex += horizontalScrollDirection;
 
       toIndex = clamp(toIndex, 0, length - 1);
       if (toIndex === activeIndex.value) {

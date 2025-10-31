@@ -5,7 +5,11 @@ import type {
   PanGestureHandlerEventPayload,
   LongPressGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
-import type { EasingFunction, EasingFunctionFactory, ReduceMotion } from 'react-native-reanimated';
+import type {
+  EasingFunction,
+  EasingFunctionFactory,
+  ReduceMotion,
+} from 'react-native-reanimated';
 
 export type Rect = {
   x: number;

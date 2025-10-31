@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
 
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { File, Paths,  } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import { withTiming, type SharedValue } from 'react-native-reanimated';
 import {
   rect,
@@ -39,7 +39,7 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   cropRef,
   setCrop,
 }) => {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [isCropping, setIsCropping] = useState<boolean>(false);
@@ -133,12 +133,12 @@ const Controls: React.FC<EffectIndicatorProps> = ({
   async function writeImageByesToDisk(bytes: Uint8Array) {
     const time = new Date().getTime();
 
-    const file = new File(Paths.cache, `picture${time}.png`)
-    file.create()
-    file.write(bytes)
+    const file = new File(Paths.cache, `picture${time}.png`);
+    file.create();
+    file.write(bytes);
 
-    setCrop(file.uri)
-    setIsCropping(false)
+    setCrop(file.uri);
+    setIsCropping(false);
   }
 
   useEffect(() => {

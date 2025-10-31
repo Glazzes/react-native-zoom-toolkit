@@ -3,7 +3,7 @@ import type { ResumableZoomProps } from '../../components/resumable/types';
 
 export default function withResumableValidation<
   T,
-  P extends ResumableZoomProps
+  P extends ResumableZoomProps,
 >(Component: React.ComponentType<P>) {
   return forwardRef<T, P>((props, ref) => {
     const childrenCount = React.Children.count(props.children);

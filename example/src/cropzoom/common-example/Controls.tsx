@@ -17,7 +17,7 @@ type ControlProps = {
 };
 
 const Controls: React.FC<ControlProps> = ({ uri, cropRef, setCrop }) => {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   const [isCropping, setIsCropping] = useState<boolean>(false);
 
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   button: {
     width: 50,
     height: 50,
-    borderRadius: "50%",
+    borderRadius: '50%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#75DAEA',

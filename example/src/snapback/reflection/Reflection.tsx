@@ -4,7 +4,6 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { ReflectionContext } from '../context';
 
-
 /*
  * This component is a "reflection" of the background seen in the meassages, once you pinch
  * a measurement of the pinched component is taken in order to update the values of ReflectionContext
@@ -29,4 +28,4 @@ export default function Reflection() {
   }));
 
   return <Animated.View style={style} />;
-};
+}

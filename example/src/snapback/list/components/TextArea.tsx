@@ -7,15 +7,19 @@ import Animated from 'react-native-reanimated';
 import { theme } from '../../../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
 /*
  * Just a text area component nothing relevant here.
  */
 export default function TextArea() {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   return (
-    <Animated.View style={[styles.root, { height: 48 + insets.bottom, paddingBottom: insets.bottom }]}>
+    <Animated.View
+      style={[
+        styles.root,
+        { height: 48 + insets.bottom, paddingBottom: insets.bottom },
+      ]}
+    >
       <Icon
         name={'sticker-emoji'}
         color={theme.colors.foregroundAccent}
@@ -44,7 +48,7 @@ export default function TextArea() {
       </View>
     </Animated.View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   root: {

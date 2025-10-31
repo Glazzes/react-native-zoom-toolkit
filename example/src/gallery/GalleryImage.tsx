@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 
-import {
-  useAnimatedReaction,
-  type SharedValue,
-} from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets'
+import { useAnimatedReaction, type SharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Image } from 'expo-image';
 import { type Asset } from 'expo-media-library';
 
@@ -19,7 +16,10 @@ type GalleryImageProps = {
 
 export default function GalleryImage(props: GalleryImageProps) {
   const { width, height } = useWindowDimensions();
-  const size = fitContainer(props.asset.width / props.asset.height, { width, height });
+  const size = fitContainer(props.asset.width / props.asset.height, {
+    width,
+    height,
+  });
 
   const [downScale, setDownScale] = useState<boolean>(true);
 
@@ -42,4 +42,4 @@ export default function GalleryImage(props: GalleryImageProps) {
       allowDownscaling={downScale}
     />
   );
-};
+}

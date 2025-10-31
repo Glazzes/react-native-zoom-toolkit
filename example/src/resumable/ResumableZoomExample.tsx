@@ -24,26 +24,26 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const IMAGE =
   'https://media.formula1.com/image/upload/v1705423544/fom-website/2023/McLaren/Formula%201%20header%20template%20%2835%29.png';
 
-const ResumableZoomExample: React.FC = ({ }) => {
+const ResumableZoomExample: React.FC = ({}) => {
   const ref = useRef<ResumableZoomRefType>(null);
 
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
 
-  const { state, onUpdate } = useTransformationState("common")
+  const { state, onUpdate } = useTransformationState('common');
   useZoomCallbacks({
     state,
     onStart() {
-      console.log("Scale start")
+      console.log('Scale start');
     },
     onMaxScaleReached(value) {
-      console.log("On max scale reached ", value)
+      console.log('On max scale reached ', value);
     },
     onEnd() {
-      console.log("Scale end")
-    }
-  })
+      console.log('Scale end');
+    },
+  });
 
   const translateY = useSharedValue<number>(0);
 
@@ -70,10 +70,10 @@ const ResumableZoomExample: React.FC = ({ }) => {
 
     translateY.value = withTiming(toY);
     setStatusBarHidden(toY !== 0, 'slide');
-  };
+  }
 
   function onGestureEnd() {
-    console.log("on gesture end!")
+    console.log('on gesture end!');
   }
 
   return (

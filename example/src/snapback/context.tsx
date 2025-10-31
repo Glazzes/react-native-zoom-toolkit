@@ -32,4 +32,4 @@ export function ReflectionProvider(props: React.PropsWithChildren) {
       {props.children}
     </ReflectionContext.Provider>
   );
-};
+}

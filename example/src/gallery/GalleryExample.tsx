@@ -57,7 +57,10 @@ export default function GalleryExample() {
     [activeIndex, progress, isSeeking]
   );
 
-  const keyExtractor = useCallback((item: Asset, index: number) => `${item.uri}-${index}`, []);
+  const keyExtractor = useCallback(
+    (item: Asset, index: number) => `${item.uri}-${index}`,
+    []
+  );
 
   // Toogle video controls opacity if the current item is a video
   const onTap = useCallback(() => {
@@ -89,7 +92,10 @@ export default function GalleryExample() {
 
   useEffect(() => {
     const requestAssets = async () => {
-      const { granted } = await requestPermissionsAsync(undefined, ['photo', 'video']);
+      const { granted } = await requestPermissionsAsync(undefined, [
+        'photo',
+        'video',
+      ]);
       if (!granted) return;
 
       const page = await getAssetsAsync({
@@ -142,7 +148,7 @@ export default function GalleryExample() {
       <StatusBar style="light" translucent={true} />
     </Animated.View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   root: {

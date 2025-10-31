@@ -15,13 +15,13 @@ type SVGOverlayProps = {
  * one also draws a "hole" in it as big as the crop size.
  */
 const SVGOverlay: React.FC<SVGOverlayProps> = ({ cropSize }) => {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   let { width, height } = useWindowDimensions();
 
   height = height - CONTROLS_HEIGHT - insets.bottom;
 
   const path = useMemo(() => {
-    const center = { x: width / 2, y: (height) / 2 };
+    const center = { x: width / 2, y: height / 2 };
     const commands = [
       'M 0 0',
       `h ${width} v ${height}`,
