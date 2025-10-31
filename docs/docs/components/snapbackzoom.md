@@ -82,6 +82,26 @@ All properties for this component are optional.
 
 Increase (Android only) or decrease the gesture detection area around your component in all directions by a given amount in pixels, useful when dealing with small components.
 
+### minScale
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `0`     |
+
+Minimum scale value allowed by the pinch gesture, expects values greater than or equals one.
+
+### maxScale
+
+| Type                           | Default |
+| ------------------------------ | ------- |
+| `Size<number> \| number` | `6`     |
+
+Maximum scale value allowed by the pinch gesture, expects values bigger than or equals one.
+
+Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`;
+this will instruct the component to calculate `maxScale` in such a way it's a value just before your content
+starts pixelating.
+
 ### timingConfig
 
 | Type     | Default     | Additional Info                                                                                            |
