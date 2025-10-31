@@ -12,11 +12,10 @@ your choice, for a hands on example see [How to use with Skia Components](../gui
 
 When calling this hook you will receive the three following properties:
 
-- `onUpdate` is a worklet function which must be passed as a property to the zoom component's onUpdate
+- `onUpdate` is a [worklet](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/) which must be passed as a property to the zoom component's onUpdate
   callback property, this way the zoom component will update transform and state properties.
 - `transform` is a shared value describing zoom component's current transformations as an array.
-- `state` is an object holding the shared values describing the current transformation state, in case
-  you need them.
+- `state` is an object holding the [Reanimated's shared values](https://docs.swmansion.com/react-native-reanimated/docs/2.x/fundamentals/shared-values/) describing the current transformation state in case you need them.
 
 ```tsx{9,21}
 import { useTransformationState } from 'react-native-zoom-toolkit';
