@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Animated, {
+  clamp,
   measure,
   useAnimatedRef,
   useAnimatedStyle,
@@ -13,6 +14,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
@@ -23,7 +25,7 @@ const DEFAULT_HITSLOP = { vertical: 0, horizontal: 0 };
 const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,
   minScale = 0,
-  maxScale: userMaxScale,
+  maxScale,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
   timingConfig,
@@ -125,6 +127,21 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onUpdate((e) => {
       measureContainer();
 
+      let toScale = Math.max(minScale, e.scale);
+
+      if(typeof maxScale === 'object') {
+        const actualMaxScale = getMaxScale(
+          {width: containerSize.width.value, height: containerSize.height.value},
+          maxScale
+        );
+
+        toScale = clamp(e.scale, minScale, actualMaxScale);
+      }
+
+      if(typeof maxScale === 'number') {
+        toScale =clamp(e.scale, minScale, maxScale);
+      }
+
       const deltaX = currentFocal.x.value - initialFocal.x.value;
       const deltaY = currentFocal.y.value - initialFocal.y.value;
 
@@ -133,7 +150,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
       translate.x.value = toX;
       translate.y.value = toY;
-      scale.value = e.scale; // clamp(e.scale, minScale ?? 0, maxScale);
+      scale.value = toScale;
     })
     .onEnd((e) => {
       onPinchEnd && scheduleOnRN(onPinchEnd, e);
