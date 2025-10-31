@@ -23,7 +23,7 @@ export default function useZoomCallbacks<
   useAnimatedReaction(
     () => options.state.scale.value,
     (value, previousValue) => {
-      if (options.onUpdate) {
+      if (options.onUpdate !== undefined) {
         scheduleOnRN(options.onUpdate, value);
       }
 
@@ -47,7 +47,7 @@ export default function useZoomCallbacks<
 
       if (
         value >= options.state.maxScale.value &&
-        options.onMaxScaleReached &&
+        options.onMaxScaleReached !== undefined &&
         !hasReachedMaxScale.value
       ) {
         hasReachedMaxScale.value = true;
