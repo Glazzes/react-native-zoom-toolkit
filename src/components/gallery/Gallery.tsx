@@ -197,6 +197,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       itemSize: itemSize.value,
       gap,
     });
+
+    scale.value = 0;
+    translate.x.value = 0;
+    translate.y.value = 0;
   }
 
   function getState(): CommonZoomState<number> {
