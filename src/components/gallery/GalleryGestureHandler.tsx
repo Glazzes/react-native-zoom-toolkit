@@ -281,7 +281,6 @@ const GalleryGestureHandler = ({
       scale,
       minScale,
       maxScale,
-      scaleOffset,
       boundsFn,
       onGestureEnd,
     });

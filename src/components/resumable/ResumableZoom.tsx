@@ -177,7 +177,6 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
       scale,
       minScale,
       maxScale,
-      scaleOffset,
       boundsFn: boundsFn,
       onGestureEnd,
     });

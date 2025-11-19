@@ -12,7 +12,6 @@ type DoubleTapOptions = {
   scale: SharedValue<number>;
   minScale: number;
   maxScale: SharedValue<number>;
-  scaleOffset: SharedValue<number>;
   boundsFn: BoundsFuction;
   onGestureEnd?: () => void;
 };
@@ -23,7 +22,6 @@ export const useDoubleTapCommons = ({
   scale,
   minScale,
   maxScale,
-  scaleOffset,
   boundsFn,
   onGestureEnd,
 }: DoubleTapOptions) => {
@@ -56,7 +54,6 @@ export const useDoubleTapCommons = ({
 
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scaleOffset.value = toScale;
     scale.value = withTiming(toScale, undefined, (finished) => {
       scheduleOnRN(setIsPanGestureEnabled, true);
       if (finished && onGestureEnd !== undefined) {

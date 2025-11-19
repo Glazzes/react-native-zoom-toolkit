@@ -173,8 +173,6 @@ export const usePinchCommons = (options: PinchOptions) => {
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
     scale.value = withTiming(toScale, undefined, (finished) => {
-      scaleOffset.value = scale.value;
-
       if (finished) {
         scheduleOnRN(switchGesturesState, true);
       }
