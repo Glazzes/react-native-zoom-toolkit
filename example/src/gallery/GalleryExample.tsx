@@ -14,19 +14,26 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Gallery, type GalleryRefType } from 'react-native-zoom-toolkit';
+import {
+  Gallery,
+  type GalleryRefType,
+  type Size,
+  type VerticalPullOptions,
+} from 'react-native-zoom-toolkit';
 
 import GalleryImage from './GalleryImage';
 import VideoControls from './controls/VideoControls';
 import GalleryVideo from './GalleryVideo';
 
-type SizeVector = { width: number; height: number };
+function keyExtractor(item: Asset, index: number): string {
+  return `${item.uri}-${index}`;
+}
 
 export default function GalleryExample() {
   const ref = useRef<GalleryRefType>(null);
 
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [scales, setScales] = useState<SizeVector[]>([]);
+  const [scales, setScales] = useState<Size<number>[]>([]);
 
   const progress = useSharedValue<number>(0);
   const opacityControls = useSharedValue<number>(0);
@@ -57,11 +64,6 @@ export default function GalleryExample() {
     [activeIndex, progress, isSeeking]
   );
 
-  const keyExtractor = useCallback(
-    (item: Asset, index: number) => `${item.uri}-${index}`,
-    []
-  );
-
   // Toogle video controls opacity if the current item is a video
   const onTap = useCallback(() => {
     const isVideo = assets[activeIndex.value]?.mediaType === MediaType.video;
@@ -73,9 +75,9 @@ export default function GalleryExample() {
 
   // used to derived the color animation when pulling vertically
   const translateY = useSharedValue<number>(0);
-  const onVerticalPulling = (ty: number) => {
+  const onVerticalPulling = (options: VerticalPullOptions) => {
     'worklet';
-    translateY.value = ty;
+    translateY.value = options.translateY;
   };
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -104,7 +106,7 @@ export default function GalleryExample() {
         sortBy: 'creationTime',
       });
 
-      const pageScales: SizeVector[] = [];
+      const pageScales: Size<number>[] = [];
       for (let asset of page.assets) {
         pageScales.push({ width: asset.width, height: asset.height });
       }

@@ -13,6 +13,12 @@ import type {
   TimingConfig,
 } from '../../commons/types';
 
+export type VerticalPullOptions = {
+  translateY: number;
+  released: boolean;
+  velocityY: number;
+};
+
 export type GalleryTransitionState = {
   index: number;
   activeIndex: number;
@@ -53,7 +59,7 @@ export type GalleryProps<T = unknown> = {
   onIndexChange: (index: number) => void;
   onScroll: (scroll: number, contentOffset: number) => void;
   onUpdate: (state: CommonZoomState<number>) => void;
-  onVerticalPull: (translateY: number, released: boolean) => void;
+  onVerticalPull: (options: VerticalPullOptions) => void;
   onGestureEnd: () => void;
 }> &
   PinchGestureCallbacks &

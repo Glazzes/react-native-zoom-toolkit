@@ -108,6 +108,7 @@ const GalleryGestureHandler = ({
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
+  const velocityY = useSharedValue<number>(0);
   const gestureEnd = useSharedValue<number>(0);
   const isPullingVertical = useSharedValue<boolean>(false);
   const pullReleased = useSharedValue<boolean>(false);
@@ -225,11 +226,17 @@ const GalleryGestureHandler = ({
       translate: translate.y.value,
       isPulling: isPullingVertical.value,
       released: pullReleased.value,
+      velocityY: velocityY.value,
     }),
     (val) => {
-      val.isPulling && onVerticalPull?.(val.translate, val.released);
+      val.isPulling &&
+        onVerticalPull?.({
+          translateY: val.translate,
+          released: val.released,
+          velocityY: val.velocityY,
+        });
     },
-    [translate, isPullingVertical, pullReleased]
+    [translate, isPullingVertical, pullReleased, velocityY]
   );
 
   useAnimatedReaction(
@@ -331,6 +338,7 @@ const GalleryGestureHandler = ({
     })
     .onUpdate((e) => {
       if (isPullingVertical.value) {
+        velocityY.value = e.velocityY;
         translate.y.value = e.translationY;
         return;
       }
