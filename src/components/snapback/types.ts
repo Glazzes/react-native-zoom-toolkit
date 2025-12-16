@@ -19,7 +19,9 @@ import type {
 export type BlocksGesture =
   | GestureType
   | React.RefObject<GestureType | undefined>
-  | React.RefObject<React.ComponentType<{}> | undefined>;
+  | React.RefObject<GestureType | null>
+  | React.RefObject<React.ComponentType<{}> | undefined>
+  | React.RefObject<React.ComponentType<{}> | null>;
 
 export type TimingConfig = Partial<{
   duration: number;
