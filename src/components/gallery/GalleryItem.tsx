@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { type LayoutChangeEvent } from 'react-native';
+
 import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
@@ -17,6 +18,7 @@ type GalleryItemProps = {
   index: number;
   gap: number;
   zIndex: number;
+  rtl: boolean;
   vertical: boolean;
   renderItem: (item: any, index: number) => React.ReactElement;
   customTransition?: GalleryTransitionCallback;
@@ -27,6 +29,7 @@ const GalleryItem = ({
   gap,
   zIndex,
   item,
+  rtl = false,
   vertical,
   renderItem,
   customTransition,
@@ -97,7 +100,9 @@ const GalleryItem = ({
       });
     }
 
-    const currentScroll = -1 * scroll.value + index * gap;
+    const direction = rtl ? -1 : 1;
+    const currentScroll =
+      direction * -1 * scroll.value + direction * index * gap;
 
     const isSizeNotDefined =
       rootSize.width.value === 0 && rootSize.height.value === 0;
@@ -108,7 +113,7 @@ const GalleryItem = ({
       return { transform: [{ translateY }], opacity };
     }
 
-    const translateX = index * rootSize.width.value + currentScroll;
+    const translateX = direction * index * rootSize.width.value + currentScroll;
     return { transform: [{ translateX }], opacity };
   });
 

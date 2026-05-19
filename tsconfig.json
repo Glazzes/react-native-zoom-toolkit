@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "react-native-zoom-toolkit": ["./src/index"]
     },

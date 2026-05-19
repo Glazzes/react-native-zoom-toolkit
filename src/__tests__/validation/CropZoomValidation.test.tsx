@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import { render } from '@testing-library/react-native';
 
 import CropZoom from '../../components/crop/CropZoom';
-import type { SizeVector } from '../../commons/types';
+import type { Size } from '../../commons/types';
 
-const cropSize: SizeVector<number> = { width: 100, height: 100 };
-const resolution: SizeVector<number> = { width: 100, height: 200 };
+const cropSize: Size<number> = { width: 100, height: 100 };
+const resolution: Size<number> = { width: 100, height: 200 };
 
 describe('CropZoom Validation Tests', () => {
   afterEach(() => {

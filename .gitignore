@@ -40,9 +40,9 @@ project.xcworkspace
 local.properties
 android.iml
 
-# Cocoapods
-#
-example/ios/Pods
+# Native files
+example/ios/
+example/android/
 
 # Ruby
 example/vendor/

@@ -1,26 +1,30 @@
 import React, { useContext, useImperativeHandle, useState } from 'react';
 import { type LayoutChangeEvent } from 'react-native';
+
 import Animated, {
-  runOnJS,
+  clamp,
+  Easing,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
-import { clamp } from '../../commons/utils/clamp';
 import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
+import type { CommonZoomState } from '../../commons/types';
 
+import { GalleryContext } from './context';
 import GalleryGestureHandler from './GalleryGestureHandler';
 import GalleryItem from './GalleryItem';
-import { GalleryContext } from './context';
 import { type GalleryProps, type GalleryRefType } from './types';
-import type { CommonZoomState } from '../../commons/types';
 
 type GalleryPropsWithRef<T> = GalleryProps<T> & {
   reference?: React.ForwardedRef<GalleryRefType>;
 };
+
+const defaultTimingConfig = { duration: 300, easing: Easing.out(Easing.cubic) };
 
 const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
   const {
@@ -32,6 +36,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     windowSize = 5,
     maxScale: userMaxScale = 6,
     vertical = false,
+    rtl = false,
     gap = 0,
     allowOverflow = false,
     tapOnEdgeToItem = true,
@@ -40,6 +45,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     pinchMode = 'clamp',
     allowPinchPanning = true,
     longPressDuration = 500,
+    snapTimingConfig = defaultTimingConfig,
     customTransition,
     onIndexChange,
     onScroll,
@@ -77,7 +83,9 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
 
   const maxScale = useDerivedValue(() => {
     if (typeof userMaxScale === 'object') {
-      if (userMaxScale.length === 0) return 6;
+      if (userMaxScale.length === 0) {
+        return 6;
+      }
 
       return getMaxScale(
         {
@@ -116,6 +124,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
 
   useDerivedValue(() => {
     onUpdate?.({
+      translateX: translate.x.value,
+      translateY: translate.y.value,
+      scale: scale.value,
+      maxScale: maxScale.value,
       containerSize: {
         width: rootSize.width.value,
         height: rootSize.height.value,
@@ -124,24 +136,24 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         width: rootChildSize.width.value,
         height: rootChildSize.height.value,
       },
-      maxScale: maxScale.value,
-      translateX: translate.x.value,
-      translateY: translate.y.value,
-      scale: scale.value,
     });
   }, [rootSize, rootChildSize, maxScale, translate, scale]);
 
   useAnimatedReaction(
     () => ({ scroll: scroll.value, itemSize: itemSize.value }),
-    (value) => onScroll?.(value.scroll, (data.length - 1) * value.itemSize),
+    (value) => {
+      const scrollableItems = data.length - 1;
+      const totalGap = gap * scrollableItems;
+      onScroll?.(value.scroll, scrollableItems * value.itemSize + totalGap);
+    },
     [scroll, itemSize]
   );
 
   useAnimatedReaction(
     () => activeIndex.value,
     (value) => {
-      onIndexChange && runOnJS(onIndexChange)(value);
-      runOnJS(setScrollIndex)(value);
+      onIndexChange && scheduleOnRN(onIndexChange, value);
+      scheduleOnRN(setScrollIndex, value);
     },
     [activeIndex]
   );
@@ -166,10 +178,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     (value, previousValue) => {
       if (value !== 1 && !hasZoomed.value) {
         hasZoomed.value = true;
-        onZoomBegin && runOnJS(onZoomBegin)(activeIndex.value);
+        onZoomBegin && scheduleOnRN(onZoomBegin, activeIndex.value);
       } else if (value === 1 && previousValue !== 1 && hasZoomed.value) {
         hasZoomed.value = false;
-        onZoomEnd && runOnJS(onZoomEnd)(activeIndex.value);
+        onZoomEnd && scheduleOnRN(onZoomEnd, activeIndex.value);
       }
     },
     [scale]
@@ -185,6 +197,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       itemSize: itemSize.value,
       gap,
     });
+
+    scale.value = 0;
+    translate.x.value = 0;
+    translate.y.value = 0;
   }
 
   function getState(): CommonZoomState<number> {
@@ -225,7 +241,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       {data.map((item, index) => {
         const inLowerHalf = index < scrollIndex - nextItems;
         const inUpperHalf = index > scrollIndex + nextItems;
-        if (inLowerHalf || inUpperHalf) return null;
+
+        if (inLowerHalf || inUpperHalf) {
+          return null;
+        }
 
         const key = keyExtractor?.(item, index) ?? `item-${index}`;
 
@@ -236,6 +255,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
             index={index}
             gap={gap}
             item={item}
+            rtl={rtl}
             vertical={vertical}
             renderItem={renderItem}
             customTransition={customTransition}
@@ -248,6 +268,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         maxScale={maxScale}
         itemSize={itemSize}
         length={data.length}
+        rtl={rtl}
         vertical={vertical}
         tapOnEdgeToItem={tapOnEdgeToItem}
         zoomEnabled={zoomEnabled}
@@ -256,6 +277,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         allowPinchPanning={allowPinchPanning}
         pinchMode={pinchMode}
         longPressDuration={longPressDuration}
+        snapTimingConfig={snapTimingConfig}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}

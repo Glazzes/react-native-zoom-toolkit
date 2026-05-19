@@ -1,7 +1,6 @@
 import React, { forwardRef } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
+import { clamp, useSharedValue } from 'react-native-reanimated';
 
-import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
 

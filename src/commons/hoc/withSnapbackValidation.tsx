@@ -18,6 +18,14 @@ export default function withSnapbackValidation(
       throw new Error('longPressDuration must be greater than 250ms');
     }
 
+    if (
+      props.minScale !== undefined &&
+      typeof props.maxScale === 'number' &&
+      props.minScale >= props.maxScale
+    ) {
+      throw new Error('minScale must be lesser than maxScale');
+    }
+
     return <Component {...props} />;
   };
 }

@@ -1,8 +1,8 @@
-import type { SizeVector } from '../types';
+import type { Size } from '../types';
 
 export const getMaxScale = (
-  canvasSize: SizeVector<number>,
-  resolution: SizeVector<number>
+  canvasSize: Size<number>,
+  resolution: Size<number>
 ): number => {
   'worklet';
 

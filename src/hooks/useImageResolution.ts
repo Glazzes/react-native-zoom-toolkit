@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 
-import type { SizeVector } from '../commons/types';
+import type { Size } from '../commons/types';
 
 export type FetchImageResolutionResult = {
   isFetching: boolean;
-  resolution: SizeVector<number> | undefined;
+  resolution: Size<number> | undefined;
   error: Error | undefined;
 };
 
@@ -27,7 +27,7 @@ export type Source = {
 export default function (source: Source | number): FetchImageResolutionResult {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<Error | undefined>(undefined);
-  const [resolution, setResolution] = useState<SizeVector<number> | undefined>(
+  const [resolution, setResolution] = useState<Size<number> | undefined>(
     undefined
   );
 

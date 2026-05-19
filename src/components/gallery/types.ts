@@ -6,11 +6,19 @@ import type {
   PinchMode,
   PinchGestureCallbacks,
   ScaleMode,
-  SizeVector,
+  Size,
   SwipeDirection,
   TapGestureEvent,
   ZoomEventCallbacks,
+  TimingConfig,
+  TapGestureCallbacks,
 } from '../../commons/types';
+
+export type VerticalPullOptions = {
+  translateY: number;
+  released: boolean;
+  velocityY: number;
+};
 
 export type GalleryTransitionState = {
   index: number;
@@ -19,7 +27,7 @@ export type GalleryTransitionState = {
   direction: 'vertical' | 'horizontal';
   isScrolling: boolean;
   scroll: number;
-  gallerySize: SizeVector<number>;
+  gallerySize: Size<number>;
 };
 
 export type GalleryTransitionCallback = (
@@ -30,11 +38,12 @@ export type GalleryProps<T = unknown> = {
   data: T[];
   renderItem: (item: T, index: number) => React.ReactElement;
 } & Partial<{
-  keyExtractor: (item: T, index: number) => string;
-  maxScale: number | SizeVector<number>[];
-  initialIndex: number;
   windowSize: number;
+  keyExtractor: (item: T, index: number) => string;
+  maxScale: number | Size<number>[];
+  initialIndex: number;
   gap: number;
+  rtl: boolean;
   vertical: boolean;
   allowOverflow: boolean;
   tapOnEdgeToItem: boolean;
@@ -43,6 +52,7 @@ export type GalleryProps<T = unknown> = {
   allowPinchPanning: boolean;
   pinchMode: PinchMode;
   longPressDuration: number;
+  snapTimingConfig: TimingConfig;
   customTransition: GalleryTransitionCallback;
   onTap: (e: TapGestureEvent, index: number) => void;
   onLongPress: (e: LongPressEvent, index: number) => void;
@@ -50,12 +60,13 @@ export type GalleryProps<T = unknown> = {
   onIndexChange: (index: number) => void;
   onScroll: (scroll: number, contentOffset: number) => void;
   onUpdate: (state: CommonZoomState<number>) => void;
-  onVerticalPull: (translateY: number, released: boolean) => void;
+  onVerticalPull: (options: VerticalPullOptions) => void;
   onGestureEnd: () => void;
 }> &
   PinchGestureCallbacks &
   PanGestureCallbacks &
-  ZoomEventCallbacks;
+  ZoomEventCallbacks &
+  Omit<TapGestureCallbacks, 'onTap'>;
 
 export interface GalleryRefType {
   setIndex: (index: number) => void;

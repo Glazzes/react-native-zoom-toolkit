@@ -98,13 +98,13 @@ Minimum scale value allowed by the pinch gesture, expects values greater than or
 
 | Type                           | Default |
 | ------------------------------ | ------- |
-| `SizeVector<number> \| number` | `6`     |
+| `Size<number> \| number`       | `6`     |
 
 Maximum scale value allowed by the pinch gesture, expects values bigger than or equals one.
 
 Alternatively you can pass the resolution of your image/video, for instance `{ width: 1920, height: 1080 }`;
 this will instruct the component to calculate `maxScale` in such a way it's a value just before your content
-starts to pixelate.
+starts pixelating.
 
 ### panMode
 
@@ -199,6 +199,22 @@ Enables and disables both single and double tap gestures.
 | `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
 Callback triggered when the user taps the wrapped component once.
+
+### onDoubleTapStart
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the user double taps.
+
+### onDoubleTapEnd
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the scale animation ends after a double tap.
 
 ### onSwipe
 

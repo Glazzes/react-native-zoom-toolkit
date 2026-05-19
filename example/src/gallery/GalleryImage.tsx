@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
-import {
-  runOnJS,
-  useAnimatedReaction,
-  type SharedValue,
-} from 'react-native-reanimated';
+
+import { useAnimatedReaction, type SharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Image } from 'expo-image';
 import { type Asset } from 'expo-media-library';
 
@@ -16,35 +14,32 @@ type GalleryImageProps = {
   activeIndex: SharedValue<number>;
 };
 
-const GalleryImage: React.FC<GalleryImageProps> = ({
-  asset,
-  index,
-  activeIndex,
-}) => {
+export default function GalleryImage(props: GalleryImageProps) {
   const { width, height } = useWindowDimensions();
-  const size = fitContainer(asset.width / asset.height, { width, height });
+  const size = fitContainer(props.asset.width / props.asset.height, {
+    width,
+    height,
+  });
 
   const [downScale, setDownScale] = useState<boolean>(true);
 
   const wrapper = (active: number) => {
-    if (index === active) setDownScale(false);
-    if (index === active - 1 && !downScale) setDownScale(true);
-    if (index === active + 1 && !downScale) setDownScale(true);
+    if (props.index === active) setDownScale(false);
+    if (props.index === active - 1 && !downScale) setDownScale(true);
+    if (props.index === active + 1 && !downScale) setDownScale(true);
   };
 
   useAnimatedReaction(
-    () => activeIndex.value,
-    (value) => runOnJS(wrapper)(value),
-    [activeIndex]
+    () => props.activeIndex.value,
+    (value) => scheduleOnRN(wrapper, value),
+    [props.activeIndex]
   );
 
   return (
     <Image
-      source={{ uri: asset.uri }}
+      source={{ uri: props.asset.uri }}
       style={size}
       allowDownscaling={downScale}
     />
   );
-};
-
-export default GalleryImage;
+}

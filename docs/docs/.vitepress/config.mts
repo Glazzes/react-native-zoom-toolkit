@@ -14,7 +14,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       {
-        text: '5.0.0',
+        text: '5.1.0',
         items: [
           {
             text: 'Releases',
@@ -51,6 +51,10 @@ export default defineConfig({
           {
             text: 'useTransformationState',
             link: '/utilities/usetransformationstate',
+          },
+          {
+            text: 'useZoomCallbacks',
+            link: '/utilities/useZoomCallbacks',
           },
         ],
       },

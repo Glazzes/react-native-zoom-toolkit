@@ -6,27 +6,44 @@ import {
   Image,
   useWindowDimensions,
 } from 'react-native';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
-import Constants from 'expo-constants';
-import { StatusBar, setStatusBarHidden } from 'expo-status-bar';
 
+import { useSharedValue, withTiming } from 'react-native-reanimated';
+import { StatusBar, setStatusBarHidden } from 'expo-status-bar';
 import {
   fitContainer,
   ResumableZoom,
   useImageResolution,
+  useTransformationState,
+  useZoomCallbacks,
   type ResumableZoomRefType,
 } from 'react-native-zoom-toolkit';
 
 import Appbar from './Appbar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const barHeight = Constants.statusBarHeight;
 const IMAGE =
   'https://media.formula1.com/image/upload/v1705423544/fom-website/2023/McLaren/Formula%201%20header%20template%20%2835%29.png';
 
 const ResumableZoomExample: React.FC = ({}) => {
   const ref = useRef<ResumableZoomRefType>(null);
+
+  const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const { isFetching, resolution } = useImageResolution({ uri: IMAGE });
+
+  const { state, onUpdate } = useTransformationState('common');
+  useZoomCallbacks({
+    state,
+    onStart() {
+      console.log('Scale start');
+    },
+    onMaxScaleReached(value) {
+      console.log('On max scale reached ', value);
+    },
+    onEnd() {
+      console.log('Scale end');
+    },
+  });
 
   const translateY = useSharedValue<number>(0);
 
@@ -47,13 +64,17 @@ const ResumableZoomExample: React.FC = ({}) => {
     height,
   });
 
-  const onTap = () => {
-    let toY = -1 * barHeight * 3.1;
+  function onTap() {
+    let toY = -1 * (60 + insets.top);
     if (translateY.value !== 0) toY = 0;
 
     translateY.value = withTiming(toY);
     setStatusBarHidden(toY !== 0, 'slide');
-  };
+  }
+
+  function onGestureEnd() {
+    console.log('on gesture end!');
+  }
 
   return (
     <View style={styles.root}>
@@ -66,6 +87,8 @@ const ResumableZoomExample: React.FC = ({}) => {
         maxScale={resolution}
         pinchMode={'free'}
         onTap={onTap}
+        onUpdate={onUpdate}
+        onGestureEnd={onGestureEnd}
       >
         <Image
           source={{ uri: IMAGE }}

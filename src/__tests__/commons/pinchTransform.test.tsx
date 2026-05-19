@@ -1,10 +1,10 @@
-import type { SizeVector, Vector } from '../../commons/types';
+import type { Size, Vector } from '../../commons/types';
 import { pinchTransform } from '../../commons/utils/pinchTransform';
 
 describe('Pinch transform', () => {
   // For these tests imagine we've got an image of 300x300 pixel size and our focal poiint
   // is located at x: 100 and y: 150
-  const size: SizeVector<number> = { width: 300, height: 300 };
+  const size: Size<number> = { width: 300, height: 300 };
   const focal: Vector<number> = { x: 100, y: 150 };
   const origin: Vector<number> = {
     x: focal.x - size.width / 2,

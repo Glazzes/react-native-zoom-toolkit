@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Image, StyleSheet, View, type ImageStyle } from 'react-native';
+
 import Animated, {
   measure,
   useAnimatedRef,
@@ -11,7 +12,7 @@ import {
   SnapbackZoom,
   useImageResolution,
   type ResizeConfig,
-  type SizeVector,
+  type Size,
 } from 'react-native-zoom-toolkit';
 
 import { maxDimension, theme } from '../../../constants';
@@ -53,7 +54,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   }
 
   const aspectRatio = resolution.width / resolution.height;
-  const size: SizeVector<number> = {
+  const size: Size<number> = {
     width: 250,
     height: 250 / aspectRatio,
   };

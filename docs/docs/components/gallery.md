@@ -176,7 +176,14 @@ Blank space between items.
 | -------- | ------- |
 | `number` | `0`     |
 
-Sets the initial position of the list.
+Set the initial position of the list.
+
+### rtl
+| Type      | Default |
+| --------- | ------- |
+| `boolean` | `false` |
+
+Enable support for right to left layouts on horizontal mode, [more info](https://github.com/Glazzes/react-native-zoom-toolkit/issues/99#issuecomment-3029442065).
 
 ### vertical
 
@@ -184,13 +191,21 @@ Sets the initial position of the list.
 | --------- | ------- |
 | `boolean` | `false` |
 
-Modifies the orientation of the component to vertical mode.
+Modify the orientation of the component to vertical mode.
+
+### snapTimingConfig
+
+| Type     | Default     | Adittional Info |
+| -------- | ------------| --------------- |
+| `object` | `{duration: 300, easing: Easing.out(Easing.cubic)}` | see [timingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
+
+Set the timing config used to snap between gallery's elements.
 
 ### maxScale
 
 | Type                             | Default |
 | -------------------------------- | ------- |
-| `SizeVector<number>[] \| number` | `6`     |
+| `Size<number>[] \| number`       | `6`     |
 
 Maximum scale value allowed by the pinch gesture for all elements, expects values bigger than or equals one.
 
@@ -287,6 +302,22 @@ Callback triggered when the list scrolls to the next or previous item.
 | `(e: TapGestureEvent, index: number) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
 
 Callback triggered when the user taps the current item once, provides additional metadata like index if you need it.
+
+### onDoubleTapStart
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the user double taps.
+
+### onDoubleTapEnd
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the scale animation ends after a double tap.
 
 ### onVerticalPull
 
@@ -498,4 +529,4 @@ Reset all transformations to their initial state.
 | `direction`   | `vertical \| horizontal` | Direction of the gallery.                             |
 | `isScrolling` | `boolean`                | Whether the gallery is actively being scrolled.       |
 | `scroll`      | `number`                 | Current scroll value.                                 |
-| `gallerySize` | `SizeVector<number>`     | Width and height of the gallery.                      |
+| `gallerySize` | `Size<number>`           | Width and height of the gallery.                      |

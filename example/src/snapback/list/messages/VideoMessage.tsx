@@ -1,5 +1,6 @@
 import React, { useContext, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
+
 import Animated, {
   Easing,
   useSharedValue,

@@ -5,6 +5,11 @@ import type {
   PanGestureHandlerEventPayload,
   LongPressGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+import type {
+  EasingFunction,
+  EasingFunctionFactory,
+  ReduceMotion,
+} from 'react-native-reanimated';
 
 export type Rect = {
   x: number;
@@ -18,7 +23,7 @@ export type Vector<T> = {
   y: T;
 };
 
-export type SizeVector<T> = {
+export type Size<T> = {
   width: T;
   height: T;
 };
@@ -35,8 +40,8 @@ export type CommonTransformState<T> = {
 };
 
 export type CommonZoomState<T> = {
-  containerSize: SizeVector<T>;
-  childSize: SizeVector<T>;
+  containerSize: Size<T>;
+  childSize: Size<T>;
   maxScale: T;
 } & CommonTransformState<T>;
 
@@ -65,6 +70,10 @@ export type PanGestureEventCallback = (e: PanGestureEvent) => void;
 export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
 export type LongPressGestreEventCallback = (e: LongPressEvent) => void;
+export type SwipeGestureCallback = (
+  directon: SwipeDirection,
+  e: PanGestureEvent
+) => void;
 
 export type PanGestureCallbacks = Partial<{
   onPanStart: PanGestureEventCallback;
@@ -78,7 +87,8 @@ export type PinchGestureCallbacks = Partial<{
 
 export type TapGestureCallbacks = Partial<{
   onTap: TapGestureEventCallback;
-  onDoubleTap: TapGestureEventCallback;
+  onDoubleTapStart: TapGestureEventCallback;
+  onDoubleTapEnd: TapGestureEventCallback;
 }>;
 
 export type LongPressCallbacks = Partial<{
@@ -88,6 +98,16 @@ export type LongPressCallbacks = Partial<{
 export type ZoomEventCallbacks = Partial<{
   onZoomBegin: (index: number) => void;
   onZoomEnd: (index: number) => void;
+}>;
+
+export type SwipeCallbacks = Partial<{
+  onSwipe: SwipeGestureCallback;
+}>;
+
+export type TimingConfig = Partial<{
+  duration: number;
+  easing: EasingFunction | EasingFunctionFactory;
+  reduceMotion: ReduceMotion;
 }>;
 
 export type BoundsFuction = (scale?: number) => Vector<number>;

@@ -11,7 +11,7 @@ import {
 import { act, render } from '@testing-library/react-native';
 
 import CropZoom from '../../components/crop/CropZoom';
-import type { SizeVector } from '../../commons/types';
+import type { Size } from '../../commons/types';
 import type {
   CropZoomProps,
   CropZoomRefType,
@@ -29,8 +29,8 @@ describe('CropZoom Gesture Tests', () => {
   const renderCropZoom = (
     props: Omit<CropZoomPropsWithRef, 'cropSize' | 'resolution'>
   ) => {
-    const cropSize: SizeVector<number> = { width: 100, height: 100 };
-    const resolution: SizeVector<number> = { width: 600, height: 600 };
+    const cropSize: Size<number> = { width: 100, height: 100 };
+    const resolution: Size<number> = { width: 600, height: 600 };
 
     render(<CropZoom {...props} cropSize={cropSize} resolution={resolution} />);
   };

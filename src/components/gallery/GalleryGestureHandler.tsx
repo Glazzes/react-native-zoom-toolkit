@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import Animated, {
-  Easing,
+  clamp,
   cancelAnimation,
-  runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -11,9 +10,9 @@ import Animated, {
   type SharedValue,
   type WithDecayConfig,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
-import { clamp } from '../../commons/utils/clamp';
 import { useVector } from '../../commons/hooks/useVector';
 import { snapPoint } from '../../commons/utils/snapPoint';
 import { getVisibleRect } from '../../commons/utils/getVisibleRect';
@@ -24,22 +23,22 @@ import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 import type {
   SwipeDirection,
   BoundsFuction,
-  PanGestureEvent,
   ScaleMode,
   PinchMode,
+  TimingConfig,
 } from '../../commons/types';
 import { GalleryContext } from './context';
 import { type GalleryProps } from './types';
 import { getScrollPosition } from '../../commons/utils/getScrollPosition';
 
 const minScale = 1;
-const config = { duration: 300, easing: Easing.linear };
 
 type GalleryGestureHandlerProps = {
   length: number;
   gap: number;
   maxScale: SharedValue<number>;
   itemSize: Readonly<SharedValue<number>>;
+  rtl: boolean;
   vertical: boolean;
   tapOnEdgeToItem: boolean;
   allowPinchPanning: boolean;
@@ -48,6 +47,7 @@ type GalleryGestureHandlerProps = {
   scaleMode: ScaleMode;
   pinchMode: PinchMode;
   longPressDuration: number;
+  snapTimingConfig: TimingConfig;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
   onPanEnd?: GalleryProps['onPanEnd'];
@@ -57,6 +57,8 @@ type GalleryGestureHandlerProps = {
   onLongPress?: GalleryProps['onLongPress'];
   onVerticalPull?: GalleryProps['onVerticalPull'];
   onGestureEnd?: GalleryProps['onGestureEnd'];
+  onDoubleTapStart?: GalleryProps['onDoubleTapStart'];
+  onDoubleTapEnd?: GalleryProps['onDoubleTapEnd'];
 };
 
 /*
@@ -69,6 +71,7 @@ const GalleryGestureHandler = ({
   gap,
   maxScale,
   itemSize,
+  rtl,
   vertical,
   tapOnEdgeToItem,
   zoomEnabled,
@@ -77,12 +80,15 @@ const GalleryGestureHandler = ({
   allowPinchPanning,
   pinchMode,
   longPressDuration,
+  snapTimingConfig,
   onTap,
   onPanStart,
   onPanEnd,
   onPinchStart: onUserPinchStart,
   onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
+  onDoubleTapStart: onUserTapStart,
+  onDoubleTapEnd: onUserTapEnd,
   onLongPress,
   onVerticalPull,
   onGestureEnd,
@@ -105,9 +111,12 @@ const GalleryGestureHandler = ({
 
   const time = useSharedValue<number>(0);
   const position = useVector(0, 0);
+  const velocityY = useSharedValue<number>(0);
   const gestureEnd = useSharedValue<number>(0);
   const isPullingVertical = useSharedValue<boolean>(false);
   const pullReleased = useSharedValue<boolean>(false);
+
+  const horizontalScrollDirection = rtl ? -1 : 1;
 
   const boundsFn: BoundsFuction = (optionalScale) => {
     'worklet';
@@ -138,7 +147,9 @@ const GalleryGestureHandler = ({
     scaleOffset.value = toScale;
   };
 
-  const snapToScrollPosition = (e: PanGestureEvent) => {
+  // This funcions controls the snapping of the gallery's items when panning
+  // For instance if you slowly pan and let go the item
+  const snapToScrollPosition = () => {
     'worklet';
 
     cancelAnimation(scroll);
@@ -159,10 +170,10 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    const velocity = vertical ? e.velocityY : e.velocityX;
-    const toScroll = snapPoint(scroll.value, velocity, [prev, current, next]);
+    // Gesture velocity can be used as a second parameter but 0 is fine
+    const toScroll = snapPoint(scroll.value, 0, [prev, current, next]);
 
-    scroll.value = withTiming(toScroll, config, (finished) => {
+    scroll.value = withTiming(toScroll, snapTimingConfig, (finished) => {
       if (!finished) return;
       if (toScroll !== current) {
         activeIndex.value += toScroll === next ? 1 : -1;
@@ -173,19 +184,26 @@ const GalleryGestureHandler = ({
     });
   };
 
-  const onSwipe = (direction: SwipeDirection) => {
+  const onSwipe = (swipeDirection: SwipeDirection) => {
     'worklet';
 
     cancelAnimation(scroll);
 
     let toIndex = activeIndex.value;
-    if (direction === 'up' && vertical) toIndex += 1;
-    if (direction === 'down' && vertical) toIndex -= 1;
-    if (direction === 'left' && !vertical) toIndex += 1;
-    if (direction === 'right' && !vertical) toIndex -= 1;
+    if (swipeDirection === 'up' && vertical) toIndex += 1;
+    if (swipeDirection === 'down' && vertical) toIndex -= 1;
+    if (swipeDirection === 'left' && !vertical)
+      toIndex += horizontalScrollDirection;
+    if (swipeDirection === 'right' && !vertical)
+      toIndex -= horizontalScrollDirection;
 
     toIndex = clamp(toIndex, 0, length - 1);
-    if (toIndex === activeIndex.value) return;
+
+    // Even tho this statement looks redundant, don't remove it because it makes the items translate
+    // outside of their parent container boundaries, I don't know why and I don't want to know.
+    if (toIndex === activeIndex.value) {
+      return;
+    }
 
     const newScrollPosition = getScrollPosition({
       index: toIndex,
@@ -193,13 +211,19 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    scroll.value = withTiming(newScrollPosition, config, (finished) => {
-      if (!finished) return;
+    scroll.value = withTiming(
+      newScrollPosition,
+      snapTimingConfig,
+      (finished) => {
+        if (!finished) {
+          return;
+        }
 
-      activeIndex.value = toIndex;
-      isScrolling.value = false;
-      reset(0, 0, minScale, false);
-    });
+        activeIndex.value = toIndex;
+        isScrolling.value = false;
+        reset(0, 0, minScale, false);
+      }
+    );
   };
 
   useAnimatedReaction(
@@ -207,11 +231,17 @@ const GalleryGestureHandler = ({
       translate: translate.y.value,
       isPulling: isPullingVertical.value,
       released: pullReleased.value,
+      velocityY: velocityY.value,
     }),
     (val) => {
-      val.isPulling && onVerticalPull?.(val.translate, val.released);
+      val.isPulling &&
+        onVerticalPull?.({
+          translateY: val.translate,
+          released: val.released,
+          velocityY: val.velocityY,
+        });
     },
-    [translate, isPullingVertical, pullReleased]
+    [translate, isPullingVertical, pullReleased, velocityY]
   );
 
   useAnimatedReaction(
@@ -263,9 +293,10 @@ const GalleryGestureHandler = ({
       scale,
       minScale,
       maxScale,
-      scaleOffset,
       boundsFn,
       onGestureEnd,
+      onTapStart: onUserTapStart,
+      onTapEnd: onUserTapEnd,
     });
 
   const pinch = Gesture.Pinch()
@@ -289,19 +320,21 @@ const GalleryGestureHandler = ({
   const pan = Gesture.Pan()
     .withTestId('pan')
     .maxPointers(1)
-    .minVelocity(100)
     .enabled(gesturesEnabled && enablePanGestureByDoubleTap)
     .onStart((e) => {
       cancelAnimation(translate.x);
       cancelAnimation(translate.y);
       cancelAnimation(scroll);
 
-      onPanStart && runOnJS(onPanStart)(e);
+      if (onPanStart !== undefined) {
+        scheduleOnRN(onPanStart, e);
+      }
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
       isScrolling.value = true;
 
+      // @ts-ignore
       time.value = performance.now();
       position.x.value = e.absoluteX;
       position.y.value = e.absoluteY;
@@ -312,6 +345,7 @@ const GalleryGestureHandler = ({
     })
     .onUpdate((e) => {
       if (isPullingVertical.value) {
+        velocityY.value = e.velocityY;
         translate.y.value = e.translationY;
         return;
       }
@@ -320,7 +354,8 @@ const GalleryGestureHandler = ({
       const toY = offset.y.value + e.translationY;
 
       const { x: boundX, y: boundY } = boundsFn(scale.value);
-      const exceedX = Math.max(0, Math.abs(toX) - boundX);
+      const exceedX =
+        horizontalScrollDirection * Math.max(0, Math.abs(toX) - boundX);
       const exceedY = Math.max(0, Math.abs(toY) - boundY);
 
       const scrollX = -1 * Math.sign(toX) * exceedX;
@@ -356,7 +391,7 @@ const GalleryGestureHandler = ({
       }
 
       if (direction !== undefined && onUserSwipe !== undefined) {
-        runOnJS(onUserSwipe)(direction);
+        scheduleOnRN(onUserSwipe, direction);
       }
 
       if (isPullingVertical.value) {
@@ -375,11 +410,11 @@ const GalleryGestureHandler = ({
       const snapH = !vertical && (direction === undefined || isSwipingV);
 
       if (direction === undefined && onPanEnd !== undefined) {
-        runOnJS(onPanEnd)(e);
+        scheduleOnRN(onPanEnd, e);
       }
 
       if (snapV || snapH) {
-        snapToScrollPosition(e);
+        snapToScrollPosition();
       }
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
@@ -390,7 +425,9 @@ const GalleryGestureHandler = ({
       const finalConfig = restX > restY ? configX : configY;
       gestureEnd.value = restX > restY ? translate.x.value : translate.y.value;
       gestureEnd.value = withDecay(finalConfig as WithDecayConfig, () => {
-        onGestureEnd && runOnJS(onGestureEnd)();
+        if (onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
+        }
       });
 
       translate.x.value = withDecay(configX as WithDecayConfig);
@@ -421,12 +458,16 @@ const GalleryGestureHandler = ({
 
       let toIndex = activeIndex.value;
       const canGoToItem = tapOnEdgeToItem && !vertical;
-      if (event.x <= leftEdge && canGoToItem) toIndex -= 1;
-      if (event.x >= rightEdge && canGoToItem) toIndex += 1;
+      if (event.x <= leftEdge && canGoToItem)
+        toIndex -= horizontalScrollDirection;
+      if (event.x >= rightEdge && canGoToItem)
+        toIndex += horizontalScrollDirection;
 
       toIndex = clamp(toIndex, 0, length - 1);
       if (toIndex === activeIndex.value) {
-        onTap && runOnJS(onTap)(event, activeIndex.value);
+        if (onTap !== undefined) {
+          scheduleOnRN(onTap, event, activeIndex.value);
+        }
         return;
       }
 
@@ -494,6 +535,8 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.onSwipe === next.onSwipe &&
     prev.onLongPress === next.onLongPress &&
     prev.onVerticalPull === next.onVerticalPull &&
+    prev.onDoubleTapStart === next.onDoubleTapStart &&
+    prev.onDoubleTapEnd === next.onDoubleTapEnd &&
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&

@@ -1,25 +1,27 @@
-import { runOnJS, withTiming, type SharedValue } from 'react-native-reanimated';
-
-import { pinchTransform } from '../utils/pinchTransform';
-import { clamp } from '../utils/clamp';
-
-import type {
-  BoundsFuction,
-  SizeVector,
-  TapGestureEvent,
-  Vector,
-} from '../types';
 import { useState } from 'react';
 
+import { clamp, withTiming, type SharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+
+import { pinchTransform } from '../utils/pinchTransform';
+import type {
+  BoundsFuction,
+  Size,
+  TapGestureEvent,
+  TapGestureEventCallback,
+  Vector,
+} from '../types';
+
 type DoubleTapOptions = {
-  container: SizeVector<SharedValue<number>>;
+  container: Size<SharedValue<number>>;
   translate: Vector<SharedValue<number>>;
   scale: SharedValue<number>;
   minScale: number;
   maxScale: SharedValue<number>;
-  scaleOffset: SharedValue<number>;
   boundsFn: BoundsFuction;
   onGestureEnd?: () => void;
+  onTapStart?: TapGestureEventCallback;
+  onTapEnd?: TapGestureEventCallback;
 };
 
 export const useDoubleTapCommons = ({
@@ -28,15 +30,19 @@ export const useDoubleTapCommons = ({
   scale,
   minScale,
   maxScale,
-  scaleOffset,
   boundsFn,
+  onTapStart,
+  onTapEnd,
   onGestureEnd,
 }: DoubleTapOptions) => {
   const [isPanGestureEnabled, setIsPanGestureEnabled] = useState<boolean>(true);
 
-  const onDoubleTapStart = () => {
+  const onDoubleTapStart = (event: TapGestureEvent) => {
     'worklet';
-    runOnJS(setIsPanGestureEnabled)(false);
+    scheduleOnRN(setIsPanGestureEnabled, false);
+    if (onTapStart !== undefined) {
+      scheduleOnRN(onTapStart, event);
+    }
   };
 
   const onDoubleTapEnd = (event: TapGestureEvent) => {
@@ -61,10 +67,15 @@ export const useDoubleTapCommons = ({
 
     translate.x.value = withTiming(toX);
     translate.y.value = withTiming(toY);
-    scaleOffset.value = toScale;
     scale.value = withTiming(toScale, undefined, (finished) => {
-      runOnJS(setIsPanGestureEnabled)(true);
-      finished && onGestureEnd && runOnJS(onGestureEnd)();
+      scheduleOnRN(setIsPanGestureEnabled, true);
+      if (finished && onGestureEnd !== undefined) {
+        scheduleOnRN(onGestureEnd);
+      }
+
+      if (finished && onTapEnd !== undefined) {
+        scheduleOnRN(onTapEnd, event);
+      }
     });
   };
 

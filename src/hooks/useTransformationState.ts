@@ -11,15 +11,13 @@ import type { SnapbackZoomState } from '../components/snapback/types';
 import type { CropZoomState } from '../components/crop/types';
 import type { CommonZoomState } from '../commons/types';
 
-type SharedNumber = SharedValue<number>;
-
-type ComponentSelection = 'resumable' | 'snapback' | 'crop';
+type ComponentSelection = 'common' | 'snapback' | 'crop';
 
 type StateSelection<C extends ComponentSelection, T> = C extends 'snapback'
   ? SnapbackZoomState<T>
   : C extends 'crop'
-  ? CropZoomState<T>
-  : CommonZoomState<T>;
+    ? CropZoomState<T>
+    : CommonZoomState<T>;
 
 type TransformNames = 'matrix' | 'translateX' | 'translateY';
 
@@ -39,7 +37,7 @@ type Matrix4x4 = [
   number,
   number,
   number,
-  number
+  number,
 ];
 
 type Transformations = {
@@ -53,7 +51,7 @@ type Transforms3d =
 
 type TransformationState<T extends ComponentSelection> = {
   onUpdate: (state: StateSelection<T, number>) => void;
-  state: StateSelection<T, SharedNumber>;
+  state: StateSelection<T, SharedValue<number>>;
   transform: Readonly<SharedValue<Transforms3d[]>>;
 };
 
@@ -120,16 +118,16 @@ export const useTransformationState = <T extends ComponentSelection>(
     ];
   }, [translate, scale, rotation, rotate]);
 
-  const createSharedState = (): StateSelection<T, SharedNumber> => {
+  const createSharedState = (): StateSelection<T, SharedValue<number>> => {
     // @ts-ignore
-    const state: StateSelection<T, SharedNumber, SharedSize> = {
+    const state: StateSelection<T, SharedValue<number>, SharedSize> = {
       translateX: translate.x,
       translateY: translate.y,
       scale: scale,
     };
 
-    if (param === 'resumable' || param === 'crop') {
-      const st = state as CommonZoomState<SharedNumber>;
+    if (param === 'common' || param === 'crop') {
+      const st = state as CommonZoomState<SharedValue<number>>;
 
       st.containerSize = {
         width: containerSize.width,
@@ -145,7 +143,7 @@ export const useTransformationState = <T extends ComponentSelection>(
     }
 
     if (param === 'crop') {
-      const st = state as CropZoomState<SharedNumber>;
+      const st = state as CropZoomState<SharedValue<number>>;
 
       st.rotateX = rotate.x;
       st.rotateY = rotate.y;
@@ -153,7 +151,7 @@ export const useTransformationState = <T extends ComponentSelection>(
     }
 
     if (param === 'snapback') {
-      const st = state as SnapbackZoomState<SharedNumber>;
+      const st = state as SnapbackZoomState<SharedValue<number>>;
 
       st.size = {
         width: containerSize.width,
@@ -181,7 +179,7 @@ export const useTransformationState = <T extends ComponentSelection>(
     translate.y.value = state.translateY;
     scale.value = state.scale;
 
-    if (param === 'resumable' || param === 'crop') {
+    if (param === 'common' || param === 'crop') {
       const commonState = state as CommonZoomState<number>;
 
       childSize.width.value = commonState.childSize.width;

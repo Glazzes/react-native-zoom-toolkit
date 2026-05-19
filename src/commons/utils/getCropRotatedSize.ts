@@ -1,15 +1,15 @@
-import type { SizeVector } from '../types';
+import type { Size } from '../types';
 
 type Options = {
-  crop: SizeVector<number>;
-  resolution: SizeVector<number>;
+  crop: Size<number>;
+  resolution: Size<number>;
   angle: number;
 };
 
 export const getRatioSize = (
   aspectRatio: number,
-  container: Partial<SizeVector<number>>
-): SizeVector<number> => {
+  container: Partial<Size<number>>
+): Size<number> => {
   'worklet';
 
   if (container.width !== undefined) {
@@ -25,7 +25,7 @@ export const getRatioSize = (
   };
 };
 
-export const getCropRotatedSize = (options: Options): SizeVector<number> => {
+export const getCropRotatedSize = (options: Options): Size<number> => {
   'worklet';
   const { crop, angle, resolution } = options;
   const cropAspectRatio = crop.width / crop.height;

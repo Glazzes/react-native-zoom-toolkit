@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
+
 import { Canvas, Image, useImage, vec } from '@shopify/react-native-skia';
 import {
   fitContainer,
@@ -15,7 +16,7 @@ const uri =
 const App = () => {
   const image = useImage(uri);
   const { width, height } = useWindowDimensions();
-  const { onUpdate, transform } = useTransformationState('resumable');
+  const { onUpdate, transform } = useTransformationState('common');
 
   if (image === null) {
     return null;

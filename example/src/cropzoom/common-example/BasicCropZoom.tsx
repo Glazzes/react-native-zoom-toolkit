@@ -1,19 +1,18 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
+
 import { StatusBar } from 'expo-status-bar';
 import {
   CropZoom,
   useImageResolution,
   type CropZoomRefType,
-  type SizeVector,
+  type Size,
 } from 'react-native-zoom-toolkit';
 
+import { IMAGE } from '../commons/contants';
 import CropModal from '../commons/CropModal';
 import SVGOverlay from '../commons/SVGOverlay';
 import Controls from './Controls';
-
-const IMAGE =
-  'https://assets-global.website-files.com/63634f4a7b868a399577cf37/64665685a870fadf4bb171c2_labrador%20americano.jpg';
 
 const BasicCropZoom = ({}) => {
   const cropRef = useRef<CropZoomRefType>(null);
@@ -23,7 +22,7 @@ const BasicCropZoom = ({}) => {
 
   const [result, setResult] = useState<string | undefined>(undefined);
 
-  const cropSize: SizeVector<number> = {
+  const cropSize: Size<number> = {
     width: width * 0.8,
     height: width * 0.8,
   };
@@ -56,6 +55,7 @@ const BasicCropZoom = ({}) => {
        * The height of this component is subtracted from the screen height, so the overlay
        * height is screen height - controls height
        */}
+      {/* @ts-ignore */}
       <Controls uri={IMAGE} cropRef={cropRef} setCrop={setResult} />
 
       {/*

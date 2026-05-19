@@ -1,12 +1,12 @@
 import { getVisibleRect } from './getVisibleRect';
 
-import type { SizeVector, Vector } from '../types';
+import type { Size, Vector } from '../types';
 
 type CanvasToSizeOptions = {
   scale: number;
-  cropSize: SizeVector<number>;
-  itemSize: SizeVector<number>;
-  resolution: SizeVector<number>;
+  cropSize: Size<number>;
+  itemSize: Size<number>;
+  resolution: Size<number>;
   translation: Vector<number>;
   isRotated: boolean;
   fixedWidth?: number;
@@ -43,7 +43,7 @@ export const crop = (options: CanvasToSizeOptions) => {
   // Make a normal crop, if the fixedWidth is defined just resize everything to meet the ratio
   // between fixedWidth and the width of the crop.
   let sizeModifier = 1;
-  let resize: SizeVector<number> | undefined;
+  let resize: Size<number> | undefined;
   if (fixedWidth !== undefined) {
     sizeModifier = fixedWidth / width;
     resize = {

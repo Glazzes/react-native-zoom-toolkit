@@ -20,7 +20,7 @@ export type {
 export type {
   CommonZoomState,
   Vector,
-  SizeVector,
+  Size,
   PanGestureEvent,
   PanGestureEventCallback,
   PinchGestureEvent,
@@ -35,6 +35,7 @@ export {
   type Source,
 } from './hooks/useImageResolution';
 
+export { default as useZoomCallbacks } from './hooks/useZoomCallbacks';
 export { useTransformationState } from './hooks/useTransformationState';
 
 export { fitContainer } from './utils/fitContainer';

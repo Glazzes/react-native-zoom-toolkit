@@ -1,17 +1,20 @@
 import React from 'react';
+
 import Animated, {
+  clamp,
   measure,
-  runOnJS,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
 import { useSizeVector } from '../../commons/hooks/useSizeVector';
+import { getMaxScale } from '../../commons/utils/getMaxScale';
 import { resizeToAspectRatio } from '../../commons/utils/resizeToAspectRatio';
 import withSnapbackValidation from '../../commons/hoc/withSnapbackValidation';
 
@@ -21,6 +24,8 @@ const DEFAULT_HITSLOP = { vertical: 0, horizontal: 0 };
 
 const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
   children,
+  minScale = 0,
+  maxScale,
   hitSlop = DEFAULT_HITSLOP,
   resizeConfig,
   timingConfig,
@@ -111,7 +116,7 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     })
     .onStart((e) => {
       measureContainer();
-      onPinchStart && runOnJS(onPinchStart)(e);
+      onPinchStart && scheduleOnRN(onPinchStart, e);
 
       initialFocal.x.value = currentFocal.x.value;
       initialFocal.y.value = currentFocal.y.value;
@@ -122,6 +127,24 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
     .onUpdate((e) => {
       measureContainer();
 
+      let toScale = Math.max(minScale, e.scale);
+
+      if (typeof maxScale === 'object') {
+        const actualMaxScale = getMaxScale(
+          {
+            width: containerSize.width.value,
+            height: containerSize.height.value,
+          },
+          maxScale
+        );
+
+        toScale = clamp(e.scale, minScale, actualMaxScale);
+      }
+
+      if (typeof maxScale === 'number') {
+        toScale = clamp(e.scale, minScale, maxScale);
+      }
+
       const deltaX = currentFocal.x.value - initialFocal.x.value;
       const deltaY = currentFocal.y.value - initialFocal.y.value;
 
@@ -130,15 +153,17 @@ const SnapbackZoom: React.FC<SnapBackZoomProps> = ({
 
       translate.x.value = toX;
       translate.y.value = toY;
-      scale.value = e.scale;
+      scale.value = toScale;
     })
     .onEnd((e) => {
-      onPinchEnd && runOnJS(onPinchEnd)(e);
+      onPinchEnd && scheduleOnRN(onPinchEnd, e);
 
       translate.x.value = withTiming(0, timingConfig);
       translate.y.value = withTiming(0, timingConfig);
       scale.value = withTiming(1, timingConfig, (_) => {
-        onGestureEnd && runOnJS(onGestureEnd)();
+        if (onGestureEnd !== undefined) {
+          scheduleOnRN(onGestureEnd);
+        }
       });
     });
 

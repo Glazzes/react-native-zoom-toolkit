@@ -19,6 +19,7 @@ export const getSwipeDirection = (
 
   const { time, boundaries, position, translate } = options;
 
+  // @ts-ignore
   const deltaTime = performance.now() - time;
   const { x: boundX, y: boundY } = boundaries;
 
