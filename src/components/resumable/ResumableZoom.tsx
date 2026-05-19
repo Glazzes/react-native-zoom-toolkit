@@ -58,6 +58,8 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
     onPinchEnd: onUserPinchEnd,
     onPanStart: onUserPanStart,
     onPanEnd: onUserPanEnd,
+    onDoubleTapStart: onUserDoubleTapStart,
+    onDoubleTapEnd: onUserDoubleTapEnd,
     onOverPanning,
   } = props;
 
@@ -177,8 +179,10 @@ const ResumableZoom: React.FC<ResumableZoomPropsWithRef> = (props) => {
       scale,
       minScale,
       maxScale,
-      boundsFn: boundsFn,
       onGestureEnd,
+      boundsFn: boundsFn,
+      onTapStart: onUserDoubleTapStart,
+      onTapEnd: onUserDoubleTapEnd,
     });
 
   const pinch = Gesture.Pinch()

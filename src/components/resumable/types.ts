@@ -11,9 +11,9 @@ import type {
   PinchGestureCallbacks,
   Rect,
   Size,
-  SwipeDirection,
   TapGestureCallbacks,
   Vector,
+  SwipeCallbacks,
 } from '../../commons/types';
 
 export type ResumableZoomProps = Partial<{
@@ -26,12 +26,12 @@ export type ResumableZoomProps = Partial<{
   maxScale: Size<number> | number;
   pinchMode: PinchMode;
   longPressDuration: number;
-  onSwipe: (direction: SwipeDirection) => void;
   onUpdate: (e: CommonZoomState<number>) => void;
   onOverPanning: (x: number, y: number) => void;
 }> & { children: React.ReactNode } & PanGestureCallbacks &
   PinchGestureCallbacks &
   LongPressCallbacks &
+  SwipeCallbacks &
   Omit<TapGestureCallbacks, 'onDoubleTap'> &
   Omit<CommonResumableProps, 'maxScale'>;
 
