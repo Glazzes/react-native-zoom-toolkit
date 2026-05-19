@@ -45,6 +45,9 @@ export default function GalleryExample() {
 
   const renderItem = useCallback(
     (item: Asset, index: number): React.ReactElement => {
+      /*
+      Removed temporarly as I switch to expo-video
+
       if (item.mediaType === MediaType.video) {
         return (
           <GalleryVideo
@@ -56,12 +59,13 @@ export default function GalleryExample() {
           />
         );
       }
+      */
 
       return (
         <GalleryImage asset={item} index={index} activeIndex={activeIndex} />
       );
     },
-    [activeIndex, progress, isSeeking]
+    [activeIndex]
   );
 
   // Toogle video controls opacity if the current item is a video
