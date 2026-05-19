@@ -1,22 +1,25 @@
 const path = require('path');
-const pak = require('../package.json');
+const { getDefaultConfig } = require('@expo/metro-config');
+const { withMetroConfig } = require('react-native-monorepo-config');
+
+const root = path.resolve(__dirname, '..');
+
+/**
+ * Metro configuration
+ * https://facebook.github.io/metro/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = withMetroConfig(getDefaultConfig(__dirname), {
+  root,
+  dirname: __dirname,
+});
+
+module.exports = config;
 
 module.exports = function (api) {
   api.cache(true);
-
   return {
     presets: ['babel-preset-expo'],
-    plugins: [
-      [
-        'module-resolver',
-        {
-          extensions: ['.tsx', '.ts', '.js', '.json'],
-          alias: {
-            // For development, we want to alias the library to the source
-            [pak.name]: path.join(__dirname, '..', pak.source),
-          },
-        },
-      ],
-    ],
   };
 };
