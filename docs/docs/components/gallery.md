@@ -183,7 +183,7 @@ Set the initial position of the list.
 | --------- | ------- |
 | `boolean` | `false` |
 
-Invert the gallery's orientation in horizontal mode, [more info](https://github.com/Glazzes/react-native-zoom-toolkit/issues/99#issuecomment-3029442065).
+Enable support for right to left layouts on horizontal mode, [more info](https://github.com/Glazzes/react-native-zoom-toolkit/issues/99#issuecomment-3029442065).
 
 ### vertical
 
