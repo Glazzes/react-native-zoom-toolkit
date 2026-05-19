@@ -46,8 +46,13 @@ export default function (source: Source | number): FetchImageResolutionResult {
     setIsFetching(true);
 
     if (typeof source === 'number') {
-      const { width, height } = Image.resolveAssetSource(source);
-      onSuccess(width, height);
+      const asset = Image.resolveAssetSource(source);
+      if (asset === undefined) {
+        onFailure(new Error("Asset was resolved but its dimensions couldn't be retrieved"))
+        return;
+      }
+
+      onSuccess(asset.width, asset.height);
       return;
     }
 
