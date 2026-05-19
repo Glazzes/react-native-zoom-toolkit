@@ -24,7 +24,7 @@ import type {
   Size,
   PanGestureEventCallback,
   PanGestureEvent,
-  SwipeDirection,
+  SwipeGestureCallback,
 } from '../types';
 
 type PanCommmonOptions = {
@@ -38,7 +38,7 @@ type PanCommmonOptions = {
     onGestureEnd: () => void;
     onPanStart: PanGestureEventCallback;
     onPanEnd: PanGestureEventCallback;
-    onSwipe: (direction: SwipeDirection) => void;
+    onSwipe: SwipeGestureCallback;
     onOverPanning: (x: number, y: number) => void;
   }>;
 };
@@ -144,7 +144,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
       });
 
       if (direction !== undefined) {
-        scheduleOnRN(onSwipe, direction);
+        onSwipe(direction, e);
         return;
       }
     }

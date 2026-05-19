@@ -70,6 +70,10 @@ export type PanGestureEventCallback = (e: PanGestureEvent) => void;
 export type TapGestureEventCallback = (e: TapGestureEvent) => void;
 export type PinchGestureEventCallback = (e: PinchGestureEvent) => void;
 export type LongPressGestreEventCallback = (e: LongPressEvent) => void;
+export type SwipeGestureCallback = (
+  directon: SwipeDirection,
+  e: PanGestureEvent
+) => void;
 
 export type PanGestureCallbacks = Partial<{
   onPanStart: PanGestureEventCallback;
@@ -83,7 +87,8 @@ export type PinchGestureCallbacks = Partial<{
 
 export type TapGestureCallbacks = Partial<{
   onTap: TapGestureEventCallback;
-  onDoubleTap: TapGestureEventCallback;
+  onDoubleTapStart: TapGestureEventCallback;
+  onDoubleTapEnd: TapGestureEventCallback;
 }>;
 
 export type LongPressCallbacks = Partial<{
@@ -93,6 +98,10 @@ export type LongPressCallbacks = Partial<{
 export type ZoomEventCallbacks = Partial<{
   onZoomBegin: (index: number) => void;
   onZoomEnd: (index: number) => void;
+}>;
+
+export type SwipeCallbacks = Partial<{
+  onSwipe: SwipeGestureCallback;
 }>;
 
 export type TimingConfig = Partial<{

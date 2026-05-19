@@ -1,10 +1,16 @@
-import type { BoundsFuction, Size, TapGestureEvent, Vector } from '../types';
 import { useState } from 'react';
 
 import { clamp, withTiming, type SharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { pinchTransform } from '../utils/pinchTransform';
+import type {
+  BoundsFuction,
+  Size,
+  TapGestureEvent,
+  TapGestureEventCallback,
+  Vector,
+} from '../types';
 
 type DoubleTapOptions = {
   container: Size<SharedValue<number>>;
@@ -14,6 +20,8 @@ type DoubleTapOptions = {
   maxScale: SharedValue<number>;
   boundsFn: BoundsFuction;
   onGestureEnd?: () => void;
+  onTapStart?: TapGestureEventCallback;
+  onTapEnd?: TapGestureEventCallback;
 };
 
 export const useDoubleTapCommons = ({
@@ -23,13 +31,18 @@ export const useDoubleTapCommons = ({
   minScale,
   maxScale,
   boundsFn,
+  onTapStart,
+  onTapEnd,
   onGestureEnd,
 }: DoubleTapOptions) => {
   const [isPanGestureEnabled, setIsPanGestureEnabled] = useState<boolean>(true);
 
-  const onDoubleTapStart = () => {
+  const onDoubleTapStart = (event: TapGestureEvent) => {
     'worklet';
     scheduleOnRN(setIsPanGestureEnabled, false);
+    if (onTapStart !== undefined) {
+      scheduleOnRN(onTapStart, event);
+    }
   };
 
   const onDoubleTapEnd = (event: TapGestureEvent) => {
@@ -58,6 +71,10 @@ export const useDoubleTapCommons = ({
       scheduleOnRN(setIsPanGestureEnabled, true);
       if (finished && onGestureEnd !== undefined) {
         scheduleOnRN(onGestureEnd);
+      }
+
+      if (finished && onTapEnd !== undefined) {
+        scheduleOnRN(onTapEnd, event);
       }
     });
   };
