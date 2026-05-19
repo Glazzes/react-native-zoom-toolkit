@@ -11,6 +11,7 @@ import type {
   TapGestureEvent,
   ZoomEventCallbacks,
   TimingConfig,
+  TapGestureCallbacks,
 } from '../../commons/types';
 
 export type VerticalPullOptions = {
@@ -64,7 +65,8 @@ export type GalleryProps<T = unknown> = {
 }> &
   PinchGestureCallbacks &
   PanGestureCallbacks &
-  ZoomEventCallbacks;
+  ZoomEventCallbacks &
+  Omit<TapGestureCallbacks, 'onTap'>;
 
 export interface GalleryRefType {
   setIndex: (index: number) => void;

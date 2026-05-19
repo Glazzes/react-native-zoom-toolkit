@@ -23,7 +23,6 @@ import { getSwipeDirection } from '../../commons/utils/getSwipeDirection';
 import type {
   SwipeDirection,
   BoundsFuction,
-  PanGestureEvent,
   ScaleMode,
   PinchMode,
   TimingConfig,
@@ -58,6 +57,8 @@ type GalleryGestureHandlerProps = {
   onLongPress?: GalleryProps['onLongPress'];
   onVerticalPull?: GalleryProps['onVerticalPull'];
   onGestureEnd?: GalleryProps['onGestureEnd'];
+  onDoubleTapStart?: GalleryProps['onDoubleTapStart'];
+  onDoubleTapEnd?: GalleryProps['onDoubleTapEnd'];
 };
 
 /*
@@ -86,6 +87,8 @@ const GalleryGestureHandler = ({
   onPinchStart: onUserPinchStart,
   onPinchEnd: onUserPinchEnd,
   onSwipe: onUserSwipe,
+  onDoubleTapStart: onUserTapStart,
+  onDoubleTapEnd: onUserTapEnd,
   onLongPress,
   onVerticalPull,
   onGestureEnd,
@@ -144,7 +147,9 @@ const GalleryGestureHandler = ({
     scaleOffset.value = toScale;
   };
 
-  const snapToScrollPosition = (e: PanGestureEvent) => {
+  // This funcions controls the snapping of the gallery's items when panning
+  // For instance if you slowly pan and let go the item
+  const snapToScrollPosition = () => {
     'worklet';
 
     cancelAnimation(scroll);
@@ -165,8 +170,8 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    const velocity = vertical ? e.velocityY : e.velocityX;
-    const toScroll = snapPoint(scroll.value, velocity, [prev, current, next]);
+    // Gesture velocity can be used as a second parameter but 0 is fine
+    const toScroll = snapPoint(scroll.value, 0, [prev, current, next]);
 
     scroll.value = withTiming(toScroll, snapTimingConfig, (finished) => {
       if (!finished) return;
@@ -290,6 +295,8 @@ const GalleryGestureHandler = ({
       maxScale,
       boundsFn,
       onGestureEnd,
+      onTapStart: onUserTapStart,
+      onTapEnd: onUserTapEnd,
     });
 
   const pinch = Gesture.Pinch()
@@ -313,7 +320,6 @@ const GalleryGestureHandler = ({
   const pan = Gesture.Pan()
     .withTestId('pan')
     .maxPointers(1)
-    .minVelocity(100)
     .enabled(gesturesEnabled && enablePanGestureByDoubleTap)
     .onStart((e) => {
       cancelAnimation(translate.x);
@@ -407,7 +413,7 @@ const GalleryGestureHandler = ({
       }
 
       if (snapV || snapH) {
-        snapToScrollPosition(e);
+        snapToScrollPosition();
       }
 
       const configX = { velocity: e.velocityX, clamp: [-bounds.x, bounds.x] };
@@ -528,6 +534,8 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.onSwipe === next.onSwipe &&
     prev.onLongPress === next.onLongPress &&
     prev.onVerticalPull === next.onVerticalPull &&
+    prev.onDoubleTapStart === next.onDoubleTapStart &&
+    prev.onDoubleTapEnd === next.onDoubleTapEnd &&
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&
