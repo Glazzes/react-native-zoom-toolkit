@@ -9,6 +9,7 @@ import type {
   PinchGestureCallbacks,
   Size,
   TapGestureCallbacks,
+  TapGestureEventCallback,
   TimingConfig,
   Vector,
 } from '../../commons/types';
@@ -40,10 +41,11 @@ export type SnapBackZoomProps = React.PropsWithChildren<
     hitSlop: HitSlop;
     timingConfig: TimingConfig;
     scrollRef: BlocksGesture;
+    onDoubleTap: TapGestureEventCallback;
     onGestureEnd: () => void;
     onUpdate: (e: SnapbackZoomState<number>) => void;
   }>
 > &
   PinchGestureCallbacks &
-  TapGestureCallbacks &
-  LongPressCallbacks;
+  LongPressCallbacks &
+  Omit<TapGestureCallbacks, 'onDoubleTapStart' | 'onDoubleTapEnd'>;
