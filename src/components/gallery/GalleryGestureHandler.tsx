@@ -334,6 +334,7 @@ const GalleryGestureHandler = ({
       isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
       isScrolling.value = true;
 
+      // @ts-ignore
       time.value = performance.now();
       position.x.value = e.absoluteX;
       position.y.value = e.absoluteY;

@@ -79,6 +79,7 @@ export const usePanCommons = (options: PanCommmonOptions) => {
     offset.x.value = translate.x.value;
     offset.y.value = translate.y.value;
 
+    // @ts-ignore
     time.value = performance.now();
     position.x.value = e.absoluteX;
     position.y.value = e.absoluteY;
