@@ -197,7 +197,7 @@ Modify the orientation of the component to vertical mode.
 
 | Type     | Default     | Adittional Info |
 | -------- | ------------| --------------- |
-| `object` | `undefined` | see [timingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
+| `object` | `{duration: 300, easing: Easing.out(Easing.cubic)}` | see [timingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
 
 Set the timing config used to snap between gallery's elements.
 
