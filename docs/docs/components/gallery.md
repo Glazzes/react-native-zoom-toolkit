@@ -303,6 +303,22 @@ Callback triggered when the list scrolls to the next or previous item.
 
 Callback triggered when the user taps the current item once, provides additional metadata like index if you need it.
 
+### onDoubleTapStart
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the user double taps.
+
+### onDoubleTapEnd
+
+| Type                           | Default     | Additional Info                                                                                                            |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `(e: TapGestureEvent) => void` | `undefined` | see [tap gesture event data](https://docs.swmansion.com/react-native-gesture-handler/docs/gestures/tap-gesture#event-data) |
+
+Callback triggered when the scale animation ends after a double tap.
+
 ### onVerticalPull
 
 | Type                                              | Default     | Additional Info                                                                                    |
