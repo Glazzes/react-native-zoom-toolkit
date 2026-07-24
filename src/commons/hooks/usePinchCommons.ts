@@ -179,9 +179,18 @@ export const usePinchCommons = (options: PinchOptions) => {
     });
 
     gestureEnd.value = withTiming(toValue, undefined, (finished) => {
-      gestureEnd.value = 0;
-      if (finished && userCallbacks.onGestureEnd !== undefined) {
-        scheduleOnRN(userCallbacks.onGestureEnd);
+      // Only re-arm the gimmick on a genuine finish. Writing gestureEnd.value
+      // unconditionally here re-enters this callback via Reanimated 4.x's
+      // valueSetter (it fires a still-live animation's callback(false) before
+      // clearing _animation when the value is overwritten), recursing to a
+      // native-stack overflow on rapid pinch in/out. Gating on `finished`
+      // mirrors usePanCommons (which never self-writes) and keeps the callback
+      // re-entry a single no-op level deep. See issue #126.
+      if (finished) {
+        gestureEnd.value = 0;
+        if (userCallbacks.onGestureEnd !== undefined) {
+          scheduleOnRN(userCallbacks.onGestureEnd);
+        }
       }
     });
   };
