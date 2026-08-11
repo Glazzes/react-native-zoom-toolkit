@@ -14,7 +14,6 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useVector } from '../../commons/hooks/useVector';
-import { snapPoint } from '../../commons/utils/snapPoint';
 import { getVisibleRect } from '../../commons/utils/getVisibleRect';
 import { usePinchCommons } from '../../commons/hooks/usePinchCommons';
 import { useDoubleTapCommons } from '../../commons/hooks/useDoubleTapCommons';
@@ -48,6 +47,10 @@ type GalleryGestureHandlerProps = {
   pinchMode: PinchMode;
   longPressDuration: number;
   snapTimingConfig: TimingConfig;
+  snapThreshold: number;
+  swipeTimeThreshold: number;
+  swipeVelocityThreshold: number;
+  swipeDistanceThreshold: number;
   onTap?: GalleryProps['onTap'];
   onPanStart?: GalleryProps['onPanStart'];
   onPanEnd?: GalleryProps['onPanEnd'];
@@ -81,6 +84,10 @@ const GalleryGestureHandler = ({
   pinchMode,
   longPressDuration,
   snapTimingConfig,
+  snapThreshold,
+  swipeTimeThreshold,
+  swipeVelocityThreshold,
+  swipeDistanceThreshold,
   onTap,
   onPanStart,
   onPanEnd,
@@ -170,8 +177,15 @@ const GalleryGestureHandler = ({
       gap,
     });
 
-    // Gesture velocity can be used as a second parameter but 0 is fine
-    const toScroll = snapPoint(scroll.value, 0, [prev, current, next]);
+    const distance = scroll.value - current;
+    const threshold = (itemSize.value + gap) * clamp(snapThreshold, 0, 1);
+
+    let toScroll = current;
+    if (distance < 0 && Math.abs(distance) >= threshold) {
+      toScroll = prev;
+    } else if (distance > 0 && distance >= threshold) {
+      toScroll = next;
+    }
 
     scroll.value = withTiming(toScroll, snapTimingConfig, (finished) => {
       if (!finished) return;
@@ -373,6 +387,9 @@ const GalleryGestureHandler = ({
       const direction = getSwipeDirection(e, {
         boundaries: bounds,
         time: time.value,
+        timeThreshold: swipeTimeThreshold,
+        velocityThreshold: swipeVelocityThreshold,
+        distanceThreshold: swipeDistanceThreshold,
         position: { x: position.x.value, y: position.y.value },
         translate: {
           x: isPullingVertical.value ? 100 : translate.x.value,
@@ -537,6 +554,10 @@ export default React.memo(GalleryGestureHandler, (prev, next) => {
     prev.onVerticalPull === next.onVerticalPull &&
     prev.onDoubleTapStart === next.onDoubleTapStart &&
     prev.onDoubleTapEnd === next.onDoubleTapEnd &&
+    prev.snapThreshold === next.snapThreshold &&
+    prev.swipeTimeThreshold === next.swipeTimeThreshold &&
+    prev.swipeVelocityThreshold === next.swipeVelocityThreshold &&
+    prev.swipeDistanceThreshold === next.swipeDistanceThreshold &&
     prev.length === next.length &&
     prev.vertical === next.vertical &&
     prev.tapOnEdgeToItem === next.tapOnEdgeToItem &&

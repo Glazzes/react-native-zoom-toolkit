@@ -76,6 +76,7 @@ const GalleryExample = () => {
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       onTap={onTap}
+      snapThreshold={0.25}
       customTransition={transition}
     />
   );
@@ -200,6 +201,52 @@ Modify the orientation of the component to vertical mode.
 | `object` | `{duration: 300, easing: Easing.out(Easing.cubic)}` | see [timingConfig](https://docs.swmansion.com/react-native-reanimated/docs/animations/withTiming/#config-) |
 
 Set the timing config used to snap between gallery's elements.
+
+### snapThreshold
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `0.5`   |
+
+Fraction of the distance between pages that must be dragged before changing to the previous or next item.
+Values are clamped between `0` and `1`. Lower values make page changes require a shorter drag in both
+horizontal and vertical galleries.
+
+For TikTok-style vertical paging, for example:
+
+```tsx
+<Gallery
+  data={items}
+  renderItem={renderItem}
+  vertical={true}
+  snapThreshold={0.2}
+/>
+```
+
+### swipeVelocityThreshold
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `500`   |
+
+Minimum pan velocity in points per second that triggers a page swipe. This is independent of
+`snapThreshold`: quick flings can change pages without crossing the configured distance threshold.
+
+### swipeTimeThreshold
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `175`   |
+
+Maximum pan duration in milliseconds that can be recognized as a swipe.
+
+### swipeDistanceThreshold
+
+| Type     | Default |
+| -------- | ------- |
+| `number` | `20`    |
+
+Minimum pan distance in points required before a swipe can change pages.
 
 ### maxScale
 
