@@ -198,7 +198,7 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
       gap,
     });
 
-    scale.value = 0;
+    scale.value = 1;
     translate.x.value = 0;
     translate.y.value = 0;
   }
