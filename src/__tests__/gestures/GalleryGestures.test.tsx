@@ -56,6 +56,24 @@ describe('Gallery Gesture Tests', () => {
     jest.runAllTimers();
   };
 
+  const panToNextItem = (vertical: boolean, distance: number, velocity = 0) => {
+    const start = { absoluteX: 50, absoluteY: 300 };
+    const translation = vertical
+      ? { translationY: -distance, velocityY: -velocity }
+      : { translationX: -distance, velocityX: -velocity };
+    const end = vertical
+      ? { absoluteX: 50, absoluteY: start.absoluteY - distance }
+      : { absoluteX: start.absoluteX - distance, absoluteY: 300 };
+
+    fireGestureHandler<PanGesture>(getByGestureTestId('pan'), [
+      { state: State.BEGAN, ...start },
+      { state: State.ACTIVE, ...start },
+      { state: State.ACTIVE, ...end, ...translation },
+      { state: State.END, ...end, ...translation },
+    ]);
+    jest.runAllTimers();
+  };
+
   it('should trigger gesture callbacks', () => {
     const onPanStart = jest.fn();
     const onPanEnd = jest.fn();
@@ -151,5 +169,66 @@ describe('Gallery Gesture Tests', () => {
     expect(onPinchEnd).toHaveBeenCalledTimes(timesCalled);
     expect(onGestureEnd).toHaveBeenCalledTimes(timesCalled * 2);
     expect(ref.current?.getState().scale).toBe(expectedScale);
+  });
+
+  it.each([
+    {
+      title: 'changes horizontal pages at a custom snap threshold',
+      vertical: false,
+      distance: 20,
+    },
+    {
+      title: 'changes vertical pages at a custom snap threshold',
+      vertical: true,
+      distance: 120,
+    },
+  ])('$title', ({ vertical, distance }) => {
+    const onIndexChange = jest.fn();
+    renderGallery({ vertical, snapThreshold: 0.2, onIndexChange });
+
+    panToNextItem(vertical, distance);
+
+    expect(onIndexChange).toHaveBeenLastCalledWith(1);
+  });
+
+  it('keeps the default halfway snap threshold', () => {
+    const onIndexChange = jest.fn();
+    renderGallery({ onIndexChange });
+
+    panToNextItem(false, 49);
+
+    expect(onIndexChange).not.toHaveBeenCalledWith(1);
+
+    panToNextItem(false, 51);
+
+    expect(onIndexChange).toHaveBeenLastCalledWith(1);
+  });
+
+  it('changes pages at a custom swipe velocity threshold', () => {
+    const onIndexChange = jest.fn();
+    renderGallery({
+      vertical: true,
+      snapThreshold: 0.9,
+      swipeVelocityThreshold: 200,
+      onIndexChange,
+    });
+
+    panToNextItem(true, 30, 250);
+
+    expect(onIndexChange).toHaveBeenLastCalledWith(1);
+  });
+
+  it('changes pages at a custom swipe distance threshold', () => {
+    const onIndexChange = jest.fn();
+    renderGallery({
+      vertical: true,
+      snapThreshold: 0.9,
+      swipeDistanceThreshold: 10,
+      onIndexChange,
+    });
+
+    panToNextItem(true, 10, 500);
+
+    expect(onIndexChange).toHaveBeenLastCalledWith(1);
   });
 });

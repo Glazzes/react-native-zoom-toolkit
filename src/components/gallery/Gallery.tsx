@@ -46,6 +46,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
     allowPinchPanning = true,
     longPressDuration = 500,
     snapTimingConfig = defaultTimingConfig,
+    snapThreshold = 0.5,
+    swipeTimeThreshold = 175,
+    swipeVelocityThreshold = 500,
+    swipeDistanceThreshold = 20,
     customTransition,
     onIndexChange,
     onScroll,
@@ -278,6 +282,10 @@ const Gallery = <T,>(props: GalleryPropsWithRef<T>) => {
         pinchMode={pinchMode}
         longPressDuration={longPressDuration}
         snapTimingConfig={snapTimingConfig}
+        snapThreshold={snapThreshold}
+        swipeTimeThreshold={swipeTimeThreshold}
+        swipeVelocityThreshold={swipeVelocityThreshold}
+        swipeDistanceThreshold={swipeDistanceThreshold}
         onTap={onTap}
         onPanStart={onPanStart}
         onPanEnd={onPanEnd}

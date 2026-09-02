@@ -53,6 +53,27 @@ export type GalleryProps<T = unknown> = {
   pinchMode: PinchMode;
   longPressDuration: number;
   snapTimingConfig: TimingConfig;
+  /**
+   * Fraction of an item that must be dragged before changing pages.
+   * Values are clamped between 0 and 1.
+   * @default 0.5
+   */
+  snapThreshold: number;
+  /**
+   * Maximum pan duration in milliseconds that can be recognized as a swipe.
+   * @default 175
+   */
+  swipeTimeThreshold: number;
+  /**
+   * Minimum pan velocity in points per second that triggers a page swipe.
+   * @default 500
+   */
+  swipeVelocityThreshold: number;
+  /**
+   * Minimum pan distance in points required before a swipe can change pages.
+   * @default 20
+   */
+  swipeDistanceThreshold: number;
   customTransition: GalleryTransitionCallback;
   onTap: (e: TapGestureEvent, index: number) => void;
   onLongPress: (e: LongPressEvent, index: number) => void;

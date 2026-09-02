@@ -135,6 +135,7 @@ export default function GalleryExample() {
         renderItem={renderItem}
         gap={24}
         maxScale={scales}
+        snapThreshold={0.25}
         onIndexChange={(idx) => {
           activeIndex.value = idx;
         }}
