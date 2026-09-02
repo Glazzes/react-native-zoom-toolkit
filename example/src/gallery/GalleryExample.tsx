@@ -23,7 +23,7 @@ import {
 
 import GalleryImage from './GalleryImage';
 import VideoControls from './controls/VideoControls';
-import GalleryVideo from './GalleryVideo';
+// import GalleryVideo from './GalleryVideo';
 
 function keyExtractor(item: Asset, index: number): string {
   return `${item.uri}-${index}`;
