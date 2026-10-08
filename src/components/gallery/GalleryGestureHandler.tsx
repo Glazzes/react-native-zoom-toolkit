@@ -249,7 +249,19 @@ const GalleryGestureHandler = ({
       width: rootSize.width.value,
       height: rootSize.height.value,
     }),
-    () => reset(0, 0, minScale, false),
+    (current, previous) => {
+      // Only reset on a real size change, the reaction can run again with the
+      // same size (e.g. after a re-render) and that would cancel an ongoing zoom.
+      if (
+        previous !== null &&
+        current.width === previous.width &&
+        current.height === previous.height
+      ) {
+        return;
+      }
+
+      reset(0, 0, minScale, false);
+    },
     [rootSize]
   );
 
