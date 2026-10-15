@@ -438,7 +438,7 @@ const GalleryGestureHandler = ({
     .withTestId('tap')
     .enabled(gesturesEnabled)
     .numberOfTaps(1)
-    .maxDuration(250)
+    .maxDuration(longPressDuration)
     .onEnd((event) => {
       const gallerySize = {
         width: rootSize.width.value,
