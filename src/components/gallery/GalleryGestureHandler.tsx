@@ -317,6 +317,7 @@ const GalleryGestureHandler = ({
     .onUpdate(onPinchUpdate)
     .onEnd(onPinchEnd);
 
+  const verticalPullEnabled = onVerticalPull !== undefined;
   const pan = Gesture.Pan()
     .withTestId('pan')
     .maxPointers(1)
@@ -331,7 +332,8 @@ const GalleryGestureHandler = ({
       }
 
       const isVerticalPan = Math.abs(e.velocityY) > Math.abs(e.velocityX);
-      isPullingVertical.value = isVerticalPan && scale.value === 1 && !vertical;
+      isPullingVertical.value =
+        verticalPullEnabled && isVerticalPan && scale.value === 1 && !vertical;
       isScrolling.value = true;
 
       // @ts-ignore

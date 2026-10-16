@@ -333,7 +333,7 @@ Callback triggered when the scale animation ends after a double tap.
 
 Worklet callback triggered as the user drags the component vertically when this one is at a scale of one, it includes metadata like `released` parameter which indicates whether the user stopped pulling.
 
-This property is useful for instance to animate the background color based on the translateY parameter.
+This property is useful for instance to animate the background color based on the translateY parameter. When it isn't set, the item doesn't follow vertical drags.
 
 ### onSwipe
 
