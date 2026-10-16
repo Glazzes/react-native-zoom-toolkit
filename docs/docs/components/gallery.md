@@ -389,7 +389,7 @@ Callback triggered as soon as the user lifts their fingers off the screen after 
 | --------- | ------- |
 | `number`  | `500`   |
 
-Minimum time expressed in milliseconds required to trigger the long press gesture event, expect values greater than 250 to avoid collisions with tap and double tap gestures.
+Minimum time expressed in milliseconds required to trigger the long press gesture event, any shorter press is a tap. Expect values greater than 250 to avoid collisions with the double tap gesture.
 
 ### onLongPress
 
